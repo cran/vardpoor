@@ -1,187 +1,109 @@
 \name{vardom_othstr}
 \alias{vardom_othstr}
+
 \title{Variance estimation for sample surveys in domain by the two stratification}
-\description{Computes the variance estimation in domain.}
+
+\description{Computes the variance estimation for sample surveys in domain by the two stratification.}
+
 \usage{vardom_othstr(Y, H, H2, PSU, w_final, id=NULL,
-       Dom = NULL, N_h = NULL, N_h2, s2g=FALSE,  Z = NULL,
+       Dom = NULL, period=NULL, N_h = NULL,
+       N_h2, s2g=FALSE, Z = NULL,
        X = NULL, g = NULL, dataset = NULL, 
        q = rep(1, if (is.null(dataset)) nrow(data.frame(X)) else nrow(dataset)),
        confidence = .95, outp_lin=FALSE, outp_res=FALSE)}
+
 \arguments{
-  \item{Y}{either a numeric data.frame, matrix, data.table with
-  column names giving the variables of interest, or (if \code{dataset} 
-  is not \code{NULL}) a character string, an integer or a
-  logical vector (length is the same as 'dataset' column count)
-  specifying the corresponding column of \code{dataset}.}
 
-  \item{H}{either 1 column data.frame, matrix, data.table with
-  column name giving elements  indicating the unit stratum,
-  or (if \code{dataset} is not \code{NULL}) a character string,
-  an integer or a logical vector (length is the same as 'dataset'
-  column count) specifying the corresponding column of \code{dataset}.}
+\item{Y}{Variables of interest. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{H2}{either 1 column data.frame, matrix, data.table with
-  column name giving elements  indicating the unit new stratum,
-  or (if \code{dataset} is not \code{NULL}) a character string,
-  an integer or a logical vector (length is the same as 'dataset'
-  column count) specifying the corresponding column of \code{dataset}.}
+\item{H}{The unit stratum variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{PSU}{either 1 column data.frame, matrix, data.table giving
-  primary sampling unit, or (if \code{dataset} is not \code{NULL})
-  a character string, an integer or a logical vector (length is the
-  same as 'dataset' column count) specifying the corresponding
-  column of \code{dataset}.}
+\item{H2}{The unit new stratum variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{w_final}{either a numeric vector, 1 column data.frame, matrix,
-  data.table giving the final weights, or (if \code{dataset} is not
-  \code{NULL}) a character string,  an integer or a logical vector
-  (length is the same as 'dataset' column count) specifying the
-  corresponding column of \code{dataset}.}
+\item{PSU}{Primary sampling unit variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{id}{optional; either 1 column data.frame, matrix,
-  data.table with column names giving the IDs, or
-  (if \code{dataset} is not \code{NULL}) a character string,
-  an integer or a logical vector (length is the same as
-  'dataset' column count) specifying the corresponding
-  column of \code{dataset}. if \code{id} is \code{NULL},
-  then it will be \code{PSU}.}
+\item{w_final}{Weight variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{Dom}{optional; either a data.frame, matrix, data.table with
-  column names giving different domains, or (if \code{dataset} is
-  not \code{NULL}) character strings, integers or a logical vectors
-  (length is the same as 'dataset' column count) specifying the
-  corresponding columns of \code{dataset}. This variable is \code{NULL}
-  by default. If supplied, the values for each domain are computed.}
+\item{id}{Optional variable for unit ID codes. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}). If \code{id} is \code{NULL}, then it will be \code{PSU}.}
 
-  \item{N_h}{optional; either a matrix giving the first column - stratum, but
-  the second column - the total of the population in each stratum.}
+\item{Dom}{Optional variables used to define population domains. If supplied, linearization of the at-risk-of-poverty rate is done for each domain. An object convertable to \code{data.frame} or variable names as character vector, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{N_h2}{optional; either a matrix giving the first column - new stratum,
-  but the second column - the total of the population in each new stratum.}
+\item{period}{Optional variable for survey period. If supplied, residual estimation of calibration is done independently for each time period. One dimentional object convertable to one-column \code{data.frame}.}
 
-  \item{s2g}{by default is FALSE; calculate variance, but if s2g is TRUE, 
-  then variance estimation is taken as S^2g value.}
+\item{N_h}{optional; either a \code{data.frame} giving the first column - stratum, but the second column - the total of the population in each stratum.}
 
-  \item{Z}{optional; either a data.frame, matrix, data.table with
-  column names giving variables of denominator, or (if \code{dataset}
-  is not \code{NULL}) character strings, integers or a logical vectors
-  (length is the same as 'dataset' column count) specifying the
-  corresponding columns of \code{dataset}. This variable is \code{NULL}
-  by default. If supplied, the ratio estimation is computed.}
+\item{N_h2}{optional; either a \code{data.frame} giving the first column - new stratum, but the second column - the total of the population in each new stratum.}
 
-  \item{X}{optional; either a data.frame, matrix, data.table giving
-  auxiliary variables, or (if \code{dataset} is not \code{NULL})
-  character strings, integers or a logical vectors (length is the
-  same as 'dataset' column count) specifying the corresponding
-  columns of \code{dataset}. This variable is \code{NULL} by default.}
+\item{s2g}{by default is FALSE; calculate variance, but if s2g is TRUE, then variance estimation is taken as S^2g value.}
 
-  \item{g}{optional; either a numeric vector, 1 column data.frame,
-  matrix, data.table giving the g weights, or (if \code{dataset} is not
-  \code{NULL}) a character string,  an integer or a logical vector
-  (length is the same as 'dataset' column count) specifying the
-  corresponding column of \code{dataset}. This variable is \code{NULL}
-  by default.}
+\item{Z}{optional variables of denominator for ratio estimation. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{q}{optional; either a numeric vector, 1 column data.frame,
-  matrix, data.table giving the positive values accounting for
-  heteroscedasticity, or (if \code{dataset} is not \code{NULL}) a
-  character string,  an integer or a logical vector (length is the
-  same as 'dataset' column count) specifying the corresponding
-  column of \code{dataset}. This variable is \code{NULL} by default.}
+\item{X}{Optional matrix of the auxiliary variables for the calibration estimator. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{dataset}{an optional; name of the individual dataset 
-  \code{data.frame}.}
+\item{g}{Optional variable of the g weights. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{confidence}{optional; either a positive value for confidence
-  interval. This variable by default is 0.95 .}
+\item{q}{Variable of the positive values accounting for heteroscedasticity. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{outp_lin}{logical. if \code{TRUE} linearized values of 
-  the ratio estimator will be printed out}
+\item{dataset}{Optional survey data object convertable to \code{data.frame}.}
 
-  \item{outp_res}{logical. if \code{TRUE} estimated residuals
-  of calibration will be printed out}
+\item{confidence}{Optional positive value for confidence interval. This variable by default is 0.95.}
+
+\item{outp_lin}{Logical value. if \code{TRUE} linearized values of the ratio estimator will be printed out.}
+
+\item{outp_res}{Logical value. if \code{TRUE} estimated residuals of calibration will be printed out.}
+
 }
+
 \value{
-  The function returns values: 
-  \item{estim}{a \code{data.table} containing the estimation(s)
-  by domain, or (if \code{Dom} is \code{NULL}) totals.}
 
-  \item{var}{a \code{data.table} containing the values of the
-  variance estimation by domains or (if \code{Dom} is \code{NULL})
-  totals.}
+  A list with objects are returned by the function:
 
-  \item{se}{a \code{data.table} containing the values of the
-  standart error by domains or (if \code{Dom} is \code{NULL})
-  totals.}
+  \item{lin_out}{A \code{data.table} containing the linearized values of the ratio estimator with id and PSU.}
 
-  \item{rse}{a \code{data.table} containing the values of the
-  relative standart error (coefficient of variation) by domains
-  or (if \code{Dom} is \code{NULL}) totals in percentage.}
+  \item{res_out}{A \code{data.table} containing the estimated residuals of calibration with id and PSU.}
 
-  \item{cv}{a \code{data.table} containing the values of the
-  relative standart error (coefficient of variation) by domains
-  or (if \code{Dom} is \code{NULL}) totals.}
+  \item{all_result}{A \code{data.table}, which containing variables:
 
-  \item{absolute_margin_of_error}{a \code{data.table} containing
-  the values of the absolute margin of error by domains or
-  (if \code{Dom} is \code{NULL}) totals.}
+       \code{estim} - the estimated value,
 
-  \item{relative_margin_of_error}{a \code{data.table} containing
-  the values of the relative margin of error by domains or
-  (if \code{Dom} is \code{NULL}) totals.}
+       \code{var} - the estimated variance,
 
-  \item{CI_lower}{a \code{data.table} containing the values of
-  the confidence interval lower bound by domains or (if \code{Dom}
-  is \code{NULL}) totals.}
+       \code{se} - the estimated standart error,
 
-  \item{CI_upper}{a \code{data.table} containing the values of
-  the confidence interval upper bound by domains or (if \code{Dom}
-  is \code{NULL}) totals.}
+       \code{rse} - the estiamted relative standart error (coefficient of variation),
 
-  \item{var_srs_HT}{a \code{matrix} containing the values of
-  the variance estimation of HT estimator under SRS by domains
-  or (if \code{Dom} is \code{NULL}) totals.}
+       \code{cv} - the estimated relative standart error (coefficient of variation) in percentage,
 
-  \item{var_cur_HT}{a \code{matrix} containing the values of the
-  variance estimation of HT estimator under HT estimator under
-  current design by domains or (if \code{Dom} is \code{NULL}) totals.}
+       \code{absolute_margin_of_error} - the estimated absolute margin of error,
 
-  \item{var_srs_ca}{a \code{matrix} containing the values of
-  the variance estimation of calibrated estimator under SRS
-  by domains or (if \code{Dom} is \code{NULL}) totals.}
+       \code{relative_margin_of_error} - the estimated relative margin of error,
+
+       \code{CI_lower} - the estimated confidence interval lower bound,
+ 
+       \code{CI_upper} - the estimated confidence interval upper bound,
+
+       \code{var_srs_HT} - the estimated variance of the HT estimator under SRS,
+
+       \code{var_cur_HT} - the estimated variance of the HT estimator under current design,
+
+       \code{var_srs_ca} - the estimated variance of the calibrated estimator under SRS,
   
-  \item{deff_sam}{a \code{matrix} containing the values of
-  the estimation of the design effect of sample design by
-  domains or (if \code{Dom} is \code{NULL}) totals.}
+       \code{deff_sam} - the estimated design effect of sample design,
 
-  \item{deff_est}{a \code{matrix} containing the values of
-  the estimation of the design effect of estimator by domains
-  or (if \code{Dom} is \code{NULL}) totals.}
+       \code{deff_est} - the estimated design effect of estimator,
 
-  \item{deff}{a \code{matrix} containing the values of
-  the estimation of the overall design effect of sample
-  design and estimator by domains or (if \code{Dom} is
-  \code{NULL}) totals.}
-
-  \item{lin_out}{a \code{data.table} containing the linearized
-  values of the ratio estimator with id and PSU.}
-
-  \item{res_out}{a \code{data.table} containing the estimated
-  residuals of calibration with id and PSU.}
-
-  \item{all_result}{a \code{data.frame} containing all previosly definited
-  values together by domains or (if \code{Dom} is \code{NULL}) totals.}
+       \code{deff} - the overall estimated design effect of sample design and estimator.}
 }
-\details{
-Calculate variance estimation on domains based on G. Osier documents.
-}
+
 \references{
-
-  Deville, J. C. (1999). Variance estimation for complex statistics
+  Jean-Claude Deville (1999). Variance estimation for complex statistics
   and estimators: linearization and residual techniques. Survey
   Methodology, 25, 193-203,
   URL \url{http://www5.statcan.gc.ca/bsolc/olc-cel/olc-cel?lang=eng&catno=12-001-X19990024882}. \cr
+
+  M. Liberts. (2004) Non-response Analysis and Bias Estimation in a Survey on Transportation of Goods by Road.  \cr
 }
+
 \examples{
 
 data(eusilc)
@@ -191,16 +113,16 @@ Nh <- data.table(db040=eusilc$db040, rb050=eusilc$rb050)
 setkeyv(Nh, names(Nh)[1])
 N_h2 <- Nh[, sum(rb050, na.rm = FALSE), keyby="db040"]
 
-aa<-vardom_othstr("eqIncome", H="db040",H2="db040", PSU="db030", w_final="rb050",
-           id="db030", Dom = "db040", N_h=NULL, N_h2, Z = NULL,
+aa<-vardom_othstr(Y="eqIncome", H="db040",H2="db040", PSU="db030", w_final="rb050",
+           id="db030", Dom = "db040", period=NULL, N_h=NULL, N_h2=N_h2, Z = NULL,
            X = NULL, g = NULL, dataset = dataset,
            q = rep(1, if (is.null(dataset)) 
                        nrow(as.data.frame(H)) else nrow(dataset)),
            confidence = .95, outp_lin=TRUE, outp_res=TRUE)
 
-} \seealso{
-  \code{\link{domain}},   \code{\link{lin.ratio}},  \code{\link{residual_est}},
-  \code{\link{vardomh}},  \code{\link{var_srs}},    \code{\link{variance_est}},
-  \code{\link{variance_othstr}}
 }
+\seealso{
+\code{\link{domain}},   \code{\link{lin.ratio}},  \code{\link{residual_est}},
+\code{\link{vardomh}},  \code{\link{var_srs}},    \code{\link{variance_est}},
+\code{\link{variance_othstr}}}
 \keyword{vardpoor}

@@ -1,81 +1,59 @@
 \name{lingini}
+
 \alias{lingini}
+
 \title{Linearization of the GINI coefficient I}
+
+\description{
+  Estimate the Gini coefficient, which is a measure for inequality, and its linerization.
+}
+
 \usage{
-  lingini(inc, id = NULL, weight = NULL, sort = NULL, Dom = NULL,
-          period=NULL, dataset = NULL, na.rm = FALSE, var_name="lin_gini")
+  lingini(inc, id = NULL, weight = NULL,
+          sort = NULL, Dom = NULL, period=NULL,
+          dataset = NULL, na.rm = FALSE,
+          var_name="lin_gini")
 }
 
 \arguments{
-  \item{inc}{either a numeric vector, 1 column data.frame,
-  matrix, data.table giving the equivalized disposable
-  income, or (if \code{dataset} is not \code{NULL})
-  a character string, an integer or a logical vector
-  (length is the same as 'dataset' column count) specifying
-  the corresponding column of \code{dataset}.}
 
-  \item{id}{optional; either 1 column data.frame, matrix,
-  data.table with column names giving the personal IDs, or
-  (if \code{dataset} is not \code{NULL}) a character string,
-  an integer or a logical vector (length is the same as
-  'dataset' column count) specifying the corresponding
-  column of \code{dataset}.}
+  \item{inc}{Study variable (for example equivalized disposable income). One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{weight}{optional; either a numeric vector, 1 column
-  data.frame, matrix, data.table giving the personal sample
-  weights, or (if \code{dataset} is not \code{NULL}) a
-  character string, an integer or a logical vector (length
-  is the same as 'dataset' column count) specifying the
-  corresponding column of \code{dataset}.}
+  \item{id}{Optional variable for unit ID codes. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{sort}{optional; either a numeric vector, 1 column
-  data.frame, matrix, data.table giving the personal IDs
-  to be used as tie-breakers for sorting, or (if \code{dataset}
-  is not \code{NULL}) a character string, an integer or a
-  logical vector (length is the same as 'dataset' column
-  count) specifying the corresponding column of \code{dataset}.}
+  \item{weight}{Optional weight variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{Dom}{optional; either a data.frame, matrix,
-  data.table with column names giving different domains, or
-  (if \code{dataset} is not \code{NULL}) character strings,
-  integers or a logical vectors (length is the same as
-  'dataset' column count)specifying the corresponding columns
-  of \code{dataset}.  If supplied, the values for each domain
-  are computed.}
+  \item{sort}{Optional variable to be used as tie-breaker for sorting. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{period}{optional; either a data.frame, matrix, data.table
-  with column names giving different periods, or (if 
-  \code{dataset} is not \code{NULL}) character strings,
-  integers or a logical vectors (length is the same as 
-  'dataset' column count) specifying the corresponding
-  columns of \code{dataset}. If supplied, the values for
-  each period are computed independently.}
+  \item{Dom}{Optional variables used to define population domains. If supplied, linearization of the GINI is done for each domain. An object convertable to \code{data.frame} or variable names as character vector, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{dataset}{an optional; name of the individual dataset
-  \code{data.frame}.}
+  \item{period}{Optional variable for survey period. If supplied, linearization of the GINI is done for each time period. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
-  \item{na.rm}{a logical indicating whether missing values
-  should be removed.}
+  \item{dataset}{Optional survey data object convertable to \code{data.frame}.}
 
-  \item{var_name}{a character string specifying the name of the 
-  linearized variable.}
+  \item{na.rm}{A logical value indicating whether missing values in study variable should be removed.}
+
+  \item{var_name}{A character specifying the name of the linearized variable.}
 }
+
 \value{
- The function returns two values: 
-  \item{value}{a \code{data.frame} containing the estimate(s)
-  the gini coeffients (in percentage) by domain,  or (if
-  \code{Dom} is \code{NULL}) totals, using Osier definition
-  and Eurostat definition.}
 
-  \item{lin}{a \code{data.frame} containing the values of
-  linearized variables of the GINI coefficient (in precentage)
-  by domains or (if \code{Dom} is \code{NULL}) totals.}
+  A list with two objects are returned by the function:
+
+  \item{value}{A \code{data.frame} containing the estimated GINI coefficients (in percentage) by G. Osier and Eurostat papers.}
+  
+  \item{lin}{A \code{data.frame} containing the linearized variables of the GINI coefficients (in percentage) by G. Osier paper.}
 
 }
-\description{
-  Estimate the Gini coefficient, which is a measure for
-  inequality, and its linerization.
+
+\references{
+Working group on Statistics on Income and Living  Conditions (2004) Common cross-sectional EU indicators based on EU-SILC; the gender pay gap.  \emph{EU-SILC 131-rev/04}, Eurostat.\cr
+  
+Guillaume Osier (2009). Variance estimation for complex indicators of poverty and inequality. \emph{Journal of the European Survey Research Association}, Vol.3, No.3, pp. 167-195, ISSN 1864-3361, URL \url{https://ojs.ub.uni-konstanz.de/srm/article/view/369}. \cr
+
+Jean-Claude Deville (1999). Variance estimation for complex statistics and estimators: linearization and residual techniques. Survey Methodology, 25, 193-203, URL \url{http://www5.statcan.gc.ca/bsolc/olc-cel/olc-cel?lang=eng&catno=12-001-X19990024882}. \cr
 }
+
 \examples{
 data(eusilc)
 dati <- data.frame(1:nrow(eusilc),eusilc)[1:3,]
@@ -85,25 +63,8 @@ dat2 <- lingini("eqIncome","IDd",weight = "rb050",dataset=dati)
 dat1$value
 dat2$value
 }
-\references{
-  Working group on Statistics on Income and Living  Conditions (2004) Common cross-sectional EU indicators
-  based on EU-SILC; the gender pay gap.  \emph{EU-SILC
-  131-rev/04}, Eurostat.\cr
-  
-  Guillaume Osier (2009). Variance estimation for complex
-  indicators of poverty and inequality. \emph{Journal of
-  the European Survey Research Association}, Vol.3, No.3,
-  pp. 167-195, ISSN 1864-3361, 
-  URL \url{https://ojs.ub.uni-konstanz.de/srm/article/view/369}. \cr
 
-  Deville, J. C. (1999). Variance estimation for complex statistics
-  and estimators: linearization and residual techniques. Survey
-  Methodology, 25, 193-203,
-  URL \url{http://www5.statcan.gc.ca/bsolc/olc-cel/olc-cel?lang=eng&catno=12-001-X19990024882}. \cr
-}
 \seealso{
-  \code{\link{lingini2}}, \code{\link{linqsr}}, 
-  \code{\link{varpoord}}, \code{\link{var_srs}}
-}
+\code{\link{lingini2}}, \code{\link{linqsr}}, \code{\link{varpoord}}}
 \keyword{Linearization}
 
