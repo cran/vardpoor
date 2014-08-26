@@ -14,9 +14,9 @@
 
 \item{X}{Matrix of the auxiliary variables for the calibration estimator. This is the matrix of the sample calibration variables.} 
 
-\item{weight}{Weight variable. One dimentional object convertable to one-column \code{data.frame}.}
+\item{weight}{Weight variable. One dimensional object convertible to one-column \code{data.frame}.}
 
-\item{q}{Variable of the positive values accounting for heteroscedasticity. One dimentional object convertable to one-column \code{data.frame}.}
+\item{q}{Variable of the positive values accounting for heteroscedasticity. One dimensional object convertible to one-column \code{data.frame}.}
 }
 
 \value{

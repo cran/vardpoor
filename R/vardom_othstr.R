@@ -93,6 +93,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   Y <- data.table(Y, check.names=TRUE)
   n <- nrow(Y)
   m <- ncol(Y)
+  if (!all(sapply(Y, is.numeric))) stop("'Y' must be numeric values")
   if (any(is.na(Y))) stop("'Y' has unknown values")
   if (is.null(names(Y))) stop("'Y' must be colnames")
   
@@ -153,10 +154,12 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
       if (is.null(period)) {
              if (names(H) != names(N_h)[1]) stop("Strata titles for 'H' and 'N_h' is not equal")
              if (any(is.na(merge(unique(H), N_h, by=names(H), all.x = T)))) stop("'N_h' is not defined for all stratas")
+             if (any(duplicated(N_h[, head(names(N_h),-1), with=F]))) stop("Strata values for 'N_h' must be unique")
        } else { pH <- data.frame(period, H)
                 if (any(names(pH) != names(N_h)[c(1:(1+np))])) stop("Strata titles for 'period' with 'H' and 'N_h' is not equal")
                 if (any(is.na(merge(unique(pH), N_h, by=names(pH), all.x = T)))) stop("'N_h' is not defined for all stratas and periods")
-                pH <- NULL 
+                if (any(duplicated(N_h[, head(names(N_h),-1), with=F]))) stop("Strata values for 'N_h' must be unique in all periods")
+               pH <- NULL
      }
     setkeyv(N_h, names(N_h)[c(1:(1+np))])
   } 
@@ -199,6 +202,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
     Z <- data.table(Z)
     if (nrow(Z) != n) stop("'Z' and 'Y' must be equal row count")
     if (ncol(Z) != m) stop("'Z' and 'Y' must be equal column count")
+    if (!all(sapply(Z, is.numeric))) stop("'Z' must be numeric values")
     if (any(is.na(Z))) stop("'Z' has unknown values")
     if (is.null(names(Z))) stop("'Z' must be colnames")
   }
@@ -207,6 +211,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   if (!is.null(X)) {
     X <- data.table(X)
     if (any(is.na(X))) stop("'X' has unknown values")
+    if (!all(sapply(X, is.numeric))) stop("'X' must be numeric values")
     if (nrow(X) != n) stop("'X' and 'Y' must be equal row count")
   }
       
@@ -243,7 +248,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   if (!is.null(X)) w_design <- w_final / g else w_design <- w_final
       
   # Ratio of two totals
-  lin_outp <- per <- variableZ <- estim <- deff_sam <- NULL
+  linratio_outp <- per <- variableZ <- estim <- deff_sam <- NULL
   deff_est <- deff <- var_est2 <- se <- rse <- cv <- NULL
   absolute_margin_of_error <- relative_margin_of_error <- NULL
   CI_lower <- CI_upper <- variable <- .SD <- NULL
@@ -266,7 +271,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
             Y2a <- rbindlist(lin2)[sorts]
         }
     if (any(is.na(Y2))) print("Results are calculated, but there are cases where Z = 0")
-    if (outp_lin) ratio_outp <- data.table(idper, PSU, Y2) 
+    if (outp_lin) linratio_outp <- data.table(idper, PSU, Y2) 
   } else {
           Y2 <- Y1
           Y2a <- Y1
@@ -391,9 +396,10 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   all_result[, var_est2:=var_est]
   all_result[xor(is.na(var_est2), var_est2 < 0), var_est2:=NA]
   all_result[, se:=sqrt(var_est2)]
-  all_result[estim!=0, rse:= se/estim]
-  all_result[estim==0, rse:= NA]
+  all_result[(estim!=0) & !is.nan(estim), rse:= se/estim]
+  all_result[estim==0 | is.nan(estim), rse:=NA]
   all_result[, cv:= rse*100]
+
 
   tsad <- qnorm(0.5*(1+confidence))
   all_result[, absolute_margin_of_error:= tsad*se]
@@ -439,7 +445,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   setkeyv(all_result, c("nr_names", names(Dom), names(period)))
   all_result <- all_result[, c("variable", names(Dom), names(period), variab), with=F]
 
-  list(lin_out = lin_outp,
+  list(lin_out = linratio_outp,
        res_out = res_outp,
        all_result = all_result)
 }

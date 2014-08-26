@@ -13,26 +13,26 @@
                  X_ID_household = NULL, ind_gr = NULL, g = NULL, datasetX = NULL,
                  q, percentage = 60, order_quant = 50, alpha = 20,
                  confidence = 0.95, outp_lin = FALSE, outp_res = FALSE,
-                 na.rm = FALSE, several.ok = FALSE, type = "lin_rmpg") }
+                 several.ok = FALSE, type = "lin_rmpg") }
                      
 
 \arguments{
 
-\item{inc}{Study variable (for example equivalized disposable income). One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{inc}{Study variable (for example equalized disposable income). One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{w_final}{Weight variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{w_final}{Weight variable. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{income_thres}{Variable (for example equivalized disposable income) used for computation and linearization of poverty threshold. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}). Variable specified for \code{inc} is used as \code{income_thres} if \code{income_thres} is  not defined.}
+\item{income_thres}{Variable (for example equalized disposable income) used for computation and linearization of poverty threshold. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}). Variable specified for \code{inc} is used as \code{income_thres} if \code{income_thres} is  not defined.}
 
-\item{wght_thres}{Weight variable used for computation and linearization of poverty threshold. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}). Variable specified for \code{weight} is used as \code{wght_thres} if \code{wght_thres} is not defined.}
+\item{wght_thres}{Weight variable used for computation and linearization of poverty threshold. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}). Variable specified for \code{weight} is used as \code{wght_thres} if \code{wght_thres} is not defined.}
 
-\item{ID_household}{Variable for household ID codes. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{ID_household}{Variable for household ID codes. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{id}{Optional variable for unit ID codes. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{id}{Optional variable for unit ID codes. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{H}{The unit stratum variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{H}{The unit stratum variable. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{PSU}{Primary sampling unit variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{PSU}{Primary sampling unit variable. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
 \item{N_h}{optional; either a matrix giving the first column - stratum, but the second column - the total of the population in each stratum.}
 
@@ -40,29 +40,29 @@
 
 \item{PSU_level}{by default TRUE; if PSU_level is true, in each strata fh is calculated as division of count of PSU in sample (n_h) and count of PSU in frame(N_h). if PSU_level is false, in each strata fh is calculated as division of count of units in sample (n_h) and count of units in frame(N_h), which calculated as sum of weights.}
 
-\item{sort}{Optional variable to be used as tie-breaker for sorting. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{sort}{Optional variable to be used as tie-breaker for sorting. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{Dom}{Optional variables used to define population domains. If supplied, variables is calculated for each domain. An object convertable to \code{data.frame} or variable names as character vector, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{Dom}{Optional variables used to define population domains. If supplied, variables is calculated for each domain. An object convertible to \code{data.frame} or variable names as character vector, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
 \item{period}{Optional variable for survey period. If supplied, variables is calculated for each time period. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{gender}{Factor variable for gender. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{gender}{Numerical variable for gender, where 1 is for males, but 2 is for females. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{dataset}{Optional survey data object convertable to \code{data.frame}.}
+\item{dataset}{Optional survey data object convertible to \code{data.frame}.}
 
-\item{X}{Optional matrix of the auxiliary variables for the calibration estimator. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{datasetX}).}
+\item{X}{Optional matrix of the auxiliary variables for the calibration estimator. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{datasetX}).}
 
-\item{periodX}{Optional variable ofthe survey periods. If supplied, residual estimation of calibration is done independently for each time period. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{datasetX}).}
+\item{periodX}{Optional variable of the survey periods. If supplied, residual estimation of calibration is done independently for each time period. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{datasetX}).}
 
-\item{X_ID_household}{Variable for household ID codes. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{datasetX}).}
+\item{X_ID_household}{Variable for household ID codes. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{datasetX}).}
 
-\item{ind_gr}{Optional variable by which divided independently auxiliary variables. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{datasetX}).}
+\item{ind_gr}{Optional variable by which divided independently auxiliary variables. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{datasetX}).}
 
-\item{g}{Optional variable of the g weights. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{datasetX}).}
+\item{g}{Optional variable of the g weights. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{datasetX}).}
 
-\item{datasetX}{Optional survey data object in household level convertable to \code{data.frame}.}
+\item{datasetX}{Optional survey data object in household level convertible to \code{data.frame}.}
 
-\item{q}{Variable of the positive values accounting for heteroscedasticity. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{datasetX}).}
+\item{q}{Variable of the positive values accounting for heteroscedasticity. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{datasetX}).}
 
 \item{percentage}{A numeric value in range \eqn{[0,100]} for \eqn{p} in the formula for poverty threshold computation:
 \deqn{\frac{p}{100} \cdot Z_{\frac{\alpha}{100}}.}{p/100 * Z(\alpha/100).}
@@ -79,8 +79,6 @@ For example, to compute poverty threshold equal to some percentage of median inc
 \item{outp_lin}{Logical value. if \code{TRUE} linearized values of the ratio estimator will be printed out.}
 
 \item{outp_res}{Logical value. if \code{TRUE} estimated residuals of calibration will be printed out.}
-
-\item{na.rm}{A logical value indicating whether missing values in study variable should be removed.}
 
 \item{several.ok}{logical specifying if \code{type} should be allowed to have more than one.}
 
@@ -103,11 +101,11 @@ For example, to compute poverty threshold equal to some percentage of median inc
 
        \code{var} - the estimated variance,
 
-       \code{se} - the estimated standart error,
+       \code{se} - the estimated standard error,
 
-       \code{rse} - the estiamted relative standart error (coefficient of variation),
+       \code{rse} - the estimated relative standard error (coefficient of variation),
 
-       \code{cv} - the estimated relative standart error (coefficient of variation) in percentage,
+       \code{cv} - the estimated relative standard error (coefficient of variation) in percentage,
 
        \code{absolute_margin_of_error} - the estimated absolute margin of error,
 
@@ -152,10 +150,28 @@ Jean-Claude Deville (1999). Variance estimation for complex statistics and estim
 data(eusilc)
 dataset <- data.frame(1:nrow(eusilc),eusilc)
 colnames(dataset)[1] <- "IDd"
+dataset1 <- dataset[1:1000,]
 
 aa<-varpoord(inc = "eqIncome", w_final = "rb050",
              income_thres = NULL, wght_thres = NULL,
-             ID_household = "db030", id = NULL, 
+             ID_household = "db030", id = "IDd", 
+             H = "db040", PSU = "rb030", N_h = NULL,
+             sort = NULL, Dom = "db040",
+             gender = NULL, X = NULL,
+             X_ID_household = NULL, g = NULL,
+             datasetX = NULL,
+             q = rep(1, if (is.null(datasetX)) 
+                        nrow(as.data.frame(H)) else nrow(datasetX)),
+             dataset =  dataset1, percentage=60, order_quant=50,
+             alpha = 20, confidence = .95, outp_lin = FALSE,
+             outp_res = FALSE, several.ok=FALSE, type="linarpt")
+aa
+
+
+\dontrun{
+aa<-varpoord(inc = "eqIncome", w_final = "rb050",
+             income_thres = NULL, wght_thres = NULL,
+             ID_household = "db030", id = "IDd", 
              H = "db040", PSU = "rb030", N_h = NULL,
              sort = NULL, Dom = "db040",
              gender = NULL, X = NULL,
@@ -165,10 +181,12 @@ aa<-varpoord(inc = "eqIncome", w_final = "rb050",
                         nrow(as.data.frame(H)) else nrow(datasetX)),
              dataset =  dataset, percentage=60, order_quant=50,
              alpha = 20, confidence = .95, outp_lin = TRUE,
-             outp_res = TRUE, na.rm=FALSE,
-             several.ok=FALSE, type="lingini")
+             outp_res = TRUE, several.ok=FALSE, type="all_choises")
 aa$lin_out[20:40]
 aa$res_out[20:40]
+}
+
+
 } 
 
 \seealso{

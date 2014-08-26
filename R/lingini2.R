@@ -14,7 +14,7 @@
 
 lingini2 <- function(inc, id = NULL, weight = NULL, sort = NULL, 
                      Dom = NULL, period=NULL, dataset = NULL,
-                     na.rm = FALSE, var_name="lin_gini2") {
+                     var_name="lin_gini2") {
 
    ## initializations
    if (min(dim(as.data.frame(var_name))==1)!=1) {
@@ -56,14 +56,7 @@ lingini2 <- function(inc, id = NULL, weight = NULL, sort = NULL,
    if (ncol(inc) != 1) stop("'inc' must be a vector or 1 column data.frame, matrix, data.table")
    inc <- inc[,1]
    if(!is.numeric(inc)) stop("'inc' must be a numerical")
-   if (any(is.na(inc))) warning("'inc' has unknown values")
-
-   # id
-   if (is.null(id)) id <- 1:n 
-   id <- data.table(id)
-   if (nrow(id) != n) stop("'id' must be the same length as 'inc'")
-   if (ncol(id) != 1) stop("'id' must be 1 column data.frame, matrix, data.table")
-   if (is.null(names(id))||(names(id)=="id")) names(id) <- "ID"
+   if (any(is.na(inc))) stop("'inc' has unknown values")
  
    # weight
    weight <- data.frame(weight)
@@ -72,7 +65,8 @@ lingini2 <- function(inc, id = NULL, weight = NULL, sort = NULL,
    if (ncol(weight) != 1) stop("'weight' must be vector or 1 column data.frame, matrix, data.table")
    weight <- weight[,1]
    if (!is.numeric(weight)) stop("'weight' must be numerical")
-   
+   if (any(is.na(weight))) stop("'weight' has unknown values")
+
    # sort
    if (!is.null(sort) && !is.vector(sort) && !is.ordered(sort)) {
          stop("'sort' must be a vector or ordered factor") }
@@ -86,7 +80,20 @@ lingini2 <- function(inc, id = NULL, weight = NULL, sort = NULL,
                       paste(names(period)[duplicated(names(period))], collapse = ","))
        if (nrow(period) != n) stop("'period' must be the same length as 'inc'")
        if(any(is.na(period))) stop("'period' has unknown values")  
-   }   
+   }
+
+   # id
+   if (is.null(id)) id <- 1:n
+   id <- data.table(id)
+   if (any(is.na(id))) stop("'id' has unknown values")
+   if (ncol(id) != 1) stop("'id' must be 1 column data.frame, matrix, data.table")
+   if (nrow(id) != n) stop("'id' must be the same length as 'inc'")
+   if (is.null(names(id))||(names(id)=="id")) setnames(id,names(id),"ID")
+   if (is.null(period)){ if (any(duplicated(id))) stop("'id' are duplicate values") 
+                       } else {
+                          id1 <- data.table(period, id)
+                          if (any(duplicated(id1))) stop("'id' by period are duplicate values")
+                         }
 
    # Dom     
    if (!is.null(Dom)) {
@@ -100,77 +107,96 @@ lingini2 <- function(inc, id = NULL, weight = NULL, sort = NULL,
            
 
    ## computations
-   Dom1 <- Dom
-   if (!is.null(period)) {
-       if (!is.null(Dom1)) { Dom1 <- data.table(period, Dom1)
-        } else Dom1 <- period } 
- 
+   ind0 <- rep.int(1, n)
+   period_agg <- period1 <- NULL
+   if (!is.null(period)) { period1 <- copy(period)
+                           period_agg <- data.table(unique(period))
+                       } else period1 <- data.table(ind=ind0)
+   period1_agg <- data.table(unique(period1))
 
-  # Gini by domain (if requested)
 
-   if (!is.null(Dom1)) {
-        Dom_agg <- data.table(unique(Dom1))
-        setkeyv(Dom_agg, names(Dom1))
-  
+   # Gini by domain (if requested)
+   gini_id <- id
+   if (!is.null(period)) gini_id <- data.table(period, gini_id)
+
+   if (!is.null(Dom)) {
+        Dom_agg <- data.table(unique(Dom))
+        setkeyv(Dom_agg, names(Dom_agg))
+
         Gini <- c()
-        gini_id <- id
-        if (!is.null(period)) gini_id <- data.table(period, gini_id)
-        gini_m <- gini_id
+        gini_m <- copy(gini_id)
         for(i in 1:nrow(Dom_agg)) {
-                g <- paste(names(Dom1), as.matrix(Dom_agg[i,]), sep = ".")
-                breakdown2 <- do.call(paste, as.list(c(g, sep="__")))
-                D <- Dom_agg[i,][rep(1, nrow(Dom1)),]
-                ind <- (rowSums(Dom1 == D) == ncol(Dom1))
-                gini_l <- lingini2Calc(inc[ind], gini_id[ind], weight[ind], sort[ind], na.rm=na.rm)
-                ginilin <- gini_l$lin
-                setnames(ginilin, names(ginilin), c(names(gini_id), paste(var_name, breakdown2, sep="__")))
-                gini_m <- merge(gini_m, ginilin, by=names(gini_id), all.x=T, sort=FALSE)
-                Gini <- rbind(Gini, data.frame(gini_l$Gini, gini_l$Gini_eu))           
-             }
-      colnames(Gini) <- c("Gini", "Gini_eu")
-      Gini <- data.table(Dom_agg, Gini)
-     } else { gini_l <- lingini2Calc(inc, id, weight, sort, na.rm=na.rm)
-              gini_m <- gini_l$lin
-              setnames(gini_m, names(gini_m), c(names(id),var_name))   
-              Gini <- data.frame(gini_l$Gini, gini_l$Gini_eu)
-              colnames(Gini) <- c("Gini", "Gini_eu")}
-    rownames(Gini) <- NULL
+            g <- c(var_name, paste(names(Dom), as.matrix(Dom_agg[i,]), sep = "."))
+            var_nams <- do.call(paste, as.list(c(g, sep="__")))
+            indi <- (rowSums(Dom == Dom_agg[i,][ind0,]) == ncol(Dom))
+
+            gini_l <- lapply(1:nrow(period1_agg), function(j) {
+               indj <- ((rowSums(period1 == period1_agg[j,][ind0,]) == ncol(period1))&(indi))
+               if (!is.null(period)) { rown <- cbind(period_agg[j], Dom_agg[i])
+                                     } else rown <- Dom_agg[i] 
+               if (!all(indj)) {
+                    ginil <- lingini2Calc(inc[indj], gini_id[indj], weight[indj], sort[indj])
+                    list(data.table(rown, ginil$Gini), ginil$lin)
+                   }  else list(data.table(rown, Gini=0, Gini_eu=0),                                            
+                                lin=data.table(lin=gini_id[indi], lin=0))
+              })
+
+            giniv <- rbindlist(lapply(gini_l, function(x) x[[1]]))
+            ginilin <- rbindlist(lapply(gini_l, function(x) x[[2]]))
+
+            setnames(ginilin, names(ginilin), c(names(gini_id), var_nams))
+            setkeyv(gini_m, names(gini_id))
+            setkeyv(gini_m, names(gini_id))
+            gini_m <- merge(gini_m, ginilin, all=T)
+            Gini <- rbind(Gini, giniv)
+         }
+     } else { gini_l <- lapply(1:nrow(period1_agg), function(j) {
+                           indj <- (rowSums(period1 == period1_agg[j,][ind0,]) == ncol(period1))
+                           ginil <- lingini2Calc(inc[indj], gini_id[indj], weight[indj], sort[indj])                                                 
+                           if (!is.null(period)) {
+                                  list(data.table(period_agg[j], ginil$Gini), ginil$lin)
+                                }  else ginil
+                         })
+            Gini <- rbindlist(lapply(gini_l, function(x) x[[1]]))
+            gini_m <- rbindlist(lapply(gini_l, function(x) x[[2]]))
+            setnames(gini_m, names(gini_m), c(names(gini_id), var_name))   
+     }
     gini_m[is.na(gini_m)] <- 0
+    setkeyv(gini_m, names(gini_id))
     return(list(value=Gini, lin=gini_m))
 }
 
 
-## workhorse
-lingini2Calc <- function(x, ids, weights = NULL, sort = NULL, na.rm = FALSE) {
-     # initializations
-    if (isTRUE(na.rm)){
-          indices <- !is.na(x)
-          x <- x[indices]
-          if(!is.null(weights)) weights <- weights[indices]
-          if(!is.null(ids)) ids <- ids[indices]
-          if(!is.null(sort)) sort <- sort[indices]
-      } else if(any(is.na(x))) return(NA)
-     # sort values and weights
-    order <- if(is.null(sort)) order(x) else order(x, sort)
-    x <- x[order]  # order values
-    ids <- ids[order]  # order values
-    if (is.null(weights)) { weights <- rep.int(1, length(x))  # equal weights
-     } else weights <- weights[order]  # order weights
+# workhorse 
+lingini2Calc <- function(x, ids, weights = NULL, sort = NULL) { 
 
-    ## calculations
-    taille <- length(weights)   # Sample size
-    wx <- weights * x       # weighted values
-    N <- sum(weights)     # Estimated population size
-    cw <- cumsum(weights)   # cumulative sum of weights
-    T <- sum(wx)             # Estimated total income
+    # sort values and weights 
+    order <- if(is.null(sort)) order(x) else order(x, sort) 
+    x <- x[order]  # order values 
+    ids <- ids[order]  # order values 
+    if (is.null(weights)) { weights <- rep.int(1, length(x))  # equal weights 
+     } else weights <- weights[order]  # order weights 
 
-    Nk <- c()
-    wx1 <- c()
+    ## calculations 
+    wx <- weights * x       # weighted values 
+    N <- sum(weights)     # Estimated population size 
+    cw <- cumsum(weights)   # cumulative sum of weights 
+    T <- sum(wx)             # Estimated total income 
 
-    for(i in 1:length(x)) {
-        Nk[i] <- sum(weights*(x<=x[i]))       #  Estimation of the cumulative distribution function
-        wx1[i]<- sum(wx*(x<=x[i]))           #  Weighted partial sum
-    }
+    dt <- data.table(x = x, weights = weights, wx = wx, key = "x")
+    weights0 <- wx0 <- NULL
+    dt1 <- dt[, list(weights0 = sum(weights),
+                wx0 = sum(wx)), keyby = x][,
+                Nk := cumsum(weights0)][,
+                wx1 := cumsum(wx0)]
+    dt <- merge(dt, dt1)
+
+    # Nk - estimation of the cumulative distribution function 
+    Nk <- dt[["Nk"]]
+
+    # wx - weighted partial sum
+    wx1 <- dt[["wx1"]]
+    dt <- dt1 <- NULL
 
     Num_eu <- 2 * sum(wx*cw) - sum(weights^2 * x)
     Num <- 2 * sum(wx*Nk) - sum(weights^2 * x)
@@ -187,9 +213,9 @@ lingini2Calc <- function(x, ids, weights = NULL, sort = NULL, na.rm = FALSE) {
 
     lin <- 100*(2*Nk*(x-wx1/Nk)+T-N*x-Gini*(T+N*x))/(N*T)
     
-    lin_id <- data.table(ids,lin)
-
-    return(list(Gini_eu=Gini_eu, Gini=Gini_pr, lin=lin_id))
-
+    Gini_pr <- data.table(Gini=Gini_pr, Gini_eu=Gini_eu)
+    lin_id <- data.table(ids, lin=lin)
+    
+    return(list(Gini=Gini_pr, lin=lin_id))
 }
 

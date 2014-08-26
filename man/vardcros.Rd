@@ -2,40 +2,43 @@
 
 \alias{vardcros}
 
-\title{Variance estimation for cros-sectional and longitudinal measures for any stage cluster sampling designs}
+\title{Variance estimation for cross-sectional, longitudinal measures for single and multistage stage cluster sampling designs}
 
-\description{Computes the variance estimation for cros-sectional and longitudinal measures for any stage cluster sampling designs.}
+\description{Computes the variance estimation for cross-sectional and longitudinal measures for any stage cluster sampling designs.}
 
 \usage{
 vardcros(Y, H, PSU, w_final, id, Dom = NULL,
          Z = NULL, country, period,
-         dataset = NULL, meanY=TRUE,
+         dataset = NULL, linratio=FALSE,
+         household_level_max=TRUE,
          withperiod=TRUE, netchanges=TRUE,
          confidence = .95)}
 
 \arguments{
 
-\item{Y}{Variables of interest. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{Y}{Variables of interest. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{H}{The unit stratum variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{H}{The unit stratum variable. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{PSU}{Primary sampling unit variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{PSU}{Primary sampling unit variable. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{w_final}{Weight variable. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{w_final}{Weight variable. One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{id}{optional; either 1 column data.frame, matrix, data.table with column names giving the IDs, or (if \code{dataset} is not \code{NULL}) a character string, an integer or a logical vector (length is the same as 'dataset' column count) specifying the corresponding column of \code{dataset}.}
+\item{id}{variable for unit ID codes (for household surveys - secondary unit id number). One dimensional object convertible to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{Dom}{Optional variables used to define population domains. If supplied, variables is calculated for each domain. An object convertable to \code{data.frame} or variable names as character vector, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{Dom}{Optional variables used to define population domains. If supplied, variables are calculated for each domain. An object convertible to \code{data.frame} or variable names as character vector, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{Z}{Optional variables of denominator for ratio estimation. If supplied, the ratio estimation is computed. Object convertable to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}). This variable is \code{NULL} by default.}
+\item{Z}{Optional variables of denominator for ratio estimation. If supplied, the ratio estimation is computed. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}). This variable is \code{NULL} by default.}
 
-\item{country}{optional; either a data.frame, matrix, data.table with column names giving different countries, or (if \code{dataset} is not \code{NULL}) character strings, integers or a logical vectors (length is the same as 'dataset' column count) specifying the corresponding columns of \code{dataset} .}
+\item{country}{Variable for the survey countries. The values for each country are computed independently. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{period}{Optional variable for survey period. If supplied, variables is calculated for each time period. One dimentional object convertable to one-column \code{data.frame} or variable name as character, column number or logical vector with only one \code{TRUE} value (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{period}{Variable for the survey periods. The values for each period are computed independently. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{dataset}{Optional survey data object convertable to \code{data.frame}.}
+\item{dataset}{Optional survey data object convertible to \code{data.frame}.}
 
-\item{meanY}{Logical value. If value is \code{TRUE}, then is calculated mean of the variables of interest.}
+\item{linratio}{Logical value. If value is \code{TRUE}, then the linearized variables for the ratio estimator is used for variance estimation. If value is \code{FALSE}, then the gradients is used for variance , but if f variables of interest.}
+
+\item{household_level_max}{Logical value.}
 
 \item{withperiod}{Logical value. If \code{TRUE} is value, the results is with period, if \code{FALSE}, without period.}
 
@@ -53,6 +56,8 @@ vardcros(Y, H, PSU, w_final, id, Dom = NULL,
   \item{var_grad}{ A \code{data.table} containing estimation for Y, the variance, gradient for numerator and denominator by country and period (if available).}
 
   \item{results}{ A \code{data.table} containing
+     \code{period} -  survey periods, \cr
+     \code{country} - survey countries, \cr
      \code{sample_size} - the sample size (in numbers of individuals), \cr
      \code{pop_size} - the population size (in numbers of individuals), \cr
      \code{total} - the estimated totals, \cr
@@ -64,8 +69,8 @@ vardcros(Y, H, PSU, w_final, id, Dom = NULL,
      \code{stderr_w} - the estimated weighted standard error of simple random sample, \cr
      \code{stderr_nw} - the estimated standard error of simple random sample, \cr
      \code{se} - the estimated standard error of cross-sectional or longitudinal, \cr
-     \code{rse} - the estiamted relative standart error (coefficient of variation), \cr
-     \code{cv} - the estimated relative standart error (coefficient of variation) in percentage, \cr
+     \code{rse} - the estimated relative standard error (coefficient of variation), \cr
+     \code{cv} - the estimated relative standard error (coefficient of variation) in percentage, \cr
      \code{absolute_margin_of_error} - the estimated absolute margin of error, \cr
      \code{relative_margin_of_error} - the estimated relative margin of error, \cr
      \code{CI_lower} - the estimated confidence interval lower bound, \cr
@@ -83,6 +88,48 @@ URL \url{http://www.cros-portal.eu/content/handbook-standard-error-estimation-an
 
 \examples{
 # Example 1
+data(eusilc)
+set.seed(1)
+data <- data.table(eusilc,
+                   year=rep(2010, nrow(eusilc)),
+                   country=rep("AT", nrow(eusilc)))
+data[age<0, age:=0]
+PSU <- data[,.N, keyby="db030"]
+PSU[, N:=NULL]
+PSU[, PSU:=trunc(runif(nrow(PSU), 0, 100))]
+data <- merge(data, PSU, by="db030", all=TRUE)
+PSU <- eusilc <- 0
+
+data[, strata:="XXXX"]
+data[, t_pov:=trunc(runif(nrow(data), 0, 2))]
+data[, t_dep:=trunc(runif(nrow(data), 0, 2))]
+data[, t_lwi:=trunc(runif(nrow(data), 0, 2))]
+data[, exp:= 1]
+data[, exp2:= 1 * (age < 60)]
+
+# At-risk-of-poverty (AROP)
+data[, pov:= ifelse (t_pov == 1, 1, 0)]
+
+# Severe material deprivation (DEP)
+data[, dep:= ifelse (t_dep == 1, 1, 0)]
+
+# Low work intensity (LWI)
+data[, lwi:= ifelse (t_lwi == 1 & exp2 == 1, 1, 0)]
+
+# At-risk-of-poverty or social exclusion (AROPE)
+data[, arope:= ifelse (pov == 1 | dep == 1 | lwi == 1, 1, 0)]
+
+result11 <- vardcros(Y="arope",
+                    H="strata", PSU="PSU", w_final="rb050",
+                    id="db030", Dom="rb090", Z=NULL,
+                    country="country", period="year",
+                    dataset=data,
+                    linratio=FALSE, 
+                    withperiod=TRUE,
+                    netchanges=TRUE,
+                    confidence = .95)
+\dontrun{
+# Example 2
 data(eusilc)
 set.seed(1)
 data <- data.table(rbind(eusilc, eusilc),
@@ -121,7 +168,7 @@ result11 <- vardcros(Y=c("pov", "dep", "arope"),
                     id="db030", Dom="rb090", Z=NULL,
                     country="country", period="year",
                     dataset=data,
-                    meanY=TRUE, 
+                    linratio=FALSE, 
                     withperiod=TRUE,
                     netchanges=TRUE,
                     confidence = .95)
@@ -132,7 +179,7 @@ result12 <- vardcros(Y=c("lwi"),
                     id="db030", Dom="rb090", Z=NULL,
                     country="country", period="year",
                     dataset=data2,
-                    meanY=TRUE, 
+                    linratio=FALSE, 
                     withperiod=TRUE,
                     netchanges=TRUE,
                     confidence = .95)
@@ -230,11 +277,10 @@ result20 <- vardcros(Y="ppr", H="strata", PSU="PSU",
                     Dom = NULL, Z=NULL,
                     country="rb020", period=NULL,
                     dataset=apv,
-                    meanY=TRUE,
+                    linratio=FALSE, 
                     withperiod=FALSE,
                     netchanges=FALSE,
-                    confidence = .95)
-
+                    confidence = .95)}
 }
 
 
