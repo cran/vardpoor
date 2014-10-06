@@ -70,6 +70,10 @@ vardom(Y, H, PSU, w_final, id=NULL,
 
   \item{all_result}{A \code{data.table}, which containing variables:
 
+       \code{sample_size} - the sample size,
+
+       \code{pop_size} - the estimated size of population,
+
        \code{estim} - the estimated value,
 
        \code{var} - the estimated variance,

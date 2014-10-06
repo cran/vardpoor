@@ -26,7 +26,7 @@ import(foreach)
 import(plyr)
 import(reshape2)
 import(gdata)
-import(lpSolve)
 import(data.table)
 import(MASS)
+import(stringr)
 

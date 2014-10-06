@@ -262,6 +262,7 @@ varpoord <- function(inc, w_final,
     if (nrow(Dom) != n) stop("'Dom' and 'Y' have different row count")
     if (any(is.na(Dom))) stop("'Dom' has unknown values")
     if (is.null(names(Dom))) stop("'Dom' must be colnames")
+    Dom <- Dom[, lapply(.SD, as.character), .SDcols = names(Dom)]
   }
 
  # X_ID_household
@@ -369,6 +370,22 @@ varpoord <- function(inc, w_final,
       } else w_design <- w_final
 
   ### Calculation
+  sample_size <- pop_size <- n_nonzero <- NULL
+  if (!is.null(Dom)) { if (!is.null(period)) {nhs <- data.table(Dom, period, sample_size=1, pop_size=w_final,                      
+                                                                                           n_nonzero=as.numeric(inc!=0))
+                                              nhs <-  nhs[, lapply(.SD, sum, na.rm=T),
+                                                                    keyby=c(names(Dom), names(period)),
+                                                                   .SDcols=c("sample_size", "pop_size", "n_nonzero")]
+                                     } else { nhs <- data.table(Dom, sample_size=1, pop_size=w_final, 
+                                                                              n_nonzero=as.numeric(inc!=0))
+                                              nhs <-  nhs[, lapply(.SD, sum, na.rm=T),
+                                                                    keyby=names(Dom),
+                                                                   .SDcols=c("sample_size", "pop_size", "n_nonzero")]
+                                  }
+                           } else nhs <- data.table(sample_size=nrow(Y1), 
+                                                                  pop_size=sum(w_final),
+                                                                  n_nonzero=sum(as.numeric(inc!=0))) 
+
 
   estim <- c()
   aH <- names(H)
@@ -644,32 +661,32 @@ varpoord <- function(inc, w_final,
   estim <- data.table(estim)
   estim[, variable:=paste0("lin_", tolower(type))]
   nDom <- names(copy(Dom))
-  estim[!is.null(Dom), (paste0(nDom,"@1@")):=lapply(nDom, function(x) paste(x, get(x), sep="."))]
-  
+  if (!is.null(nDom)) estim[, (paste0(nDom,"at1at")):=lapply(nDom, function(x) paste(x, get(x), sep="."))]
+
   Dom <- estim[, "variable", with=F]
-  if (!is.null(nDom)) Dom <- estim[, c("variable", paste0(nDom,"@1@")), with=F]
+  if (!is.null(nDom)) Dom <- estim[, c("variable", paste0(nDom,"at1at")), with=F]
 
   estim$variable <- do.call("paste", c(as.list(Dom), sep="__"))
-  estim[!is.null(nDom), (paste0(nDom,"@1@")):=NULL]
-
+  estim[, variable:=str_replace_all(variable, "[ ]", ".")]
+  if (!is.null(nDom)) estim[, (paste0(nDom,"at1at")):=NULL]
+  
   if (nrow(all_result[var_est < 0])>0) stop("Estimation of variance are negative!")
   
   variables <- "variable"
   if (!is.null(period)) variables <- c(variables, names(period))
   setkeyv(estim, variables)
   setkeyv(all_result, variables)
-  all_result <- merge(estim, all_result)
+  all_result <- merge(estim, all_result, all=TRUE)
   
   all_result[, variable:=NULL]
   deff_sam <- deff_est <- deff <- var_est2 <- NULL
   se <- rse <- cv <- absolute_margin_of_error <- NULL
   relative_margin_of_error <- CI_lower <- CI_upper <- NULL
 
- 
-  # Effect of sample design
+  # Design effect of sample design
   all_result[, deff_sam:=var_cur_HT / var_srs_HT]
   
-  # Effect of estimator
+  # Design effect of estimator
   all_result[, deff_est:= var_est / var_cur_HT]
   
   # Overall effect of sample design and estimator
@@ -691,14 +708,23 @@ varpoord <- function(inc, w_final,
   
   setnames(all_result, "var_est", "var")
   
-  variabl <- c("value", "value_eu", "var", "se",
-               "rse", "cv", "absolute_margin_of_error",
-               "relative_margin_of_error", "CI_lower",  
-               "CI_upper", "var_srs_HT", "var_cur_HT", 
-               "var_srs_ca", "deff_sam", "deff_est", "deff")
+  setkeyv(all_result, c(nDom, names(period)))
+
+  if (!is.null(nDom)) { all_result <- merge(all_result, nhs, all=T)
+                           } else { all_result[, sample_size:=nhs$sample_size]
+                                       all_result[, pop_size:=nhs$pop_size]
+                                       all_result[, n_nonzero:=nhs$n_nonzero]} 
+
+  variabl <- c("sample_size", "n_nonzero", "pop_size", 
+                      "value", "value_eu", "var", "se", "rse",
+                      "cv", "absolute_margin_of_error",
+                      "relative_margin_of_error", "CI_lower",  
+                      "CI_upper", "var_srs_HT", "var_cur_HT", 
+                      "var_srs_ca", "deff_sam", "deff_est", "deff")
 
   type <- "type"
   if (!is.null(period)) type <- c(type, names(period))
+  setkeyv(all_result, c(type, nDom))
   list(lin_out = lin_outp,
        res_out = res_outp,
        all_result = all_result[, c(type, nDom, variabl), with=F])
