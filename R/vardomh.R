@@ -84,6 +84,7 @@ vardomh <- function(Y, H, PSU, w_final,
     }
 
   if(!is.null(datasetX)) {
+       datasetX <- data.frame(datasetX)
        if (!is.null(periodX)) {
             aperiodX <- periodX  
             if (min(periodX %in% names(datasetX))!=1) stop("'periodX' does not exist in 'datasetX'!")
@@ -99,7 +100,7 @@ vardomh <- function(Y, H, PSU, w_final,
 
       if(!is.null(X)) {
           if (min(X %in% names(datasetX))!=1) stop("'X' does not exist in 'datasetX'!")
-          if (min(X %in% names(datasetX))==1) X <- datasetX[, X] }
+          if (min(X %in% names(datasetX))==1) X <- as.data.frame(datasetX[, X]) }
 
       if(!is.null(ind_gr)) {
           if (min(ind_gr %in% names(datasetX))!=1) stop("'ind_gr' does not exist in 'datasetX'!")
@@ -114,6 +115,7 @@ vardomh <- function(Y, H, PSU, w_final,
               if (length(q)!=nrow(datasetX))  stop("'q' does not exist in 'datasetX'!") }
           if (min(q %in% names(datasetX))==1) q <- datasetX[, q] } 
      }
+  dataset <- datasetX <- NULL
 
   # Y
   Y <- data.table(Y, check.names=TRUE)
@@ -161,10 +163,7 @@ vardomh <- function(Y, H, PSU, w_final,
   if (is.null(names(id))||(names(id)=="id")) setnames(id,names(id),"ID")
   if (names(id)==names(ID_household)) setnames(id,names(id),paste(names(id),"_id",sep=""))
   if (is.null(period)){ if (any(duplicated(id))) stop("'id' are duplicate values") 
-                       } else {
-                          id1 <- data.table(period, id)
-                          if (any(duplicated(id1))) stop("'id' by period are duplicate values")
-                         }
+                       } else if (any(duplicated(data.table(period, id)))) stop("'id' by period are duplicate values")
 
   # period     
   if (!is.null(period)) {
@@ -184,11 +183,17 @@ vardomh <- function(Y, H, PSU, w_final,
       if (!is.numeric(N_h[[ncol(N_h)]])) stop("The last column of 'N_h' should be numerical")
       if (any(is.na(N_h))) stop("'N_h' has unknown values") 
       if (is.null(names(N_h))) stop("'N_h' must be colnames")
+     namesH <- names(H)
+      if (H[, class(get(namesH))]!=N_h[, class(get(namesH))]) 
+                                         stop("Strata class for 'H' and 'N_h' is not equal ")
       if (is.null(period)) {
              if (names(H) != names(N_h)[1]) stop("Strata titles for 'H' and 'N_h' is not equal")
              if (any(is.na(merge(unique(H), N_h, by=names(H), all.x = T)))) stop("'N_h' is not defined for all stratas")
        } else { pH <- data.frame(period, H)
                 if (any(names(pH) != names(N_h)[c(1:(1+np))])) stop("Strata titles for 'period' with 'H' and 'N_h' is not equal")
+                nperH <- names(period)
+                if (H[, class(get(nperH))]!=N_h[, class(get(nperH))]) 
+                                                       stop("Period class for 'period' and 'N_h' is not equal ")
                 if (any(is.na(merge(unique(pH), N_h, by=names(pH), all.x = T)))) stop("'N_h' is not defined for all stratas and periods")
                 if (any(duplicated(N_h[, head(names(N_h),-1), with=F]))) stop("Strata values for 'N_h' must be unique in all periods")
                 pH <- NULL 
@@ -258,13 +263,11 @@ vardomh <- function(Y, H, PSU, w_final,
         if (any(IDh != X_ID_household)) stop("'X_ID_household' and 'unique(ID_household)' records have different")
     }}
 
-
   # X
   if (!is.null(X)) {
     X <- data.table(X, check.names=T)
     if (nrow(X) != nrow(X_ID_household)) stop("'X' and 'X_ID_household' have different row count")
   }
-
 
   # ind_gr
   if (!is.null(X)) {
@@ -312,29 +315,30 @@ vardomh <- function(Y, H, PSU, w_final,
     if (any(is.na(q))) stop("'q' has unknown values")
     if (any(is.infinite(q))) stop("'q' value can not be infinite")
   }
-
-
-  ### Calculation
-      
+  
+  ### Calculation 
   # Domains
 
   if (!is.null(Dom)) Y1 <- domain(Y, Dom) else Y1 <- Y
-  n_nonzero <- Y1[, lapply(.SD, function(x)  as.numeric(x!=0)), .SDcols = names(Y1)]
+  n_nonzero <- copy(Y1)
   if (!is.null(period)){ n_nonzero <- data.table(period, n_nonzero) 
-                         n_nonzero <- n_nonzero[, lapply(.SD, sum), keyby=names(period), .SDcols=names(Y1)]
-                  } else n_nonzero <- n_nonzero[, lapply(.SD, sum), .SDcols=names(Y1)]
+                         n_nonzero <- n_nonzero[, lapply(.SD, function(x) 
+                                                         sum(as.integer(abs(x)> .Machine$double.eps))),
+                                                         keyby=names(period),
+                                                         .SDcols = names(Y1)]
+                  } else n_nonzero <- n_nonzero[, lapply(.SD, function(x) 
+                                                         sum(as.integer(abs(x)> .Machine$double.eps))),
+                                                         .SDcols = names(Y1)]
 
   sample_size <- pop_size <- NULL
-  if (!is.null(Dom)) { if (!is.null(period)) {nhs <- data.table(Dom, period, sample_size=1, pop_size=w_final)
-                                              nhs <-  nhs[, lapply(.SD, sum, na.rm=T),
-                                                                    keyby=c(names(Dom), names(period)),
-                                                                   .SDcols=c("sample_size", "pop_size")]
-                                     } else { nhs <- data.table(Dom, sample_size=1, pop_size=w_final)
-                                              nhs <-  nhs[, lapply(.SD, sum, na.rm=T),
-                                                                    keyby=names(Dom),
-                                                                   .SDcols=c("sample_size", "pop_size")]
-                                  }
-                           } else nhs <- data.table(sample_size=nrow(Y1), pop_size=sum(w_final)) 
+  nhs <- data.table(sample_size=1, pop_size=w_final)
+  if (!is.null(period)) nhs <- data.table(period, nhs)
+  if (!is.null(Dom)) nhs <- data.table(Dom, nhs)
+  if (!is.null(c(Dom, period))) {nhs <- nhs[, lapply(.SD, sum, na.rm=T),
+                                                       keyby=eval(names(nhs)[0:1-ncol(nhs)]),
+                                                      .SDcols=c("sample_size", "pop_size")]
+                          } else nhs <- nhs[, lapply(.SD, sum, na.rm=T),
+                                                     .SDcols=c("sample_size", "pop_size")]
 
   # Design weights
   if (!is.null(X)) {
@@ -344,12 +348,10 @@ vardomh <- function(Y, H, PSU, w_final,
              setnames(idhx, names(idhx)[c(1:(ncol(idhx)-1))], names(idh))
              idg <- merge(idh, idhx, by=names(idh))
              w_design <- w_final / idg[[ncol(idg)]]
-             idhx <- idh <- NULL
+             idg <- idhx <- idh <- NULL
       } else w_design <- w_final
-
       
   # Ratio of two totals
-  
   Z1 <- persort <- linratio_outp <- NULL 
   estim <- var_est2 <- se <- rse <- NULL
   cv <- absolute_margin_of_error <- NULL
@@ -363,7 +365,6 @@ vardomh <- function(Y, H, PSU, w_final,
 
   if (!is.null(Z)) {
      if (!is.null(Dom)) Z1 <- domain(Z, Dom) else Z1 <- Z
-            
      if (is.null(period)) {
           Y2 <- lin.ratio(Y1, Z1, w_final, Dom=NULL)
           Y2a <- lin.ratio(Y1, Z1, w_design, Dom=NULL)
@@ -432,8 +433,6 @@ vardomh <- function(Y, H, PSU, w_final,
    } else Y4 <- Y3
   Y3 <- NULL
                                 
-  if (is.null(N_h)) print("N_h is null")
-
   var_est <- variance_est(Y=Y4, H=H, PSU=PSU,
                           w_final=w_final2, N_h=N_h, 
                           fh_zero=fh_zero, PSU_level=PSU_level,
@@ -523,7 +522,7 @@ vardomh <- function(Y, H, PSU, w_final,
   Z_nov <- hY <- hZ <- YZnames <- dati <- NULL
  
   all_result[, estim:=Y_nov]   
-  if (!is.null(Z_nov)) {all_result[, estim:=Y_nov/Z_nov]}
+  if (!is.null(all_result$Z_nov)) all_result[, estim:=Y_nov/Z_nov]
 
   if (nrow(all_result[var_est < 0])>0) stop("Estimation of variance are negative!")
  
@@ -572,7 +571,7 @@ vardomh <- function(Y, H, PSU, w_final,
        nosr1 <- nosr[, lapply(names(Dom), function(x) {substring(get(x), nchar(x)+2, nchar(get(x)))})] 
        nosr1 <- nosr1[, lapply(names(nosr1), function(x) str_replace_all(get(x), "[.]", " "))]
        setnames(nosr1, names(nosr1), names(Dom))
-       setnames(nosr, names(Dom), paste0(names(Dom),"old"))
+       setnames(nosr, names(Dom), paste0(names(Dom), "old"))
        nosr <- data.table(nosr, nosr1)
     }
 
@@ -581,12 +580,12 @@ vardomh <- function(Y, H, PSU, w_final,
   all_result <- merge(nosr, all_result)
   nosr <- nosr1 <- NULL
 
-  if (!is.null(Z_nov)) { all_result[, variable:=paste("R", get("variable"), sep="__", get("variableZ"))] }
+  if (!is.null(all_result$Z_nov)) all_result[, variable:=paste("R", get("variable"), sep="__", get("variableZ"))]
   setkeyv(all_result, c(names(Dom), names(period)))
 
-  if (!is.null(Dom)) { all_result <- merge(all_result, nhs, all=T)
-                           } else { all_result[, sample_size:=nhs$sample_size]
-                                       all_result[, pop_size:=nhs$pop_size]} 
+  if (!is.null(c(Dom, period))) { all_result <- merge(all_result, nhs, all=T)
+                         } else { all_result[, sample_size:=nhs$sample_size]
+                                  all_result[, pop_size:=nhs$pop_size]} 
   
   variab <- c("sample_size", "n_nonzero", "pop_size", "estim", "var", "se", 
               "rse", "cv", "absolute_margin_of_error", "relative_margin_of_error",

@@ -116,6 +116,7 @@ varpoord <- function(inc, w_final,
       }
 
   if(!is.null(datasetX)) {
+      dataset <- data.frame(datasetX)
        if (!is.null(periodX)) {
             aperiodX <- periodX  
             if (min(periodX %in% names(datasetX))!=1) stop("'periodX' does not exist in 'datasetX'!")
@@ -169,10 +170,8 @@ varpoord <- function(inc, w_final,
   if (nrow(id) != n) stop("'id' must be the same length as 'inc'")
   if (is.null(names(id))||(names(id)=="id")) setnames(id,names(id),"ID")
   if (is.null(period)){ if (any(duplicated(id))) stop("'id' are duplicate values") 
-                      } else {
-                         id1 <- data.table(period, id)
-                         if (any(duplicated(id1))) stop("'id' by period are duplicate values")
-                      }   
+                       } else if (any(duplicated(data.table(period, id)))) stop("'id' by period are duplicate values")
+ 
   # ID_household
   if (is.null(ID_household)) stop("'ID_household' must be defined")
   ID_household <- data.table(ID_household)
@@ -235,12 +234,17 @@ varpoord <- function(inc, w_final,
       if (!is.numeric(N_h[[ncol(N_h)]])) stop("The last column of 'N_h' should be numerical")
       if (any(is.na(N_h))) stop("'N_h' has unknown values") 
       if (is.null(names(N_h))) stop("'N_h' must be colnames")
+      namesH <- names(H)
+      if (H[, class(get(namesH))]!=N_h[, class(get(namesH))]) stop("Strata class for 'H' and 'N_h' is not equal ")
+
       if (is.null(period)) {
              if (names(H) != names(N_h)[1]) stop("Strata titles for 'H' and 'N_h' is not equal")
              if (any(is.na(merge(unique(H), N_h, by=names(H), all.x = T)))) stop("'N_h' is not defined for all stratas")
              if (any(duplicated(N_h[, head(names(N_h),-1), with=F]))) stop("Strata values for 'N_h' must be unique")
        } else { pH <- data.frame(period, H)
                 if (any(names(pH) != names(N_h)[c(1:(1+np))])) stop("Strata titles for 'period' with 'H' and 'N_h' is not equal")
+                nperH <- names(period)
+                if (pH[, class(get(nperH))]!=N_h[, class(get(nperH))])  stop("Period class for 'period' and 'N_h2' is not equal ")
                 if (any(is.na(merge(unique(pH), N_h, by=names(pH), all.x = T)))) stop("'N_h' is not defined for all stratas and periods")
                 if (any(duplicated(N_h[, head(names(N_h),-1), with=F]))) stop("Strata values for 'N_h' must be unique in all periods")
                 pH <- NULL
@@ -285,7 +289,6 @@ varpoord <- function(inc, w_final,
         if (nrow(IDh) != nrow(X_ID_household)) stop("'X_ID_household' and 'unique(ID_household)' have different row count")
         if (any(IDh != X_ID_household)) stop("'X_ID_household' and 'unique(ID_household)' records have different")
     }}
-
 
   # X
   if (!is.null(X)) {
@@ -371,21 +374,15 @@ varpoord <- function(inc, w_final,
 
   ### Calculation
   sample_size <- pop_size <- n_nonzero <- NULL
-  if (!is.null(Dom)) { if (!is.null(period)) {nhs <- data.table(Dom, period, sample_size=1, pop_size=w_final,                      
-                                                                                           n_nonzero=as.numeric(inc!=0))
-                                              nhs <-  nhs[, lapply(.SD, sum, na.rm=T),
-                                                                    keyby=c(names(Dom), names(period)),
-                                                                   .SDcols=c("sample_size", "pop_size", "n_nonzero")]
-                                     } else { nhs <- data.table(Dom, sample_size=1, pop_size=w_final, 
-                                                                              n_nonzero=as.numeric(inc!=0))
-                                              nhs <-  nhs[, lapply(.SD, sum, na.rm=T),
-                                                                    keyby=names(Dom),
-                                                                   .SDcols=c("sample_size", "pop_size", "n_nonzero")]
-                                  }
-                           } else nhs <- data.table(sample_size=nrow(Y1), 
-                                                                  pop_size=sum(w_final),
-                                                                  n_nonzero=sum(as.numeric(inc!=0))) 
-
+  nhs <- data.table(sample_size=1, pop_size=w_final, 
+                               n_nonzero=as.integer(abs(inc)> .Machine$double.eps))
+  if (!is.null(period)) nhs <- data.table(period, nhs)
+  if (!is.null(Dom)) nhs <- data.table(Dom, nhs)
+  if (!is.null(c(Dom, period))) {nhs <- nhs[, lapply(.SD, sum, na.rm=T),
+                                                       keyby=eval(names(nhs)[0:2-ncol(nhs)]),
+                                                      .SDcols=c("sample_size", "pop_size", "n_nonzero")]
+                          } else nhs <- nhs[, lapply(.SD, sum, na.rm=T),
+                                                     .SDcols=c("sample_size", "pop_size", "n_nonzero")]
 
   estim <- c()
   aH <- names(H)
@@ -710,10 +707,10 @@ varpoord <- function(inc, w_final,
   
   setkeyv(all_result, c(nDom, names(period)))
 
-  if (!is.null(nDom)) { all_result <- merge(all_result, nhs, all=T)
-                           } else { all_result[, sample_size:=nhs$sample_size]
-                                       all_result[, pop_size:=nhs$pop_size]
-                                       all_result[, n_nonzero:=nhs$n_nonzero]} 
+  if (!is.null(c(Dom, period))) { all_result <- merge(all_result, nhs, all=T)
+                         } else { all_result[, sample_size:=nhs$sample_size]
+                                  all_result[, pop_size:=nhs$pop_size]
+                                  all_result[, n_nonzero:=nhs$n_nonzero]} 
 
   variabl <- c("sample_size", "n_nonzero", "pop_size", 
                       "value", "value_eu", "var", "se", "rse",
@@ -729,7 +726,3 @@ varpoord <- function(inc, w_final,
        res_out = res_outp,
        all_result = all_result[, c(type, nDom, variabl), with=F])
 }
-
-
-
-

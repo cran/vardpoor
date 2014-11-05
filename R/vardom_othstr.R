@@ -5,7 +5,6 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
                    period = NULL,
                    N_h = NULL,
                    N_h2 = NULL,
-                   s2g = FALSE,
                    Z = NULL,
                    X = NULL,
                    g = NULL,
@@ -151,12 +150,19 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
       if (!is.numeric(N_h[[ncol(N_h)]])) stop("The last column of 'N_h' should be numerical")
       if (any(is.na(N_h))) stop("'N_h' has unknown values") 
       if (is.null(names(N_h))) stop("'N_h' must be colnames")
+      namesH <- names(H)
+      if (H[, class(get(namesH))]!=N_h[, class(get(namesH))]) 
+                                         stop("Strata class for 'H' and 'N_h' is not equal ")
+
       if (is.null(period)) {
              if (names(H) != names(N_h)[1]) stop("Strata titles for 'H' and 'N_h' is not equal")
              if (any(is.na(merge(unique(H), N_h, by=names(H), all.x = T)))) stop("'N_h' is not defined for all stratas")
              if (any(duplicated(N_h[, head(names(N_h),-1), with=F]))) stop("Strata values for 'N_h' must be unique")
        } else { pH <- data.frame(period, H)
                 if (any(names(pH) != names(N_h)[c(1:(1+np))])) stop("Strata titles for 'period' with 'H' and 'N_h' is not equal")
+                nperH <- names(period)
+                if (H[, class(get(nperH))]!=N_h2[, class(get(nperH))]) 
+                                                       stop("Period class for 'period' and 'N_h2' is not equal ")
                 if (any(is.na(merge(unique(pH), N_h, by=names(pH), all.x = T)))) stop("'N_h' is not defined for all stratas and periods")
                 if (any(duplicated(N_h[, head(names(N_h),-1), with=F]))) stop("Strata values for 'N_h' must be unique in all periods")
                pH <- NULL
@@ -171,12 +177,18 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
       if (!is.numeric(N_h2[[ncol(N_h2)]])) stop("The last column of 'N_h2' should be numerical")
       if (any(is.na(N_h2))) stop("'N_h2' has unknown values") 
       if (is.null(names(N_h2))) stop("'N_h2' must be colnames")
+     namesH2 <- names(H2)
+      if (H2[, class(get(namesH2))]!=N_h2[, class(get(namesH2))]) 
+                                         stop("Strata class for 'H2' and 'N_h2' is not equal ")
 
       if (is.null(period)) {
-             if (names(H2) != names(N_h2)[1]) stop("Strata titles for 'H' and 'N_h' is not equal")
+             if (names(H2) != names(N_h2)[1]) stop("Strata titles for 'H2' and 'N_h2' is not equal")
              if (any(is.na(merge(unique(H2), N_h2, by=names(H2), all.x = T)))) stop("'N_h2' is not defined for all stratas")
        } else { pH2 <- data.table(period, H2)
                 if (any(names(pH2) != names(N_h2)[c(1:(1+np))])) stop("Strata titles for 'period' with 'H2' and 'N_h2' is not equal")
+                nperH <- names(period)
+                if (H[, class(get(nperH))]!=N_h2[, class(get(nperH))]) 
+                                                       stop("Period class for 'period' and 'N_h2' is not equal ")
                 if (any(is.na(merge(unique(pH2), N_h2, by=names(pH2), all.x = T)))) stop("'N_h2' is not defined for all stratas and periods")
                 } 
     setkeyv(N_h2, names(N_h2)[c(1:(1+np))])
@@ -245,22 +257,26 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   # Domains
   if (!is.null(Dom)) Y1 <- domain(Y, Dom) else Y1 <- Y
 
-  n_nonzero <- Y1[, lapply(.SD, function(x)  as.numeric(x!=0)), .SDcols = names(Y1)]
+  n_nonzero <- copy(Y1)
   if (!is.null(period)){ n_nonzero <- data.table(period, n_nonzero) 
-                         n_nonzero <- n_nonzero[, lapply(.SD, sum), keyby=names(period), .SDcols=names(Y1)]
-                  } else n_nonzero <- n_nonzero[, lapply(.SD, sum), .SDcols=names(Y1)]
+                         n_nonzero <- n_nonzero[, lapply(.SD, function(x) 
+                                                         sum(as.integer(abs(x)> .Machine$double.eps))),
+                                                         keyby=names(period),
+                                                         .SDcols = names(Y1)]
+                  } else n_nonzero <- n_nonzero[, lapply(.SD, function(x) 
+                                                         sum(as.integer(abs(x)> .Machine$double.eps))),
+                                                         .SDcols = names(Y1)]
 
   sample_size <- pop_size <- NULL
-  if (!is.null(Dom)) { if (!is.null(period)) {nhs <- data.table(Dom, period, sample_size=1, pop_size=w_final)
-                                              nhs <-  nhs[, lapply(.SD, sum, na.rm=T),
-                                                                    keyby=c(names(Dom), names(period)),
-                                                                   .SDcols=c("sample_size", "pop_size")]
-                                     } else { nhs <- data.table(Dom, sample_size=1, pop_size=w_final)
-                                              nhs <-  nhs[, lapply(.SD, sum, na.rm=T),
-                                                                    keyby=names(Dom),
-                                                                   .SDcols=c("sample_size", "pop_size")]
-                                  }
-                           } else nhs <- data.table(sample_size=nrow(Y1), pop_size=sum(w_final)) 
+  nhs <- data.table(sample_size=1, pop_size=w_final)
+  if (!is.null(period)) nhs <- data.table(period, nhs)
+  if (!is.null(Dom)) nhs <- data.table(Dom, nhs)
+  if (!is.null(c(Dom, period))) {nhs <- nhs[, lapply(.SD, sum, na.rm=T),
+                                                       keyby=eval(names(nhs)[0:1-ncol(nhs)]),
+                                                      .SDcols=c("sample_size", "pop_size")]
+                          } else nhs <- nhs[, lapply(.SD, sum, na.rm=T),
+                                                     .SDcols=c("sample_size", "pop_size")]
+
 
   # Design weights
   if (!is.null(X)) w_design <- w_final / g else w_design <- w_final
@@ -299,6 +315,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   # Calibration
   res_outp <- NULL
   if (!is.null(X)) {
+        ind_gr <- data.table(nsk=rep(1, nrow(X)))
         if (!is.null(period)) ind_gr <- data.table(ind_gr, period)
         ind_gr <- do.call("paste", c(as.list(ind_gr), sep="_"))
         sortcal <- unlist(split(Y1[, .I], ind_gr))
@@ -312,8 +329,9 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
 
   var_est <- variance_othstr(Y=Y3, H=H, H2=H2,  
                              w_final=w_final, N_h=N_h,
-                             N_h2=N_h2, s2g=s2g,
-                             period=period, dataset=NULL)
+                             N_h2=N_h2, period=period, dataset=NULL)
+  s2g <- var_est$s2g
+  var_est <- var_est$var_est
   var_est <- transpos(var_est, is.null(period), "var_est", names(period))
   all_result <- var_est
 
@@ -323,8 +341,8 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   # Variance of HT estimator under current design
   var_cur_HT <- variance_othstr(Y=Y2a, H=H, H2=H2, 
                                 w_final=w_design, N_h=N_h,
-                                N_h2=N_h2, s2g=s2g, 
-                                period=period, dataset=NULL)
+                                N_h2=N_h2, period=period, dataset=NULL)
+  var_cur_HT <- var_cur_HT$var_est
   var_cur_HT <- transpos(var_cur_HT, is.null(period), "var_cur_HT", names(period))
   all_result <- merge(all_result, var_cur_HT)
   n_nonzero <- var_est <- var_cur_HT <- NULL
@@ -373,6 +391,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
                          Y_nov <- hY[, lapply(.SD, sum, na.rm = T), keyby=names(period), .SDcols = names(Y1)]
                        }
   Y_nov <- transpos(Y_nov, is.null(period), "Y_nov", names(period))
+
   all_result <- merge(all_result, Y_nov)
   
   if (!is.null(Z1)) {
@@ -401,7 +420,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
 
   
   all_result[, estim:=Y_nov]   
-  if (!is.null(Z_nov)) all_result[, estim:=Y_nov/Z_nov]
+  if (!is.null(all_result$Z_nov)) all_result[, estim:=Y_nov/Z_nov]
 
   if (nrow(all_result[var_est < 0])>0) print("Estimation of variance are negative!")
  
@@ -420,7 +439,6 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   all_result[(estim!=0) & !is.nan(estim), rse:= se/estim]
   all_result[estim==0 | is.nan(estim), rse:=NA]
   all_result[, cv:= rse*100]
-
 
   tsad <- qnorm(0.5*(1+confidence))
   all_result[, absolute_margin_of_error:= tsad*se]
@@ -448,22 +466,24 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
   if (!is.null(Dom)) {
        setnames(nosr, names(nosr)[3:ncol(nosr)], names(Dom))
        nosr1 <- nosr[, lapply(names(Dom), function(x) {substring(get(x), nchar(x)+2, nchar(get(x)))})] 
+       nosr1 <- nosr1[, lapply(names(nosr1), function(x) {str_replace_all(get(x),"[.]", " ")})] 
        setnames(nosr1, names(nosr1), names(Dom))
        setnames(nosr, names(Dom), paste0(names(Dom),"old"))
        nosr <- data.table(nosr, nosr1)
     }
+
   setkeyv(nosr, "variableD")
   setkeyv(all_result, "variableD")
   all_result <- merge(nosr, all_result)
   nosr <- nosr1 <- NULL
   
-  if (!is.null(Z_nov)) { 
+  if (!is.null(all_result$Z_nov)) { 
        all_result[, variable:=paste("R", get("variable"), sep="__", get("variableDZ"))] }
   setkeyv(all_result, c(names(Dom), names(period)))
 
-  if (!is.null(Dom)) { all_result <- merge(all_result, nhs, all=T)
-                           } else { all_result[, sample_size:=nhs$sample_size]
-                                       all_result[, pop_size:=nhs$pop_size]} 
+  if (!is.null(c(Dom, period))) { all_result <- merge(all_result, nhs, all=T)
+                         } else { all_result[, sample_size:=nhs$sample_size]
+                                  all_result[, pop_size:=nhs$pop_size]} 
 
   variab <- c("sample_size", "n_nonzero", "pop_size", "estim", "var", "se", 
               "rse", "cv", "absolute_margin_of_error", "relative_margin_of_error",
@@ -475,5 +495,6 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
 
   list(lin_out = linratio_outp,
        res_out = res_outp,
+       s2g = s2g,
        all_result = all_result)
 }
