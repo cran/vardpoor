@@ -15,7 +15,7 @@ vardom(Y, H, PSU, w_final, id=NULL,
        dataset = NULL, 
        q = rep(1, if (is.null(dataset)) 
              nrow(data.frame(X)) else nrow(dataset)),
-       confidence = .95, outp_lin=FALSE,
+       confidence = .95,  outp_lin=FALSE,
        outp_res=FALSE)}
 
 \arguments{
@@ -54,9 +54,9 @@ vardom(Y, H, PSU, w_final, id=NULL,
 
 \item{confidence}{Optional positive value for confidence interval. This variable by default is 0.95.}
 
-\item{outp_lin}{Logical value. if \code{TRUE} linearized values of the ratio estimator will be printed out.}
+\item{outp_lin}{Logical value. If \code{TRUE} linearized values of the ratio estimator will be printed out.}
 
-\item{outp_res}{Logical value. if \code{TRUE} estimated residuals of calibration will be printed out.}
+\item{outp_res}{Logical value. If \code{TRUE} estimated residuals of calibration will be printed out.}
 }
 
 
@@ -70,39 +70,25 @@ vardom(Y, H, PSU, w_final, id=NULL,
 
   \item{all_result}{A \code{data.table}, which containing variables:
 
-       \code{sample_size} - the sample size,
-
-       \code{pop_size} - the estimated size of population,
-
-       \code{estim} - the estimated value,
-
-       \code{var} - the estimated variance,
-
-       \code{se} - the estimated standard error,
-
-       \code{rse} - the estimated relative standard error (coefficient of variation),
-
-       \code{cv} - the estimated relative standard error (coefficient of variation) in percentage,
-
-       \code{absolute_margin_of_error} - the estimated absolute margin of error,
-
-       \code{relative_margin_of_error} - the estimated relative margin of error,
-
-       \code{CI_lower} - the estimated confidence interval lower bound,
- 
-       \code{CI_upper} - the estimated confidence interval upper bound,
-
-       \code{var_srs_HT} - the estimated variance of the HT estimator under SRS,
-
-       \code{var_cur_HT} - the estimated variance of the HT estimator under current design,
-
-       \code{var_srs_ca} - the estimated variance of the calibrated estimator under SRS,
-  
-       \code{deff_sam} - the estimated design effect of sample design,
-
-       \code{deff_est} - the estimated design effect of estimator,
-
-       \code{deff} - the overall estimated design effect of sample design and estimator.}
+       \code{respondent_count} - the count of respondents, \cr
+       \code{pop_size} - the estimated size of population, \cr
+       \code{n_nonzero} - the count of respondents, who answers are larger than zero, \cr
+       \code{estim} - the estimated value, \cr
+       \code{var} - the estimated variance, \cr
+       \code{se} - the estimated standard error, \cr
+       \code{rse} - the estimated relative standard error (coefficient of variation), \cr
+       \code{cv} - the estimated relative standard error (coefficient of variation) in percentage, \cr
+       \code{absolute_margin_of_error} - the estimated absolute margin of error, \cr
+       \code{relative_margin_of_error} - the estimated relative margin of error, \cr
+       \code{CI_lower} - the estimated confidence interval lower bound, \cr
+       \code{CI_upper} - the estimated confidence interval upper bound, \cr
+       \code{var_srs_HT} - the estimated variance of the HT estimator under SRS, \cr
+       \code{var_cur_HT} - the estimated variance of the HT estimator under current design, \cr
+       \code{var_srs_ca} - the estimated variance of the calibrated estimator under SRS, \cr
+       \code{deff_sam} - the estimated design effect of sample design, \cr
+       \code{deff_est} - the estimated design effect of estimator, \cr
+       \code{deff} - the overall estimated design effect of sample design and estimator, \cr
+       \code{n_eff} - the effective sample size.}
 }
 
 \details{

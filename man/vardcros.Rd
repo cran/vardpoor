@@ -8,8 +8,9 @@
 
 \usage{
 vardcros(Y, H, PSU, w_final, id, Dom = NULL,
-         Z = NULL, country, period,
+         Z = NULL, country, periods,
          dataset = NULL, linratio=FALSE,
+         use.estVar = FALSE,
          household_level_max=TRUE,
          withperiod=TRUE, netchanges=TRUE,
          confidence = .95)}
@@ -32,13 +33,15 @@ vardcros(Y, H, PSU, w_final, id, Dom = NULL,
 
 \item{country}{Variable for the survey countries. The values for each country are computed independently. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
-\item{period}{Variable for the survey periods. The values for each period are computed independently. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
+\item{periods}{Variable for the survey periods. The values for each period are computed independently. Object convertible to \code{data.frame} or variable names as character, column numbers or logical vector (length of the vector has to be the same as the column count of \code{dataset}).}
 
 \item{dataset}{Optional survey data object convertible to \code{data.frame}.}
 
-\item{linratio}{Logical value. If value is \code{TRUE}, then the linearized variables for the ratio estimator is used for variance estimation. If value is \code{FALSE}, then the gradients is used for variance , but if f variables of interest.}
+\item{linratio}{Logical value. If value is \code{TRUE}, then the linearized variables for the ratio estimator is used for variance estimation. If value is \code{FALSE}, then the gradients is used for variance estimation.}
 
-\item{household_level_max}{Logical value.}
+\item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals.}
+
+\item{household_level_max}{Logical value. If value is \code{TRUE}, then the size of sample for variance under simple random sampling is taken as maximum value of size in household . If value is \code{FALSE}, thenthen the size of sample for variance under simple random sampling is taken as count of persons in household.}
 
 \item{withperiod}{Logical value. If \code{TRUE} is value, the results is with period, if \code{FALSE}, without period.}
 
@@ -93,6 +96,7 @@ set.seed(1)
 data <- data.table(eusilc,
                    year=rep(2010, nrow(eusilc)),
                    country=rep("AT", nrow(eusilc)))
+data[, country:=as.character(country)]
 data[age<0, age:=0]
 PSU <- data[,.N, keyby="db030"]
 PSU[, N:=NULL]
@@ -122,12 +126,14 @@ data[, arope:= ifelse (pov == 1 | dep == 1 | lwi == 1, 1, 0)]
 result11 <- vardcros(Y="arope",
                     H="strata", PSU="PSU", w_final="rb050",
                     id="db030", Dom="rb090", Z=NULL,
-                    country="country", period="year",
+                    country="country", periods="year",
                     dataset=data,
-                    linratio=FALSE, 
+                    linratio=FALSE,  
+                    use.estVar=FALSE,
                     withperiod=TRUE,
                     netchanges=TRUE,
                     confidence = .95)
+
 \dontrun{
 # Example 2
 data(eusilc)
@@ -169,6 +175,7 @@ result11 <- vardcros(Y=c("pov", "dep", "arope"),
                     country="country", period="year",
                     dataset=data,
                     linratio=FALSE, 
+                    use.estVar=FALSE,
                     withperiod=TRUE,
                     netchanges=TRUE,
                     confidence = .95)
@@ -180,6 +187,7 @@ result12 <- vardcros(Y=c("lwi"),
                     country="country", period="year",
                     dataset=data2,
                     linratio=FALSE, 
+                    use.estVar=FALSE,
                     withperiod=TRUE,
                     netchanges=TRUE,
                     confidence = .95)
@@ -197,6 +205,8 @@ data <- data.table(rbind(eusilc, eusilc, eusilc, eusilc),
                            rep("AT", nrow(eusilc)),
                            rep("AT", nrow(eusilc)),
                            rep("AT", nrow(eusilc))))
+data[, rb020:=as.character(rb020)]
+
 data[, u:=1]
 data[age<0, age:=0]
 data[, strata:="XXXX"]
@@ -204,7 +214,7 @@ PSU <- data[,.N, keyby="db030"]
 PSU[, N:=NULL]
 PSU[, PSU:=trunc(runif(nrow(PSU), 0, 100))]
 data <- merge(data, PSU, by="db030", all=TRUE)
-thres <- data.table(rb020=rep("AT",4),
+thres <- data.table(rb020=as.character(rep("AT",4)),
                     thres= c(11406, 11931, 12371, 12791),
                     rb010=2008:2011)
 setnames(thres, names(thres), tolower(names(thres)))
@@ -275,9 +285,10 @@ pov3==0)|(pov1==1&pov2==0&pov3==1)|(pov1==0&pov2==1&pov3==1))),1,0)]
 result20 <- vardcros(Y="ppr", H="strata", PSU="PSU",
                     w_final="w4", id="rb030",
                     Dom = NULL, Z=NULL,
-                    country="rb020", period=NULL,
+                    country="rb020", periods=NULL,
                     dataset=apv,
                     linratio=FALSE, 
+                    use.estVar=FALSE,
                     withperiod=FALSE,
                     netchanges=FALSE,
                     confidence = .95)}

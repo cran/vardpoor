@@ -3,7 +3,7 @@
 \alias{vardpoor}
 \docType{package}
 \title{
-Variance estimation for surveys by the ultimate cluster method
+Variance Estimation for Sample Surveys by the Ultimate Cluster Method
 }
 \description{
 Generation of domain variables,
@@ -30,8 +30,8 @@ Generation of domain variables,
 \details{
 \tabular{ll}{
 Package: \tab vardpoor\cr
-Version: \tab 0.2.0.14\cr
-Date: \tab 2014-11-03\cr
+Version: \tab 0.2.1\cr
+Date: \tab 2014-12-19\cr
 Depends: \tab R (>= 3.0.0), data.table (>= 1.9.4), laeken, stringr\cr
 Imports: \tab reshape, foreach, plyr, gdata, MASS\cr
 License: \tab GPL (>= 2)\cr
