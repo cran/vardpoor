@@ -582,7 +582,7 @@ vardomh <- function(Y, H, PSU, w_final,
   namesDom <- nosr <- NULL
   
   if (!is.null(all_result$Z_nov)) { 
-       all_result[, variable:=paste("R", get("variable"), sep="__", get("variableDZ"))] }
+       all_result[, variable:=paste("R", get("variable"), get("variableZ"), sep="__")] }
   setkeyv(all_result, c(namesDom1, names(period)))
   setkeyv(nhs, c(namesDom1, names(period)))
 

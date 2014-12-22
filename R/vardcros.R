@@ -292,7 +292,8 @@ vardcros <- function(Y, H, PSU, w_final, id,
                         setnames(res1, names(res1)[1], "num") 
                         res1[, namesY1:=y]
                         if (!is.null(namesZ1) & !linratio) {
-                              setnames(res1, names(res1)[2], "den")}
+                              setnames(res1, names(res1)[2], "den")
+                              res1[, namesZ1:=namesZ1[i]]}
 
                         if (use.estVar==TRUE) {
                               setnames(res1, "num", "num1") 
@@ -305,7 +306,6 @@ vardcros <- function(Y, H, PSU, w_final, id,
                               res1[, nhcor:=ifelse(nh==1,1, nh/(nh-1))]
                               res1[, num1:=nhcor * num * num]
                               if (!is.null(namesZ1) & !linratio) {
-                                  res1[, namesZ1:=namesZ1[i]]
                                   res1[, num_den1:=nhcor * num * den]
                                   res1[, den1:=nhcor * den * den]
                                }}

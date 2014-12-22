@@ -470,7 +470,7 @@ vardom <- function(Y, H, PSU, w_final,
   nosr <- nosr[, lapply(nosr, as.character)]
   setnames(nosr, names(nosr)[2], "variable")
 
- namesDom1 <- namesDom
+  namesDom1 <- namesDom
   if (!is.null(Dom)) {
        setnames(nosr, names(nosr)[3:ncol(nosr)], paste0(namesDom, "_new"))
        nhs[, (paste0(namesDom, "_new")):=lapply(namesDom, function(x) make.names(paste0(x,".", get(x))))]
@@ -483,7 +483,7 @@ vardom <- function(Y, H, PSU, w_final,
   namesDom <- nosr <- NULL
   
   if (!is.null(all_result$Z_nov)) { 
-       all_result[, variable:=paste("R", get("variable"), sep="__", get("variableDZ"))] }
+       all_result[, variable:=paste("R", get("variable"), get("variableZ"), sep="__")] }
   setkeyv(all_result, c(namesDom1, names(period)))
   setkeyv(nhs, c(namesDom1, names(period)))
 

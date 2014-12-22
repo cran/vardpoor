@@ -151,8 +151,9 @@ vardchanges <- function(Y, H, PSU, w_final, id,
    if (any(is.na(period1))) stop("'period1' has unknown values")
    setkeyv(period1, names(periods))
    periodss <- copy(periods)
+   periodss[,periodss:=1]
    setkeyv(periodss, names(periods))
-   if (nrow(merge(period1, periodss, all.x=TRUE))==0) stop("'period1' must be in 'periods'")
+   if (any(is.na(merge(period1, periodss, all.x=TRUE)))) stop("'period1' row must be exist in 'periods'")
 
 
    # period2
@@ -162,7 +163,7 @@ vardchanges <- function(Y, H, PSU, w_final, id,
    setnames(period2, names(period2), names(periods))
    if (any(is.na(period2))) stop("'period2' has unknown values")
    setkeyv(period2, names(periods))
-   if (nrow(merge(period2, periodss, all.x=TRUE))==0) stop("'period2' must be in 'periods'")
+   if (any(is.na(merge(period2, periodss, all.x=TRUE)))) stop("'period2' row must be exist in 'periods'")
 
 
    data <- vardcros(Y=Y, H=H, PSU=PSU, w_final=w_final,

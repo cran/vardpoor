@@ -477,8 +477,8 @@
   all_result <- merge(nosr, all_result)
   namesDom <- nosr <- NULL
   
-  if (!is.null(all_result$Z_nov)) { 
-       all_result[, variable:=paste("R", get("variable"), sep="__", get("variableDZ"))] }
+  if (!is.null(all_result$Z_nov)) {
+       all_result[, variable:=paste("R", get("variable"), get("variableZ"), sep="__")] }
   setkeyv(all_result, c(namesDom1, names(period)))
   setkeyv(nhs, c(namesDom1, names(period)))
 

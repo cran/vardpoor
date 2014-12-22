@@ -39,9 +39,9 @@ vardcros(Y, H, PSU, w_final, id, Dom = NULL,
 
 \item{linratio}{Logical value. If value is \code{TRUE}, then the linearized variables for the ratio estimator is used for variance estimation. If value is \code{FALSE}, then the gradients is used for variance estimation.}
 
-\item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals.}
-
-\item{household_level_max}{Logical value. If value is \code{TRUE}, then the size of sample for variance under simple random sampling is taken as maximum value of size in household . If value is \code{FALSE}, thenthen the size of sample for variance under simple random sampling is taken as count of persons in household.}
+\item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the estimation of covariance matrix of the residuals.}
+ 
+\item{household_level_max}{Logical value. If value is \code{TRUE}, then the size of sample for variance under simple random sampling is taken as maximum value of size in household . If value is \code{FALSE}, then the size of sample for variance under simple random sampling is taken as count of persons in household.}
 
 \item{withperiod}{Logical value. If \code{TRUE} is value, the results is with period, if \code{FALSE}, without period.}
 
@@ -81,10 +81,12 @@ vardcros(Y, H, PSU, w_final, id, Dom = NULL,
 } 
 
 \references{
-Eurostat Methodologies and Working papers, Standard error estimation for the EU-SILC indicators of poverty and social exclusion, 2013, URL \url{http://epp.eurostat.ec.europa.eu/cache/ITY_OFFPUB/KS-RA-13-024/EN/KS-RA-13-024-EN.PDF}. \cr
+Guillaume Osier,  Yves Berger,  Tim Goedeme, (2013), Standard error estimation for the EU-SILC indicators of poverty and social exclusion,  Eurostat Methodologies and Working papers, URL \url{http://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-024-EN.PDF}. \cr
 
 Yves G. Berger, Tim Goedeme, Guillame Osier (2013). Handbook on standard error estimation and other related sampling issues in EU-SILC,
 URL \url{http://www.cros-portal.eu/content/handbook-standard-error-estimation-and-other-related-sampling-issues-ver-29072013} \cr
+
+Eurostat Methodologies and Working papers, Handbook on precision requirements and variance estimation for ESS household surveys, 2013, URL \url{http://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-029-EN.PDF}. \cr
 }
 
 

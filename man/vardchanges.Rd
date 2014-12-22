@@ -37,13 +37,13 @@ vardchanges(Y, H, PSU, w_final, id,
 
 \item{dataset}{Optional survey data object convertible to \code{data.frame}.}
 
-\item{period1}{The one row record from variable \code{periods} describe first period.}
+\item{period1}{The vector of the one row from variable \code{periods} describes the first period.}
 
-\item{period2}{The one row record from variable \code{periods} describe first period.}
+\item{period2}{The vector of the one row from variable \code{periods} describes the second period.}
 
 \item{linratio}{Logical value. If value is \code{TRUE}, then the linearized variables for the ratio estimator is used for variance estimation. If value is \code{FALSE}, then the gradients is used for variance estimation.}
 
-\item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals.}
+\item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the  estimation of covariance matrix of the residuals.}
 
 \item{confidence}{optional; either a positive value for confidence interval. This variable by default is 0.95 .}
 }
@@ -88,7 +88,9 @@ vardchanges(Y, H, PSU, w_final, id,
 }
 
 \references{
-Eurostat Methodologies and Working papers, Standard error estimation for the EU-SILC indicators of poverty and social exclusion, 2013, URL \url{http://epp.eurostat.ec.europa.eu/cache/ITY_OFFPUB/KS-RA-13-024/EN/KS-RA-13-024-EN.PDF}. \cr
+Guillaume Osier,  Yves Berger,  Tim Goedeme, (2013), Standard error estimation for the EU-SILC indicators of poverty and social exclusion,  Eurostat Methodologies and Working papers, URL \url{http://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-024-EN.PDF}. \cr
+
+Eurostat Methodologies and Working papers, Handbook on precision requirements and variance estimation for ESS household surveys, 2013, URL \url{http://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-029-EN.PDF}. \cr
 
 Yves G. Berger, Tim Goedeme, Guillame Osier (2013). Handbook on standard error estimation and other related sampling issues in EU-SILC,
 URL \url{http://www.cros-portal.eu/content/handbook-standard-error-estimation-and-other-related-sampling-issues-ver-29072013} \cr
