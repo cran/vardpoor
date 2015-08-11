@@ -1,4 +1,4 @@
-dfbee3f06a5d985ecf2898fd8ae54bdb *DESCRIPTION
+10cd6b28057cdb9150b6ea06d40ba965 *DESCRIPTION
 57117c1db671459c3398e70eb45833be *NAMESPACE
 8f13905b38ca29aaf85d5387e8e90b49 *R/domain.R
 21ab01bd8640865d992690851e3220b6 *R/incPercentile.R
@@ -24,13 +24,13 @@ b46370763ff2a310a286d53e84397925 *R/vardom_othstr.R
 5b0bdc5d1c28b7bdd4416986a3cce52f *R/vardomh.R
 26e3d8fc7138fd54e4c0d5c99a6f7266 *R/variance_est.R
 845c54e0770edd48ca94c7cad6aa93d2 *R/variance_othstr.R
-7e25e217bb261ce62d0177994ad97caf *R/varpoord.R
+89033bbf4f0bb7857c88e18231f1217c *R/varpoord.R
 def38dcc0cc7d95c9057e5f1cad3d43e *README
 9db57f311b5f678c5af0f4292812278d *inst/BUGS
-e9233452c57556b26859eadd979f214c *inst/CITATION
+7b810dd7e23ce3bfb59b035897cd8524 *inst/CITATION
 2fc621a3341cc126e765d8bdeb16ace8 *inst/COPYING
 afc4e1c3abb329bbcdf0725c0f7e1b55 *inst/DISCLAIMER
-b7300fe4e6eeecf50945a3c116324932 *inst/NEWS
+135a797f839c4f7ad156a424459b3789 *inst/NEWS
 ed430507b6aaf3c7a926031ad4bd4ec3 *inst/README
 7841e594586f62521d6ab428e7ec14d8 *man/domain.Rd
 d9a07a7d5daa6afead5fbd9134ea3a2c *man/incPercentile.Rd
@@ -54,7 +54,7 @@ af84f7619fd7e6a73f826978047ec06b *man/vardcrospoor.Rd
 7640588e59bd5f47f69eef1e42dd9f2a *man/vardom.Rd
 c19c6a0161775a381c6ac6e86653d34f *man/vardom_othstr.Rd
 9849b1e6241bf50bf591d53638271945 *man/vardomh.Rd
-beb06e581363fe8f665e7f27a8c73e25 *man/vardpoor-package.Rd
+2985a8aa8c1e1f9b1cf5378375598698 *man/vardpoor-package.Rd
 667a39d305cd64f62b33f701212f2e17 *man/variance_est.Rd
 8c35f10aca96d85f327330ec4124b8ec *man/variance_othstr.Rd
-d0373377aa4834af425bd63e76a67b1d *man/varpoord.Rd
+768e3ca1ec9cf08afa23a47970bc318f *man/varpoord.Rd

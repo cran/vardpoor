@@ -1,4 +1,3 @@
-
 varpoord <- function(Y, w_final,
                      age=NULL,
                      pl085=NULL,
@@ -811,7 +810,7 @@ varpoord <- function(Y, w_final,
   
   setkeyv(all_result, c(nDom, names(period)))
 
-  if (!is.null(c(Dom, period))) { all_result <- merge(all_result, nhs, all=TRUE)
+  if (!is.null(c(nDom, period))) { all_result <- merge(all_result, nhs, all=TRUE)
                          } else { all_result[, respondent_count:=nhs$respondent_count]
                                   all_result[, pop_size:=nhs$pop_size]
                                   all_result[, n_nonzero:=nhs$n_nonzero]} 

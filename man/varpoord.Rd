@@ -162,7 +162,7 @@ aa<-varpoord(Y = "eqIncome", w_final = "rb050",
              Y_thres = NULL, wght_thres = NULL,
              ID_household = "db030", id = "IDd", 
              H = "db040", PSU = "rb030", N_h = NULL,
-             sort = NULL, Dom = "db040",
+             sort = NULL, Dom = NULL,
              gender = NULL, X = NULL,
              X_ID_household = NULL, g = NULL,
              datasetX = NULL,
@@ -175,7 +175,22 @@ aa
 
 
 \dontrun{
-aa<-varpoord(Y = "eqIncome", w_final = "rb050",
+aa1 <-varpoord(Y = "eqIncome", w_final = "rb050",
+             Y_thres = NULL, wght_thres = NULL,
+             ID_household = "db030", id = "IDd", 
+             H = "db040", PSU = "rb030", N_h = NULL,
+             sort = NULL, Dom = "db040",
+             gender = NULL, X = NULL,
+             X_ID_household = NULL, g = NULL,
+             datasetX = NULL,
+             q = rep(1, if (is.null(datasetX)) 
+                        nrow(as.data.frame(H)) else nrow(datasetX)),
+             dataset =  dataset1, percentage=60, order_quant=50,
+             alpha = 20, confidence = .95, outp_lin = FALSE,
+             outp_res = FALSE, several.ok=FALSE, type="linarpt")
+aa1
+
+aa <- varpoord(Y = "eqIncome", w_final = "rb050",
              Y_thres = NULL, wght_thres = NULL,
              ID_household = "db030", id = "IDd", 
              H = "db040", PSU = "rb030", N_h = NULL,
