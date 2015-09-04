@@ -107,8 +107,18 @@ Ys <- rchisq(10, 3)
 w <- rep(2, 10)
 PSU <- 1:length(Ys)
 H <- rep("Strata_1", 10)
+
+# by default without using fh_zero (finite population correction)
 variance_est(Y=Ys, H=H, PSU=PSU, w_final=w)
 
+
+\dontrun{
+# without using fh_zero (finite population correction)
+variance_est(Y=Ys, H=H, PSU=PSU, w_final=w, fh_zero=FALSE)
+
+# with using fh_zero (finite population correction)
+variance_est(Y=Ys, H=H, PSU=PSU, w_final=w, fh_zero=TRUE)
+}
 } 
 \seealso{
    \code{\link{domain}},   \code{\link{lin.ratio}},    \code{\link{linarpr}},

@@ -24,7 +24,7 @@ vardcrospoor <- function(Y,
   ### Checking
 
   all_choices <- c("linarpr","linarpt","lingpg","linpoormed",
-                   "linrmpg","lingini","lingini2","linqsr", "linrmi", "linarr")
+                   "linrmpg","lingini","lingini2","linqsr", "linrmir", "linarr")
   choices <- c("all_choices", all_choices)
   type <- tolower(type)
   type <- match.arg(type, choices, several.ok)
@@ -391,18 +391,18 @@ vardcrospoor <- function(Y,
        estim <- rbind(estim, esti)
        vgini2 <- esti <- NULL
      }
-  if (("linrmi" %in% type)&&(!is.null(age))) {
-       vrmi <- linrmi(Y=Y, id=id, age=age, weight=w_final, 
+  if (("linrmir" %in% type)&&(!is.null(age))) {
+       vrmir <- linrmir(Y=Y, id=id, age=age, weight=w_final, 
                       sort=sort, Dom=Dom, period=countryper,
                       dataset=NULL, order_quant=order_quant,
-                      var_name="lin_rmi") 
-       Y1 <- merge(Y1, vrmi$lin, all.x=TRUE)
+                      var_name="lin_rmir") 
+       Y1 <- merge(Y1, vrmir$lin, all.x=TRUE)
 
-       esti <- data.table("RMI", vrmi$value)  
+       esti <- data.table("RMIR", vrmir$value, NA)  
        setnames(esti, names(esti)[c(1, -1:0+ncol(esti))],
                                   c("type", "value", "value_eu"))
        estim <- rbind(estim, esti)
-       vrmi <-  esti <- NULL
+       vrmir <-  esti <- NULL
     }
   if (("linarr" %in% type)&&(!is.null(age))
                 &&(!is.null(pl085))&&(!is.null(month_at_work))) {
@@ -414,7 +414,7 @@ vardcrospoor <- function(Y,
 
        Y1 <- merge(Y1, varr$lin, all.x=TRUE)
 
-       esti <- data.table("ARR", varr$value)  
+       esti <- data.table("ARR", varr$value, NA)  
        setnames(esti, names(esti)[c(1, -1:0+ncol(esti))],
                                   c("type", "value", "value_eu"))
        estim <- rbind(estim, esti)

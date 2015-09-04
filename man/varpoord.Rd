@@ -13,8 +13,7 @@
                  gender = NULL, dataset = NULL, X = NULL, periodX = NULL,
                  X_ID_household = NULL, ind_gr = NULL, g = NULL, datasetX = NULL,
                  q, percentage = 60, order_quant = 50, alpha = 20,
-                 confidence = 0.95, outp_lin = FALSE, outp_res = FALSE,
-                 several.ok = FALSE, type = "linrmpg") }
+                 confidence = 0.95, outp_lin = FALSE, outp_res = FALSE, type = "linrmpg") }
                      
 
 \arguments{
@@ -93,10 +92,8 @@ For example, to compute poverty threshold equal to some percentage of median inc
 
 \item{outp_res}{Logical value. If \code{TRUE} estimated residuals of calibration will be printed out.}
 
-\item{several.ok}{Logical value. If \code{type} should be allowed to have more than one.}
-
 \item{type}{a character vector (of length one unless several.ok is TRUE), example "linarpr","linarpt", "lingpg", "linpoormed", "linrmpg",
-   "lingini", "lingini2", "linqsr", "linarr", "linrmi", "all_choices".}
+   "lingini", "lingini2", "linqsr", "linarr", "linrmir", "all_choices".}
 
 }
 
@@ -154,10 +151,10 @@ Working group on Statistics on Income and Living Conditions (2004) Common cross-
 
 \examples{
 data(eusilc)
-dataset <- data.frame(1:nrow(eusilc),eusilc)
-colnames(dataset)[1] <- "IDd"
+dataset <- data.frame(IDd=1:nrow(eusilc),eusilc)
 dataset1 <- dataset[1:1000,]
 
+# use dataset1 by default without using fh_zero (finite population correction)
 aa<-varpoord(Y = "eqIncome", w_final = "rb050",
              Y_thres = NULL, wght_thres = NULL,
              ID_household = "db030", id = "IDd", 
@@ -170,16 +167,16 @@ aa<-varpoord(Y = "eqIncome", w_final = "rb050",
                         nrow(as.data.frame(H)) else nrow(datasetX)),
              dataset =  dataset1, percentage=60, order_quant=50,
              alpha = 20, confidence = .95, outp_lin = FALSE,
-             outp_res = FALSE, several.ok=FALSE, type="linarpt")
+             outp_res = FALSE, type="linarpt")
 aa
 
-
 \dontrun{
+# use dataset1 by default without using fh_zero (finite population correction)
 aa1 <-varpoord(Y = "eqIncome", w_final = "rb050",
              Y_thres = NULL, wght_thres = NULL,
              ID_household = "db030", id = "IDd", 
              H = "db040", PSU = "rb030", N_h = NULL,
-             sort = NULL, Dom = "db040",
+              fh_zero = FALSE, sort = NULL, Dom = "db040",
              gender = NULL, X = NULL,
              X_ID_household = NULL, g = NULL,
              datasetX = NULL,
@@ -187,10 +184,47 @@ aa1 <-varpoord(Y = "eqIncome", w_final = "rb050",
                         nrow(as.data.frame(H)) else nrow(datasetX)),
              dataset =  dataset1, percentage=60, order_quant=50,
              alpha = 20, confidence = .95, outp_lin = FALSE,
-             outp_res = FALSE, several.ok=FALSE, type="linarpt")
+             outp_res = FALSE, type="linarpt")
 aa1
+aa1$all_result
 
-aa <- varpoord(Y = "eqIncome", w_final = "rb050",
+# use dataset1 by default with using fh_zero (finite population correction)
+aa2 <-varpoord(Y = "eqIncome", w_final = "rb050",
+             Y_thres = NULL, wght_thres = NULL,
+             ID_household = "db030", id = "IDd", 
+             H = "db040", PSU = "rb030", N_h = NULL,
+              fh_zero = TRUE, sort = NULL, Dom = "db040",
+             gender = NULL, X = NULL,
+             X_ID_household = NULL, g = NULL,
+             datasetX = NULL,
+             q = rep(1, if (is.null(datasetX)) 
+                        nrow(as.data.frame(H)) else nrow(datasetX)),
+             dataset =  dataset1, percentage=60, order_quant=50,
+             alpha = 20, confidence = .95, outp_lin = FALSE,
+             outp_res = FALSE, type="linarpt")
+aa2
+aa2$all_result
+
+
+# using dataset1
+aa3 <-varpoord(Y = "eqIncome", w_final = "rb050",
+             Y_thres = NULL, wght_thres = NULL,
+             ID_household = "db030", id = "IDd", 
+             H = "db040", PSU = "rb030", N_h = NULL,
+            sort = NULL, Dom = "db040",
+             gender = NULL, X = NULL,
+             X_ID_household = NULL, g = NULL,
+             datasetX = NULL,
+             q = rep(1, if (is.null(datasetX)) 
+                        nrow(as.data.frame(H)) else nrow(datasetX)),
+             dataset =  dataset1, percentage=60, order_quant=50,
+             alpha = 20, confidence = .95, outp_lin = FALSE,
+             outp_res = FALSE, type="all_choices")
+aa3
+aa3$all_result[type=="ARPT"]
+
+# using dataset
+aa4 <- varpoord(Y = "eqIncome", w_final = "rb050",
              Y_thres = NULL, wght_thres = NULL,
              ID_household = "db030", id = "IDd", 
              H = "db040", PSU = "rb030", N_h = NULL,
@@ -202,9 +236,11 @@ aa <- varpoord(Y = "eqIncome", w_final = "rb050",
                         nrow(as.data.frame(H)) else nrow(datasetX)),
              dataset =  dataset, percentage=60, order_quant=50,
              alpha = 20, confidence = .95, outp_lin = TRUE,
-             outp_res = TRUE, several.ok=FALSE, type="all_choices")
-aa$lin_out[20:40]
-aa$res_out[20:40]
+             outp_res = TRUE, type="all_choices")
+aa4$all_result[type=="ARPT"]
+
+aa4$lin_out[20:40]
+aa4$res_out[20:40]
 }
 
 

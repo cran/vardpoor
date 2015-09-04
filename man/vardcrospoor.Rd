@@ -92,7 +92,7 @@ For example, to compute poverty threshold equal to some percentage of median inc
 \item{several.ok}{Logical value. If \code{type} should be allowed to have more than one.}
 
 \item{type}{a character vector (of length one unless several.ok is TRUE), example "linarpr","linarpt", "lingpg", "linpoormed", "linrmpg",
-   "lingini", "lingini2", "linqsr", "linarr", "linrmi", "all_choices".}
+   "lingini", "lingini2", "linqsr", "linarr", "linrmir", "all_choices".}
 }
 
 \value{
@@ -125,7 +125,7 @@ Eurostat Methodologies and Working papers, Handbook on precision requirements an
 }
 
 \seealso{
-\code{\link{linrmi}}, \code{\link{linarr}}, \code{\link{vardchanges}}}
+\code{\link{linrmir}}, \code{\link{linarr}}, \code{\link{vardchanges}}}
 
 
 \examples{

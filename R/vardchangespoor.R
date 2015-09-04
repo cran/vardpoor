@@ -27,7 +27,7 @@ vardchangespoor <- function(Y,
 
   all_choices <- c("linarpr","linarpt","lingpg",
                             "linpoormed",  "linrmpg","lingini",
-                            "lingini2","linqsr", "linrmi", "linarr")
+                            "lingini2","linqsr", "linrmir", "linarr")
   choices <- c("all_choices", all_choices)
   type <- tolower(type)
 

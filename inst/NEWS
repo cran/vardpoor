@@ -1,3 +1,9 @@
+Changes in vardpoor version 0.4.0
+
+    + Corrected bug in function vardpoor using subfunction linrmi and linarr
+       
+    + Add new examples for vardpoor and vardomh using argument fh_zero
+
 Changes in vardpoor version 0.3.6
 
     + Corrected bug in function vardpoor
