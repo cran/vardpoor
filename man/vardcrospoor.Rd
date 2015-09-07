@@ -27,7 +27,6 @@ vardcrospoor(Y,
                      withperiod = TRUE,
                      netchanges = TRUE,
                      confidence = .95,
-                     several.ok=FALSE,
                      type="linrmpg")
 }
 
@@ -88,8 +87,6 @@ For example, to compute poverty threshold equal to some percentage of median inc
 \item{netchanges}{Logical value. If value is TRUE, then produce two objects: the first object is aggregation of weighted data by period (if available), country, strata and PSU, the second object is an estimation for Y, the variance, gradient for numerator and denominator by country and period (if available). If value is FALSE, then both objects containing \code{NULL}.}
 
 \item{confidence}{Optional positive value for confidence interval. This variable by default is 0.95.}
-
-\item{several.ok}{Logical value. If \code{type} should be allowed to have more than one.}
 
 \item{type}{a character vector (of length one unless several.ok is TRUE), example "linarpr","linarpt", "lingpg", "linpoormed", "linrmpg",
    "lingini", "lingini2", "linqsr", "linarr", "linrmir", "all_choices".}
@@ -168,7 +165,6 @@ result <- vardcrospoor(Y="inc", age="age",
                      dataset = data,
                      use.estVar = FALSE,
                      confidence=0.95,
-                     several.ok=FALSE,
                      type="linrmpg")
 
 \dontrun{
@@ -189,7 +185,6 @@ result2 <- vardcrospoor(Y="inc",  age="age",
                      dataset = data,
                      use.estVar = FALSE,
                      confidence=0.95,
-                     several.ok=FALSE,
                      type="linrmpg")}
 }
 

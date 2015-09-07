@@ -19,7 +19,6 @@ vardcrospoor <- function(Y,
                      withperiod = TRUE,
                      netchanges = TRUE,
                      confidence = .95,
-                     several.ok=FALSE,
                      type="linrmpg") {
   ### Checking
 
@@ -27,9 +26,9 @@ vardcrospoor <- function(Y,
                    "linrmpg","lingini","lingini2","linqsr", "linrmir", "linarr")
   choices <- c("all_choices", all_choices)
   type <- tolower(type)
-  type <- match.arg(type, choices, several.ok)
-  if (any(type == "all_choices")) {type <- all_choices
-                                   several.ok <- TRUE } 
+
+  type <- match.arg(type, choices, length(type)>1) 
+  if (any(type == "all_choices"))  type <- all_choices
 
   # check 'p'
   p <- percentage

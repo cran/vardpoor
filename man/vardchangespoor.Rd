@@ -27,7 +27,6 @@ vardchangespoor(Y,
                      linratio = FALSE,
                      use.estVar = FALSE,
                      confidence=0.95,
-                     several.ok=FALSE,
                      type="linrmpg")}
 
 \arguments{
@@ -89,8 +88,6 @@ For example, to compute poverty threshold equal to some percentage of median inc
 \item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the  estimation of covariance matrix of the residuals.}
 
 \item{confidence}{optional; either a positive value for confidence interval. This variable by default is 0.95 .}
-
-\item{several.ok}{Logical value. If \code{type} should be allowed to have more than one.}
 
 \item{type}{a character vector (of length one unless several.ok is TRUE), example "linarpr","linarpt", "lingpg", "linpoormed", "linrmpg",
    "lingini", "lingini2", "linqsr", "linarr", "linrmir", "all_choices".}
@@ -170,7 +167,6 @@ result <- vardchangespoor(Y="inc", age="age",
                      period1=2010, period2=2011,
                      use.estVar = FALSE,
                      confidence=0.95,
-                     several.ok=FALSE,
                      type="linrmpg")
 
 }
