@@ -1,4 +1,4 @@
-579d073b9ded42bfafce34130c075603 *DESCRIPTION
+fb0adda81d1cf22ea14bb1261ef19a55 *DESCRIPTION
 48c658debcac456ae01432c23f1ee845 *NAMESPACE
 8f13905b38ca29aaf85d5387e8e90b49 *R/domain.R
 21ab01bd8640865d992690851e3220b6 *R/incPercentile.R
@@ -8,7 +8,7 @@ d593773e378d48a80c2cb515c376d7f0 *R/lin.ratio.R
 6e847a6e840beade3f5bee33762810b2 *R/linarr.R
 872abd081cfe85dc77db0bba359078bf *R/lingini.R
 c6575d083d9a29f464a0bdaabdcd334d *R/lingini2.R
-744ab55587c8f5f9b096a8f7b22c71d5 *R/lingpg.R
+651621fd90ccb8e1d5547a11ed3b248e *R/lingpg.R
 440155b2c06372b7462c5287133ff683 *R/linpoormed.R
 f7b55ebdbb664724598435dded8570f4 *R/linqsr.R
 3147a7889eb581b8150dd09987c1e2dc *R/linrmir.R
@@ -30,7 +30,7 @@ def38dcc0cc7d95c9057e5f1cad3d43e *README
 45b01d2bba8e6ea854565399afa4f824 *inst/CITATION
 2fc621a3341cc126e765d8bdeb16ace8 *inst/COPYING
 afc4e1c3abb329bbcdf0725c0f7e1b55 *inst/DISCLAIMER
-858f0c1f0f6595a5da51aa9691f76872 *inst/NEWS
+e36e179e35e3bfa5cd568f994db76c46 *inst/NEWS
 ed430507b6aaf3c7a926031ad4bd4ec3 *inst/README
 7841e594586f62521d6ab428e7ec14d8 *man/domain.Rd
 d9a07a7d5daa6afead5fbd9134ea3a2c *man/incPercentile.Rd
@@ -40,7 +40,7 @@ d289641930fa1bba443aef36931f574a *man/linarpt.Rd
 19da7d1d817cd3255d2a7c9ef3d820e7 *man/linarr.Rd
 e8427a001da851dc93de0263ca934873 *man/lingini.Rd
 518694ec5c543870296ec9bf7df61509 *man/lingini2.Rd
-2c351a69ff0a0a494b2463ac416cb47f *man/lingpg.Rd
+c77cf358133cdd542aa5498a926074ca *man/lingpg.Rd
 60658bdc1b118318149bff5ddbf828fd *man/linpoormed.Rd
 d7031c56a5d389e96e21f2c123cac799 *man/linqsr.Rd
 80aa8ddf891191d6ffa7787e253e3862 *man/linrmir.Rd
@@ -54,7 +54,7 @@ f2a663faf95461852a6bede9988a8ab6 *man/vardcrospoor.Rd
 7640588e59bd5f47f69eef1e42dd9f2a *man/vardom.Rd
 c19c6a0161775a381c6ac6e86653d34f *man/vardom_othstr.Rd
 5877d256f15bf5d6b6a0ffec8a5bb18b *man/vardomh.Rd
-201b211873ae45aebec0250e526e8e0f *man/vardpoor-package.Rd
+4bb165a7e3acab1d2080a4bfe0716e48 *man/vardpoor-package.Rd
 603cc8b46a52db3c0df1cf2a4df2f054 *man/variance_est.Rd
 9673b9a9152079d6f7d23c7a7f13039e *man/variance_othstr.Rd
 380f799182c19ea9baa9efd259be35ef *man/varpoord.Rd
