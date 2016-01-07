@@ -100,6 +100,7 @@ For example, to compute poverty threshold equal to some percentage of median inc
   \item{results}{ A \code{data.table} containing
        \code{period} -  survey periods, \cr
        \code{country} - survey countries, \cr
+       \code{Dom} - optional variable of the population domains, \cr
        \code{type} - type variable, \cr
        \code{count_respondents} - the count of respondents, \cr
        \code{pop_size} - the population size (in numbers of individuals), \cr

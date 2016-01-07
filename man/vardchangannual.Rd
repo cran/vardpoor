@@ -1,21 +1,20 @@
-\name{vardchanges}
+\name{vardchangannual}
 
-\alias{vardchanges}
+\alias{vardchangannual}
 
-\title{Variance estimation for measures of change for single and multistage stage cluster sampling designs}
+\title{Variance estimation for measures of annual net change for single and multistage stage cluster sampling designs}
 
-\description{Computes the variance estimation for measures of change for single and multistage stage cluster sampling designs.}
+\description{Computes the variance estimation for measures of annual net change for single and multistage stage cluster sampling designs.}
 
 \usage{
-vardchanges(Y, H, PSU, w_final, id,
-            Dom = NULL, Z = NULL,
-            country, periods, dataset = NULL,
-            period1, period2,
-            linratio = FALSE,
+vardchangannual(Y, H, PSU, w_final, id,
+            Dom = NULL, Z=NULL, 
+            country, years, subperiods,
+            dataset = NULL,
+            year1, year2,
             percentratio = FALSE,
             use.estVar = FALSE,
-            confidence=0.95,
-            change_type = "absolute")}
+            confidence=0.95) }
 
 \arguments{
 
@@ -35,23 +34,21 @@ vardchanges(Y, H, PSU, w_final, id,
 
 \item{country}{Variable for the survey countries. The values for each country are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
-\item{periods}{Variable for the all survey periods. The values for each period are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
+\item{years}{Variable for the all survey years. The values for each year are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
+
+\item{subperiods}{Variable for the all survey subperiods. The values for each subperiod are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
 \item{dataset}{Optional survey data object convertible to \code{data.table}.}
 
-\item{period1}{The vector of periods from variable \code{periods} describes the first period.}
+\item{year1}{The vector of years from variable \code{years} describes the first year.}
 
-\item{period2}{The vector of periods from variable \code{periods} describes the second period.}
-
-\item{linratio}{Logical value. If value is \code{TRUE}, then the linearized variables for the ratio estimator is used for variance estimation. If value is \code{FALSE}, then the gradients is used for variance estimation.}
+\item{year2}{The vector of years from variable \code{periods} describes the second year.}
 
 \item{percentratio}{Logical variable. If supplied, the all linearized variables are multiplied with 100.}
 
 \item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the  estimation of covariance matrix of the residuals.}
 
 \item{confidence}{optional; either a positive value for confidence interval. This variable by default is 0.95 .}
-
-\item{change_type}{character value net changes type - absolute or relative.}
 
 }
 
@@ -60,8 +57,8 @@ vardchanges(Y, H, PSU, w_final, id,
   A list with objects are returned by the function:
 
   \item{crossectional_results}{ A \code{data.table} containing:
-    
-       \code{period} -  survey periods, \cr
+       \code{year} -  survey years, \cr
+       \code{subperiods} -  survey subperiods, \cr
        \code{country} - survey countries, \cr
        \code{Dom} - optional variable of the population domains, \cr
        \code{namesY} - variable with names of variables of interest, \cr
@@ -85,7 +82,8 @@ vardchanges(Y, H, PSU, w_final, id,
        \code{CI_upper} - the estimated confidence interval upper bound.}
  
  \item{crossectional_var_grad}{ A \code{data.table} containing
-        \code{period} - period1 and period2 together, \cr
+        \code{year} -  survey years, \cr
+        \code{subperiods} -  survey subperiods, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
@@ -93,27 +91,95 @@ vardchanges(Y, H, PSU, w_final, id,
         \code{grad} - the estimated gradient, \cr
         \code{var} - the estimated a design-based variance.}
 
-  \item{rho}{ A \code{data.table} containing
-        \code{period} - period1 and period2 together, \cr
+ \item{vardchanges_grad_var}{ A \code{data.table} containing
+        \code{year_1} -  survey years of \code{years1}, \cr
+        \code{subperiods_1} -  survey subperiods of \code{years1}, \cr
+        \code{year_2} -  survey years of \code{years2}, \cr
+        \code{subperiods_2} -  survey subperiods of \code{years2}, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
         \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-        \code{nams} - the variable names in correlation matrix, \cr
+        \code{nams} - gradient names, numenator (num) and denominator (den), for each year, \cr 
+        \code{grad} - the estimated gradient, \cr
+        \code{cros_var} - the estimated a design-based variance.}
+
+  \item{vardchanges_rho}{ A \code{data.table} containing
+        \code{year_1} -  survey years of \code{years1}, \cr
+        \code{subperiods_1} -  survey subperiods of \code{years1}, \cr
+        \code{year_2} -  survey years of \code{years2}, \cr
+        \code{subperiods_2} -  survey subperiods of \code{years2}, \cr
+        \code{country} - survey countries, \cr
+        \code{Dom} - optional variable of the population domains, \cr
+        \code{namesY} - variable with names of variables of interest, \cr
+        \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
+        \code{nams} - gradient names, numenator (num) and denominator (den), for each year, \cr
         \code{rho} - the estimated correlation matrix.}
 
-  \item{var_tau}{ A \code{data.table} containing
-        \code{period} - period1 and period2 together, \cr
+  \item{vardchanges_var_tau}{ A \code{data.table} containing
+        \code{year_1} -  survey years of \code{years1}, \cr
+        \code{subperiods_1} -  survey subperiods of \code{years1}, \cr
+        \code{year_2} -  survey years of \code{years2}, \cr
+        \code{subperiods_2} -  survey subperiods of \code{years2}, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
         \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-        \code{nams} - the variable names in correlation matrix, \cr
+        \code{nams} - gradient names, numenator (num) and denominator (den), for each year, \cr
         \code{var_tau} - the estimated covariance matrix.}
 
-  \item{changes_results}{ A \code{data.table} containing
+  \item{vardchanges_results}{ A \code{data.table} containing
+        \code{year_1} -  survey years of \code{years1}, \cr
+        \code{subperiods_1} -  survey subperiods of \code{years1}, \cr
+        \code{year_2} -  survey years of \code{years2}, \cr
+        \code{subperiods_2} -  survey subperiods of \code{years2}, \cr
+        \code{country} - survey countries, \cr
+        \code{Dom} - optional variable of the population domains, \cr
+        \code{namesY} - variable with names of variables of interest, \cr
+        \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
+        \code{estim_1} - the estimated value for period1, \cr
+        \code{estim_2} - the estimated value for period2, \cr
+        \code{estim} - the estimated value, \cr
+        \code{var} - the estimated variance, \cr
+        \code{se} - the estimated standard error, \cr
+        \code{CI_lower} - the estimated confidence interval lower bound, \cr
+        \code{CI_upper} - the estimated confidence interval upper bound.}
+
+ \item{X_annual}{ A \code{data.table} containing
+        \code{year_1} -  survey years of \code{years1}, \cr
+        \code{year_2} -  survey years of \code{years2}, \cr
+        \code{year} -  survey years, \cr
         \code{country} - survey countries, \cr
         \code{period} - period1 and period2 together, \cr
+        \code{Dom} - optional variable of the population domains, \cr
+        \code{namesY} - variable with names of variables of interest, \cr
+        \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
+        \code{cros_se} - the estimated cross-sectional standard error.}
+
+ \item{A_matrix}{ A \code{data.table} containing
+        \code{year_1} -  survey years of \code{years1}, \cr
+        \code{year_2} -  survey years of \code{years2}, \cr
+        \code{country} - survey countries, \cr
+        \code{Dom} - optional variable of the population domains, \cr
+        \code{namesY} - variable with names of variables of interest, \cr
+        \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
+        \code{cols} - the estimated matrix_A columns, \cr
+        \code{matrix_A} - the estimated matrix A.}
+
+ \item{annual_sum}{ A \code{data.table} containing
+        \code{year} - survey years, \cr
+        \code{country} - survey countries, \cr
+        \code{Dom} - optional variable of the population domains, \cr
+        \code{namesY} - variable with names of variables of interest, \cr
+        \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
+        \code{totalY} - the estimated value of variables of interest for period1, \cr
+        \code{totalZ} - optional the estimated value of denominator for period2, \cr
+        \code{estim} - the estimated value for year .}
+
+ \item{annual_changes}{ A \code{data.table} containing
+        \code{year_1} -  survey years of \code{years1}, \cr
+        \code{year_2} -  survey years of \code{years2}, \cr
+        \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
         \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
@@ -128,6 +194,8 @@ vardchanges(Y, H, PSU, w_final, id,
 }
 
 \references{
+Guillaume OSIER, Virginie RAYMOND, (2015), Development of methodology for the estimate of variance of annual net changes for LFS-based indicators. Deliverable 1 - Short document with derivation of the methodology. \cr
+
 Guillaume Osier,  Yves Berger,  Tim Goedeme, (2013), Standard error estimation for the EU-SILC indicators of poverty and social exclusion,  Eurostat Methodologies and Working papers, URL \url{http://ec.europa.eu/eurostat/documents/3888793/5855973/KS-RA-13-024-EN.PDF}. \cr
 
 Eurostat Methodologies and Working papers, Handbook on precision requirements and variance estimation for ESS household surveys, 2013, URL \url{http://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-029-EN.PDF}. \cr
@@ -139,10 +207,9 @@ URL \url{http://www.cros-portal.eu/content/handbook-standard-error-estimation-an
 \examples{
 
 ### Example 
-
 data("eusilc")
 set.seed(1)
-eusilc1 <- eusilc[1:40,]
+eusilc1 <- eusilc
 
 set.seed(1)
 data <- data.table(rbind(eusilc1, eusilc1),
@@ -150,43 +217,11 @@ data <- data.table(rbind(eusilc1, eusilc1),
                           rep(2011, nrow(eusilc1))),
                    country=c(rep("AT", nrow(eusilc1)),
                              rep("AT", nrow(eusilc1))))
+data[, quarter:=.I - 4 * trunc((.I - 1)/4)]
 data[age<0, age:=0]
 PSU <- data[,.N, keyby="db030"]
 PSU[, N:=NULL]
 PSU[, PSU:=trunc(runif(nrow(PSU), 0, 5))]
-setkeyv(PSU, "db030")
-setkeyv(data, "db030")
-data <- merge(data, PSU, all=TRUE)
-PSU <- eusilc <- NULL
-data[, strata:=c("XXXX")]
-data[, strata:=as.character(strata)]
-
-data[, t_pov:=trunc(runif(nrow(data), 0, 2))]
-data[, exp:= 1]
-
-# At-risk-of-poverty (AROP)
-data[, pov:= ifelse (t_pov == 1, 1, 0)]
- 
-result <- vardchanges(Y="pov",
-                   H="strata", PSU="PSU", w_final="rb050",
-                   id="db030", Dom=NULL, Z=NULL,
-                   country="country", periods="year",
-                   dataset=data,
-                   period1=2010, period2=2011,
-                   use.estVar=FALSE,
-                   change_type="absolute")
- 
-\dontrun{
-data("eusilc")
-data <- data.table(rbind(eusilc, eusilc),
-                   year=c(rep(2010, nrow(eusilc)),
-                          rep(2011, nrow(eusilc))),
-                   country=c(rep("AT", nrow(eusilc)),
-                             rep("AT", nrow(eusilc))))
-data[age<0, age:=0]
-PSU <- data[,.N, keyby="db030"]
-PSU[, N:=NULL]
-PSU[, PSU:=trunc(runif(nrow(PSU), 0, 100))]
 setkeyv(PSU, "db030")
 setkeyv(data, "db030")
 data <- merge(data, PSU, all=TRUE)
@@ -211,19 +246,19 @@ data[, lwi:= ifelse (t_lwi == 1 & exp2 == 1, 1, 0)]
 
 # At-risk-of-poverty or social exclusion (AROPE)
 data[, arope:= ifelse (pov == 1 | dep == 1 | lwi == 1, 1, 0)]
-data[, dom:=1]
-
-result <- vardchanges(Y=c("pov", "dep", "lwi", "arope"),
-                   H="strata", PSU="PSU", w_final="rb050",
-                   id="db030", Dom="rb090", Z=NULL,
-                   country="country", periods="year",
-                   dataset=data,
-                   period1=2010, period2=2011,
-                   use.estVar=FALSE,
-                   change_type="absolute")
-}
+ 
+result <- vardchangannual(Y="pov", H="strata",
+                          PSU="PSU", w_final="rb050",                          
+                          id="db030", Dom=NULL, Z=NULL,
+                          country="country", years="year",
+                          subperiods="quarter",
+                          dataset=data,
+                          year1=2010, year2=2011,
+                          percentratio = FALSE,
+                          use.estVar = FALSE,
+                          confidence=0.95)
 }
 
 \seealso{
-\code{\link{domain}},   \code{\link{vardcros}},  \code{\link{vardchangespoor}}}
-\keyword{vardchanges}
+\code{\link{domain}},   \code{\link{vardcros}},  \code{\link{vardchanges}}}
+\keyword{vardchangannual}

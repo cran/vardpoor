@@ -6,7 +6,7 @@
 
 \description{Computes linearized variable for the ratio estimator.}
 
-\usage{lin.ratio(Y, Z, weight, Dom=NULL)}
+\usage{lin.ratio(Y, Z, weight, Dom = NULL, percentratio = FALSE)}
 
 \arguments{
 
@@ -14,9 +14,12 @@
 
 \item{Z}{Matrix of denominator variables. Any object convertible to \code{data.table} with numeric values, \code{NA} values are not allowed.}
 
-\item{weight}{Weight variable. One dimensional object convertible to one-column \code{data.frame}}
+\item{weight}{Weight variable. One dimensional object convertible to one-column \code{data.table}.}
 
-\item{Dom}{Optional variables used to define population domains. If supplied, the linearized variables are computed for each domain. An object convertible to \code{data.table}}
+\item{Dom}{Optional variables used to define population domains. If supplied, the linearized variables are computed for each domain. An object convertible to \code{data.table}.}
+
+\item{percentratio}{Logical variable. If supplied, the all linearized variables are multiplied with 100.}
+
 }
 
 \value{The function returns the \code{data.table} of the linearized variables for the ratio estimator.}

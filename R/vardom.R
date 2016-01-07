@@ -308,10 +308,6 @@ vardom <- function(Y, H, PSU, w_final,
       if (outp_res) res_outp <- data.table(idper, PSU, Y3)
   } else Y3 <- Y2
   Y2 <- NULL
-
-  
-  dataset = NULL
-  Y = Y3
   
   var_est <- variance_est(Y = Y3, H = H, PSU = PSU,
                           w_final = w_final, N_h = N_h,
