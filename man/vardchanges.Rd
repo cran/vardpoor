@@ -12,7 +12,7 @@ vardchanges(Y, H, PSU, w_final, id,
             country, periods, dataset = NULL,
             period1, period2,
             linratio = FALSE,
-            percentratio = FALSE,
+            percentratio = 1,
             use.estVar = FALSE,
             confidence=0.95,
             change_type = "absolute")}
@@ -45,7 +45,7 @@ vardchanges(Y, H, PSU, w_final, id,
 
 \item{linratio}{Logical value. If value is \code{TRUE}, then the linearized variables for the ratio estimator is used for variance estimation. If value is \code{FALSE}, then the gradients is used for variance estimation.}
 
-\item{percentratio}{Logical variable. If supplied, the all linearized variables are multiplied with 100.}
+\item{percentratio}{Positive integer value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
 
 \item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the  estimation of covariance matrix of the residuals.}
 
@@ -85,7 +85,7 @@ vardchanges(Y, H, PSU, w_final, id,
        \code{CI_upper} - the estimated confidence interval upper bound.}
  
  \item{crossectional_var_grad}{ A \code{data.table} containing
-        \code{period} - period1 and period2 together, \cr
+        \code{periods} -  survey periods, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
@@ -94,7 +94,8 @@ vardchanges(Y, H, PSU, w_final, id,
         \code{var} - the estimated a design-based variance.}
 
   \item{rho}{ A \code{data.table} containing
-        \code{period} - period1 and period2 together, \cr
+        \code{periods_1} -  survey periods of \code{periods1}, \cr
+        \code{periods_2} -  survey periods of \code{periods2}, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
@@ -103,7 +104,8 @@ vardchanges(Y, H, PSU, w_final, id,
         \code{rho} - the estimated correlation matrix.}
 
   \item{var_tau}{ A \code{data.table} containing
-        \code{period} - period1 and period2 together, \cr
+        \code{periods_1} -  survey periods of \code{periods1}, \cr
+        \code{periods_2} -  survey periods of \code{periods2}, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
@@ -112,8 +114,9 @@ vardchanges(Y, H, PSU, w_final, id,
         \code{var_tau} - the estimated covariance matrix.}
 
   \item{changes_results}{ A \code{data.table} containing
+        \code{periods_1} -  survey periods of \code{periods1}, \cr
+        \code{periods_2} -  survey periods of \code{periods2}, \cr
         \code{country} - survey countries, \cr
-        \code{period} - period1 and period2 together, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
         \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
@@ -154,9 +157,7 @@ data[age<0, age:=0]
 PSU <- data[,.N, keyby="db030"]
 PSU[, N:=NULL]
 PSU[, PSU:=trunc(runif(nrow(PSU), 0, 5))]
-setkeyv(PSU, "db030")
-setkeyv(data, "db030")
-data <- merge(data, PSU, all=TRUE)
+data <- merge(data, PSU, all=TRUE, by="db030")
 PSU <- eusilc <- NULL
 data[, strata:=c("XXXX")]
 data[, strata:=as.character(strata)]

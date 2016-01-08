@@ -4,7 +4,7 @@ vardcros <- function(Y, H, PSU, w_final, id,
                      country, periods,
                      dataset = NULL,
                      linratio = FALSE,
-                     percentratio=FALSE,
+                     percentratio=1,
                      use.estVar = FALSE,
                      household_level_max = TRUE,
                      withperiod = TRUE,
@@ -13,8 +13,8 @@ vardcros <- function(Y, H, PSU, w_final, id,
  
   ### Checking
   if (length(linratio) != 1 | !any(is.logical(linratio))) stop("'linratio' must be the logical value")
-  if (length(percentratio) != 1 | !any(is.logical(percentratio))) stop("'percentratio' must be the logical value")
-   if (length(netchanges) != 1 | !any(is.logical(netchanges))) stop("'netchanges' must be the logical value")
+  if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
+  if (length(netchanges) != 1 | !any(is.logical(netchanges))) stop("'netchanges' must be the logical value")
   if (length(withperiod) != 1 | !any(is.logical(withperiod))) stop("'withperiod' must be the logical value")
   if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be the logical value")
   if (length(household_level_max) != 1 | !any(is.logical(household_level_max))) stop("'household_level_max' must be the logical value")
@@ -391,13 +391,15 @@ vardcros <- function(Y, H, PSU, w_final, id,
 
   DTagg <- total <- NULL
 	
-  res[, var:=num1]
-  if (!is.null(res$totalZ) & !linratio) res[, var:=(grad1*grad1*num1)+
-                                                  (grad2*grad2*den1)+
-                                                2*(grad1*grad2*num_den1)] 
   res[, estim:=totalY]
-  if (!is.null(res$totalZ)) res[, estim:=totalY/totalZ * (1 + 99*percentratio)] 
-  
+  res[, var:=num1]
+  if (!is.null(res$totalZ) & !linratio) { 
+                    res[, estim:=totalY/totalZ * percentratio]
+                    res[, var:= (grad1 * grad1 * num1) +
+                                (grad2 * grad2 * den1) +
+                              2*(grad1 * grad2 * num_den1)] 
+                    res[, var:=var * (percentratio)^2] }
+    
   main <- c(namesperc, namesDom, "namesY", "nameY1")
   if (!is.null(namesDom)) main <- c(main, paste0(namesDom, "_new"))
   if (!is.null(res$namesZ)) main <- c(main, "namesZ", "nameZ1") 

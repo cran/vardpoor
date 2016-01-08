@@ -10,7 +10,7 @@
 vardcros(Y, H, PSU, w_final, id, Dom = NULL,
          Z = NULL, country, periods,
          dataset = NULL, linratio=FALSE,
-         percentratio = FALSE, use.estVar = FALSE,
+         percentratio = 1, use.estVar = FALSE,
          household_level_max=TRUE,
          withperiod=TRUE, netchanges=TRUE,
          confidence = .95)}
@@ -39,7 +39,7 @@ vardcros(Y, H, PSU, w_final, id, Dom = NULL,
 
 \item{linratio}{Logical value. If value is \code{TRUE}, then the linearized variables for the ratio estimator is used for variance estimation. If value is \code{FALSE}, then the gradients is used for variance estimation.}
 
-\item{percentratio}{Logical variable. If supplied, the all linearized variables are multiplied with 100.}
+\item{percentratio}{Positive integer value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
 
 \item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the estimation of covariance matrix of the residuals.}
  
@@ -227,9 +227,7 @@ thres <- data.table(rb020=as.character(rep("AT",4)),
                     thres= c(11406, 11931, 12371, 12791),
                     rb010=2008:2011)
 setnames(thres, names(thres), tolower(names(thres)))
-setkeyv(data, c("rb010", "rb020"))
-setkeyv(thres, c("rb010", "rb020"))
-data <- merge(data, thres, all.x=TRUE)
+data <- merge(data, thres, all.x=TRUE, by=c("rb010", "rb020"))
 data[is.na(u), u:=0]
 data <- data[u==1]
 setkeyv(data, c("rb020", "rb030"))

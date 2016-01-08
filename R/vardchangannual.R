@@ -4,13 +4,13 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
                         country, years, subperiods,
                         dataset = NULL,
                         year1, year2,
-                        percentratio = FALSE,
+                        percentratio = 1,
                         use.estVar = FALSE,
                         confidence=0.95) {
  
   ### Checking
 
-  if (length(percentratio) != 1 | !any(is.logical(percentratio))) stop("'percentratio' must be the logical value") 
+  if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
   if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be the logical value")
   if(length(confidence) != 1 | any(!is.numeric(confidence) |  confidence < 0 | confidence > 1)) {
           stop("'confidence' must be a numeric value in [0,1]")  }
@@ -168,6 +168,7 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
    namesDom <- names(Dom)
 
    apst <- lapply(1:nrow(year1), function(i) {
+
                  atsyear <- rbindlist(list(year1[i], year2[i]))
                  atsyear <- merge(atsyear, sarak, all.x=TRUE, by=yearm, sort = FALSE)
                  yr12 <- data.table(year1=year1[i][[1]], year2=year2[i][[1]])
@@ -237,7 +238,7 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
                                rho1[, cros_se:=sqrt(num1)]
                                X <- rho1[["cros_se"]]
                         
-                               annual_var <- data.table(rho0, yr12, (t(X)%*% A_matrix) %*% X/subn^2)
+                               annual_var <- data.table(rho0, yr12, 1/(subn)^2 * (t(X)%*% A_matrix) %*% X)
                                setnames(annual_var, "V1", "var")
                          
                                A_matrix <- data.table(rho0, yr12, cols=paste0("V", 1:nrow(A_matrix)), A_matrix)
@@ -258,7 +259,7 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
                  sarc <- sarc[sarc %in% names(crossectional_var_grad)]
                  ysum <- crossectional_var_grad[,lapply(.SD, mean), by=sars, .SDcols=sarc]
                  if (!is.null(ysum$namesZ)) {
-                              ysum[, estim:=totalY/totalZ*(1+99*percentratio)]
+                              ysum[, estim:=totalY/totalZ * percentratio]
                        } else ysum[, estim:=totalY]
                  ysum1 <- ysum[get(yearm)==year1[i][[1]],c(sarsb, "estim"), with=FALSE]
                  ysum2 <- ysum[get(yearm)==year2[i][[1]],c(sarsb, "estim"), with=FALSE]

@@ -5,7 +5,7 @@ vardchanges <- function(Y, H, PSU, w_final, id,
                      dataset = NULL,
                      period1, period2,
                      linratio = FALSE,
-                     percentratio = FALSE,
+                     percentratio = 1,
                      use.estVar = FALSE,
                      confidence=0.95,
                      change_type="absolute") {
@@ -14,7 +14,7 @@ vardchanges <- function(Y, H, PSU, w_final, id,
 
   if (!change_type %in% c("absolute", "relative")) stop("'change_type' must be 'absolute' or 'relative'")
   if (length(linratio) != 1 | !any(is.logical(linratio))) stop("'linratio' must be the logical value")
-  if (length(percentratio) != 1 | !any(is.logical(percentratio))) stop("'percentratio' must be the logical value") 
+  if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
   if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be the logical value")
   if(length(confidence) != 1 | any(!is.numeric(confidence) |  confidence < 0 | confidence > 1)) {
           stop("'confidence' must be a numeric value in [0,1]")  }
@@ -188,19 +188,28 @@ vardchanges <- function(Y, H, PSU, w_final, id,
   grad1_1 <- grad1_2 <- CI_upper <- grad2_1 <- NULL
   ids_nr <- rot <- grad2_2 <- se <-  CI_lower <-  NULL
   valueY1_1 <- valueZ1_1 <- valueY1_2 <- valueZ1_2 <- NULL
+  period_country_1 <- period_country_2 <- NULL
   id_nams <- nams <- ids_nr <- NULL
 
   var_grad <- datas$var_grad
   cros_var_grad <- copy(var_grad)
-  period1[, ind:=.I]
+  per1 <- paste0(per, "_1")
+  per2 <- paste0(per, "_2")
+  period1[, ind:=.I] 
   period2[, ind:=.I]
+  setnames(period1, per, per1)
+  setnames(period2, per, per2)
+  period1 <- merge(period1, period2, by="ind")
+  period2 <- NULL
   var_grad1 <- merge(period1, var_grad, all.x=TRUE,
-                              by=per, allow.cartesian=TRUE)
-  var_grad2 <- merge(period2, var_grad, all.x=TRUE,
-                              by=per, allow.cartesian=TRUE)
+                              by.x=per1, by.y=per,
+                              allow.cartesian=TRUE)
+  var_grad2 <- merge(period1, var_grad, all.x=TRUE,
+                              by.x=per2, by.y=per,
+                              allow.cartesian=TRUE)
   
-  sarc <- c("ind", "namesY", "namesZ", country, Dom)
-  sarc <- names(var_grad1)[(names(var_grad1) %in% sarc)]
+  sarc <- c("ind", per1, per2, country, Dom, "namesY", "namesZ")
+  sarc <- sarc[sarc %in% names(var_grad1)]
   sar <- names(var_grad1)[!(names(var_grad1) %in% sarc)]
   setnames(var_grad1, sar, paste0(sar, "_1"))
   setnames(var_grad2, sar, paste0(sar, "_2"))
@@ -239,9 +248,8 @@ vardchanges <- function(Y, H, PSU, w_final, id,
   var_gradn <- rbindlist(list(var_grad11, var_grad12,
                                var_grad21, var_grad22), fill=TRUE)
 
-  sarc2 <- c(paste0(names(periods), "_", c(1, 2)), sarc)
-  var_gradn <- var_gradn[,c(sarc2, "ids_nr", "id_nams", 
-                            "nams", "grad", "cros_var"), with=FALSE]
+  var_gradn <- var_gradn[, c(sarc, "ids_nr", "id_nams", 
+                             "nams", "grad", "cros_var"), with=FALSE]
 
   var_grad11 <- var_grad12 <- NULL
   var_grad21 <- var_grad22 <- NULL
@@ -249,26 +257,28 @@ vardchanges <- function(Y, H, PSU, w_final, id,
 
 
   data <- datas$data_net_changes
-
   data[, rot:=1]
   data1 <- merge(period1, data, all.x=TRUE,
-                    by=per, allow.cartesian=TRUE)
-  data2 <- merge(period2, data, all.x=TRUE, 
-                    by=per, allow.cartesian=TRUE)
-
-  sard <- names(data)[!(names(data) %in% sarp)]
+                    by.x=per1, by.y=per,
+                    allow.cartesian=TRUE)
+  data2 <- merge(period1, data, all.x=TRUE, 
+                    by.x=per2, by.y=per,
+                    allow.cartesian=TRUE)
+  sard <- names(data)[!(names(data) %in% c(sarp, per))]
   setnames(data1, sard, paste0(sard, "_1"))
   setnames(data2, sard, paste0(sard, "_2"))
+  data <- merge(data1, data2, all=TRUE, by=c("ind", per1, per2, sarp))
 
-  data <- merge(data1, data2, all=TRUE, by=c("ind", sarp))
-  datas <- NULL
+  data[is.na(period_country_1), period_country_1:=paste0(get(per1), "_", country)]
+  data[is.na(period_country_2), period_country_2:=paste0(get(per2), "_", country)]
+
   data1 <- data2 <- NULL
 
   recode.NA <- function(DT, cols = seq_len(ncol(DT))) {
      for (j in cols) if (is.numeric(DT[[j]]))
       set(DT, which(is.na(DT[[j]])), j, ifelse(is.integer(DT[[j]]), 0L, 0))
    }
-  recode.NA(data, c(paste0(sard, "_1"), paste0(sard, "_2")))
+
   dataH <- data[[H]]
   dataH <- factor(dataH)
   if (length(levels(dataH))==1) { data[, stratasf:= 1]
@@ -277,11 +287,12 @@ vardchanges <- function(Y, H, PSU, w_final, id,
                                   data <- cbind(data, dataH)
                                   dataH <- names(dataH) }
   den1 <- den2 <- NULL
+  sard <- sard[!(sard %in% "period_country")]
+  recode.NA(data, c(paste0(sard, "_1"), paste0(sard, "_2")))
 
   fit <- lapply(1:length(Y1), function(i) {
        fitd <- lapply(split(data, data[["ind"]]), function(data1) {
             fits <- lapply(split(data1, data1[[country]]), function(DT3c) {
-
                       y1 <- paste0(Y1[i], "_1")
                       y2 <- paste0(Y1[i], "_2")
                       if (!is.null(namesZ) & !linratio) { 
@@ -297,9 +308,11 @@ vardchanges <- function(Y, H, PSU, w_final, id,
                                                                             "rot_1*rot_2*", toString(x))))),
                                                                             collapse= "+"))) 
                       res <- lm(funkc, data=DT3c)
-                      
+    
+
                       if (use.estVar) { res <- data.table(estVar(res))
-                                  } else res <- data.table(lm(funkc, data=DT3c)$res)
+                                  } else res <- data.table(res$res)
+
                       if (!is.null(namesZ) & !linratio) { 
                                    setnames(res, names(res), c("num1", "den1", "num2", "den2"))
                                    res[, nameZs:=Z1[i]]
@@ -416,41 +429,45 @@ vardchanges <- function(Y, H, PSU, w_final, id,
              setnames(rhod, names(rhod), paste0("rho_", nosv))
              dmatr <- diag(sqrt(res[["cros_var"]]/diag(res1)),
                            length(nosv), length(nosv))
-             var_tau <- data.table((t(dmatr) %*% res1) %*% dmatr)
+             var_tau <- data.table((t(dmatr) %*% res1) %*% dmatr) 
              dmatr <- data.table(dmatr)
              setnames(dmatr, names(dmatr), paste0("d_", nosv))
              setnames(var_tau, names(var_tau), paste0("var_tau_", nosv))
              res <- data.table(res, rhod, dmatr, var_tau)
 
              var_t <- (t(res[["grad"]]) %*% as.matrix(var_tau)) %*% res[["grad"]]
-             var_grads <- var_grad[ids_nr==1]
+             var_t <- var_t[, 1]
+             var_grads <- var_grad[ids_nr==i]
 
              if (change_type=="absolute") {
                           var_grads[, estim:=estim_2 - estim_1]
-                     } else var_grads[, estim:=estim_2/estim_1]
+                     } else var_grads[, estim:=estim_2/estim_1 * percentratio]
 
-             var_grads[, var:=var_t[,1]]
+             var_grads[, var:=var_t]
              list(matricas=res, data=var_grads) })
 
    matricas <- rbindlist(lapply(dat, function(x) x[[1]]))              
    datas <- rbindlist(lapply(dat, function(x) x[[2]]))
+
+   if (change_type=="relative" | (!is.null(res$totalZ) & !linratio)) { 
+                  datas[, var:=var * (percentratio)^2] }
 
    datas[var>=0, se:=sqrt(var)]
    tsad <- qnorm(0.5*(1+confidence))
    datas[, CI_lower:=estim - tsad*se]
    datas[, CI_upper:=estim + tsad*se]
 
-   sarc2 <- c(sarc2, "nams")
-   sarc2 <- sarc2[!(sarc2 %in% "ind")]
+   sarc <- c(sarc, "nams")
+   sarc <- sarc[!(sarc %in% "ind")]
 
-   rho_matrix <- matricas[, c(sarc2, paste0("rho_", nosv)), with=FALSE]
-   var_tau <- matricas[, c(sarc2, paste0("var_tau_", nosv)), with=FALSE]
-   grad_var <- matricas[, c(sarc2, "grad", "cros_var"), with=FALSE]
+   rho_matrix <- matricas[, c(sarc, paste0("rho_", nosv)), with=FALSE]
+   var_tau <- matricas[, c(sarc, paste0("var_tau_", nosv)), with=FALSE]
+   grad_var <- matricas[, c(sarc, "grad", "cros_var"), with=FALSE]
 
    namesYZ <- c("namesY", "namesZ")
    namesYZ <- names(datas)[(names(datas) %in% namesYZ)]
 
-   changes_results <- datas[, c(country, paste0(per,"_", c(1, 2)), Dom,
+   changes_results <- datas[, c(paste0(per,"_", c(1, 2)), country, Dom,
                                 namesYZ, "estim_1",  "estim_2", "estim", 
                                 "var", "se", "CI_lower", "CI_upper"), with=FALSE]
 

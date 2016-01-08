@@ -6,7 +6,7 @@
 
 \description{Computes linearized variable for the ratio estimator.}
 
-\usage{lin.ratio(Y, Z, weight, Dom = NULL, percentratio = FALSE)}
+\usage{lin.ratio(Y, Z, weight, Dom = NULL, percentratio = 1)}
 
 \arguments{
 
@@ -18,7 +18,7 @@
 
 \item{Dom}{Optional variables used to define population domains. If supplied, the linearized variables are computed for each domain. An object convertible to \code{data.table}.}
 
-\item{percentratio}{Logical variable. If supplied, the all linearized variables are multiplied with 100.}
+\item{percentratio}{Positive integer value. All linearized variables are multiplied with percentratio value, by default - 1.}
 
 }
 
@@ -39,6 +39,9 @@ lin.ratio(Y, Z, weights)
   \code{\link{domain}},
   \code{\link{vardom}},
   \code{\link{vardomh}},
+  \code{\link{vardcros}},
+  \code{\link{vardchanges}},
+  \code{\link{vardchangannual}}
 }
 
 \keyword{survey}

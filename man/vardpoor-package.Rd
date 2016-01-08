@@ -33,8 +33,8 @@ Generation of domain variables,
 \tabular{ll}{
 Package: \tab vardpoor\cr
 Version: \tab 0.5.0\cr
-Date: \tab 2016-01-07\cr
-Depends: \tab R (>= 3.0.0), data.table (>= 1.9.6), laeken, stringr\cr
+Date: \tab 2016-01-08\cr
+Depends: \tab R (>= 3.2.3), data.table (>= 1.9.6), laeken, stringr\cr
 Imports: \tab reshape, foreach, plyr, gdata, MASS, stats, utils\cr
 License: \tab GPL (>= 2)\cr
 URL: \tab https://github.com/CSBLatvia/vardpoor/ \cr

@@ -1,7 +1,7 @@
 
-lin.ratio <- function(Y, Z, weight, Dom = NULL, percentratio = FALSE) {
+lin.ratio <- function(Y, Z, weight, Dom = NULL, percentratio = 1) {
   
-  if (length(percentratio) != 1 | !any(is.logical(percentratio))) stop("'percentratio' must be the logical value")
+  if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
  
   # Y
   Y <- data.table(Y, check.names = TRUE) 

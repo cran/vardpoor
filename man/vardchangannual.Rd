@@ -12,7 +12,7 @@ vardchangannual(Y, H, PSU, w_final, id,
             country, years, subperiods,
             dataset = NULL,
             year1, year2,
-            percentratio = FALSE,
+            percentratio = 1,
             use.estVar = FALSE,
             confidence=0.95) }
 
@@ -44,7 +44,7 @@ vardchangannual(Y, H, PSU, w_final, id,
 
 \item{year2}{The vector of years from variable \code{periods} describes the second year.}
 
-\item{percentratio}{Logical variable. If supplied, the all linearized variables are multiplied with 100.}
+\item{percentratio}{Positive integer value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
 
 \item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the  estimation of covariance matrix of the residuals.}
 
@@ -209,8 +209,7 @@ URL \url{http://www.cros-portal.eu/content/handbook-standard-error-estimation-an
 ### Example 
 data("eusilc")
 set.seed(1)
-eusilc1 <- eusilc
-
+eusilc1 <- eusilc[1:100,]
 set.seed(1)
 data <- data.table(rbind(eusilc1, eusilc1),
                    year=c(rep(2010, nrow(eusilc1)),
@@ -229,34 +228,32 @@ PSU <- eusilc <- NULL
 data[, strata:=c("XXXX")]
 data[, strata:=as.character(strata)]
 
-data[, t_pov:=trunc(runif(nrow(data), 0, 2))]
-data[, t_dep:=trunc(runif(nrow(data), 0, 2))]
-data[, t_lwi:=trunc(runif(nrow(data), 0, 2))]
-data[, exp:= 1]
-data[, exp2:= 1 * (age < 60)]
+data[, employed:=trunc(runif(nrow(data), 0, 2))]
+data[, unemployed:=trunc(runif(nrow(data), 0, 2))]
+data[, labour_force:=employed + unemployed]
 
-# At-risk-of-poverty (AROP)
-data[, pov:= ifelse (t_pov == 1, 1, 0)]
- 
-# Severe material deprivation (DEP)
-data[, dep:= ifelse (t_dep == 1, 1, 0)]
-
-# Low work intensity (LWI)
-data[, lwi:= ifelse (t_lwi == 1 & exp2 == 1, 1, 0)]
-
-# At-risk-of-poverty or social exclusion (AROPE)
-data[, arope:= ifelse (pov == 1 | dep == 1 | lwi == 1, 1, 0)]
- 
-result <- vardchangannual(Y="pov", H="strata",
+result <- vardchangannual(Y="employed", H="strata",
                           PSU="PSU", w_final="rb050",                          
                           id="db030", Dom=NULL, Z=NULL,
                           country="country", years="year",
                           subperiods="quarter",
                           dataset=data,
                           year1=2010, year2=2011,
-                          percentratio = FALSE,
+                          percentratio = 100,
                           use.estVar = FALSE,
                           confidence=0.95)
+
+\dontrun{
+result <- vardchangannual(Y="unemployed", H="strata",
+                          PSU="PSU", w_final="rb050",                          
+                          id="db030", Dom=NULL, Z="labour_force",
+                          country="country", years="year",
+                          subperiods="quarter",
+                          dataset=data,
+                          year1=2010, year2=2011,
+                          percentratio = 100,
+                          use.estVar = FALSE,
+                          confidence=0.95) }
 }
 
 \seealso{

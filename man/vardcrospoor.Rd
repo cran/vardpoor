@@ -139,9 +139,7 @@ PSU <- data[,.N, keyby="db030"]
 PSU[, N:=NULL]
 PSU[, PSU:=trunc(runif(nrow(PSU), 0, 100))]
 PSU$inc <- runif(nrow(PSU), 20, 100000)
-setkeyv(PSU, "db030")
-setkeyv(data, "db030")
-data <- merge(data, PSU, all=TRUE)
+data <- merge(data, PSU, all=TRUE, by="db030")
 PSU <- eusilc <- NULL
 data[, strata:=c("XXXX")]
 data[, strata:=as.character(strata)]
