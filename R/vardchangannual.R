@@ -5,13 +5,11 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
                         dataset = NULL,
                         year1, year2,
                         percentratio = 1,
-                        use.estVar = FALSE,
                         confidence=0.95) {
  
   ### Checking
 
   if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
-  if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be the logical value")
   if(length(confidence) != 1 | any(!is.numeric(confidence) |  confidence < 0 | confidence > 1)) {
           stop("'confidence' must be a numeric value in [0,1]")  }
 
@@ -112,7 +110,8 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
   if (any(is.na(subperiods))) stop("'subperiods' has unknown values")
   if (nrow(subperiods) != n) stop("'subperiods' length must be equal with 'Y' row count")
   if (ncol(subperiods) != 1) stop("'subperiods' must be 1 column")
-  subn <- nrow(subperiods[,.N, by=names(subperiods)])
+  subn <- data.table(years, subperiods)
+  subn <- nrow(subn[,.N, by=names(subn)])/nrow(unique(years))
   subpm <- names(subperiods)
 
   # Dom
@@ -190,10 +189,9 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
                                       id=id, Dom=Dom, Z=Z, country=country,
                                       periods=pers[, "pers", with=FALSE], dataset=NULL,
                                       period1=yrs[["pers_1"]], period2=yrs[["pers_2"]],
-                                      linratio=!is.null(Z), percentratio=percentratio,
-                                      use.estVar = use.estVar,
-                                      confidence=confidence,
-                                      change_type="absolute")
+                                      annual=TRUE, linratio=!is.null(Z),
+                                      percentratio=percentratio,
+                                      confidence=confidence, change_type="absolute")
 
                  crossectional_results <- datas$crossectional_results
                  crossectional_results <- merge(sarak, crossectional_results, all.y=TRUE, by="pers")
@@ -219,15 +217,17 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
                  rhoj <- rho[,.N, keyby=sar][, N:=NULL]
 
                  apstr <- lapply(1:ncol(Y), function(j){                               
+
                                rho0 <- rhoj[j]
                                rho1 <- merge(rho0, rho, by=sar)[nams=="num2"]
                                A_matrix <- diag(1, nrow(atsyear), nrow(atsyear))
 
                                for (k in 1:nrow(rho1)) {
+
                                      at <- rho1[k==ids]
                                      A_matrix[at[["ids_1"]],at[["ids_2"]]] <- at[["rho_num1"]]
                                      A_matrix[at[["ids_2"]],at[["ids_1"]]] <- at[["rho_num1"]]
-                                     if (at[["ids_2"]]> subn & at[["ids_1"]]> subn+1) {
+                                     if (at[["ids_2"]]> subn & at[["ids_1"]]< subn+1) {
                                                   A_matrix[at[["ids_1"]],at[["ids_2"]]] <- - 2 * at[["rho_num1"]]
                                                   A_matrix[at[["ids_2"]],at[["ids_1"]]] <- - 2 * at[["rho_num1"]]
                                            }

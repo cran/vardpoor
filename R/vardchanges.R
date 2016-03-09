@@ -4,9 +4,9 @@ vardchanges <- function(Y, H, PSU, w_final, id,
                      country, periods,
                      dataset = NULL,
                      period1, period2,
+                     annual = FALSE,
                      linratio = FALSE,
                      percentratio = 1,
-                     use.estVar = FALSE,
                      confidence=0.95,
                      change_type="absolute") {
  
@@ -14,8 +14,8 @@ vardchanges <- function(Y, H, PSU, w_final, id,
 
   if (!change_type %in% c("absolute", "relative")) stop("'change_type' must be 'absolute' or 'relative'")
   if (length(linratio) != 1 | !any(is.logical(linratio))) stop("'linratio' must be the logical value")
+  if (length(annual) != 1 | !any(is.logical(annual))) stop("'annual' must be the logical value")
   if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
-  if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be the logical value")
   if(length(confidence) != 1 | any(!is.numeric(confidence) |  confidence < 0 | confidence > 1)) {
           stop("'confidence' must be a numeric value in [0,1]")  }
 
@@ -155,7 +155,6 @@ vardchanges <- function(Y, H, PSU, w_final, id,
                     periods=periods, dataset=NULL,
                     linratio=linratio, 
                     percentratio=percentratio,
-                    use.estVar = use.estVar,
                     household_level_max=TRUE,
                     withperiod=TRUE, netchanges=TRUE, 
                     confidence=confidence)
@@ -177,9 +176,9 @@ vardchanges <- function(Y, H, PSU, w_final, id,
   Z <- names(Z)
   sarp <- c(country, H, PSU)
  
-  namesY <- w_final <- ind <- NULL  
-  dataset <- nameYs <- nameZs <- grad1 <- grad2 <- NULL
-  rot_1 <- rot_2 <- stratasf <- name1 <- num1 <- NULL
+  namesY <- w_final <- ind <- dataset <- nameYs <- NULL  
+  nameZs <- grad1 <- grad2 <- rot_1 <- rot_2 <- NULL
+  rot_1_rot_2 <- stratasf <- name1 <- num1 <- NULL
   num1num1 <- den1den1 <- den1 <- num2num2 <- NULL
   den2den2 <- den2 <- num1den1 <- num1num2 <- NULL
   num2 <- num1den2 <- den1num2 <- den1den2 <- num2den2 <- NULL
@@ -188,8 +187,8 @@ vardchanges <- function(Y, H, PSU, w_final, id,
   grad1_1 <- grad1_2 <- CI_upper <- grad2_1 <- NULL
   ids_nr <- rot <- grad2_2 <- se <-  CI_lower <-  NULL
   valueY1_1 <- valueZ1_1 <- valueY1_2 <- valueZ1_2 <- NULL
-  period_country_1 <- period_country_2 <- NULL
-  significant <- id_nams <- nams <- ids_nr <- NULL
+  nh <- period_country_1 <- period_country_2 <- NULL
+  nhcor <- significant <- id_nams <- nams <- ids_nr <- NULL
 
   var_grad <- datas$var_grad
   cros_var_grad <- copy(var_grad)
@@ -279,6 +278,9 @@ vardchanges <- function(Y, H, PSU, w_final, id,
       set(DT, which(is.na(DT[[j]])), j, ifelse(is.integer(DT[[j]]), 0L, 0))
    }
 
+
+  data[, nh:=.N, by=c("ind", "period_country_1", "period_country_2", H)]
+
   dataH <- data[[H]]
   dataH <- factor(dataH)
   if (length(levels(dataH))==1) { data[, stratasf:= 1]
@@ -290,9 +292,15 @@ vardchanges <- function(Y, H, PSU, w_final, id,
   sard <- sard[!(sard %in% "period_country")]
   recode.NA(data, c(paste0(sard, "_1"), paste0(sard, "_2")))
 
+  data[, rot_1_rot_2:=rot_1*rot_2]
+  
   fit <- lapply(1:length(Y1), function(i) {
        fitd <- lapply(split(data, data[["ind"]]), function(data1) {
             fits <- lapply(split(data1, data1[[country]]), function(DT3c) {
+
+#i=1
+#DT3c=data[ind==1]
+
                       y1 <- paste0(Y1[i], "_1")
                       y2 <- paste0(Y1[i], "_2")
                       if (!is.null(namesZ) & !linratio) { 
@@ -301,17 +309,21 @@ vardchanges <- function(Y, H, PSU, w_final, id,
                                } else z1 <- z2 <- ""
 
                        funkc <- as.formula(paste0("cbind(", y1, z1, ", ", 
-                                                            y2, z2, ")~-1+",
+                                                            y2, z2, ")~0+",
                                                            paste(t(unlist(lapply(dataH, function(x) 
                                                                      paste0("rot_1*", toString(x), "+",
                                                                             "rot_2*", toString(x), "+",
                                                                             "rot_1*rot_2*", toString(x))))),
                                                                             collapse= "+"))) 
-                      res <- lm(funkc, data=DT3c)
-    
 
-                      if (use.estVar) { res <- data.table(estVar(res))
-                                  } else res <- data.table(res$res)
+#         funkc2 <- as.formula(cbind(nod_1,nod_2) ~ 0+as.factor(pil_lauk)+as.factor(rot_1)
+#                                              +as.factor(rot_2))
+
+# +as.factor(rot_1_rot_2)
+                      res <- lm(funkc, data=DT3c)
+#                      res2 <- aov(funkc2, data=DT3c)
+
+                      res <- data.table(res$res)
 
                       if (!is.null(namesZ) & !linratio) { 
                                    setnames(res, names(res), c("num1", "den1", "num2", "den2"))
@@ -326,66 +338,68 @@ vardchanges <- function(Y, H, PSU, w_final, id,
                                     paste0(per, "_2"), "nameYs", "nameZs")
                       keynames <- keynames[keynames %in% c(names(DT3c), names(res))]
 
-                      if (use.estVar) { 
-                            res <- data.table(id_nams=1:nrow(res), nams=nosv, res, DT3c[1])
-                        } else {
-                            res[, num1num1:=num1 * num1]
-                            res[, num2num2:=num2 * num2]
-                            res[, num1num2:=num1 * num2]
-                            res[, id_nams:=0]
-                            res[, nams:=""]
-                            if (!is.null(namesZ) & !linratio) {
-                                  res[, den1den1:=den1 * den1]
-                                  res[, den2den2:=den2 * den2]
-                                  res[, num1den1:=num1 * den1]
-                                  res[, num1den2:=num1 * den2]
-                                  res[, den1num2:=den1 * num2]
-                                  res[, den1den2:=den1 * den2]
-                                  res[, num2den2:=num2 * den2] }
-                            res <- data.table(res, DT3c)
-                            varsp <- c("num1num1", "den1den1",
-                                       "num2num2", "den2den2",
-                                       "num1den1", "num1num2",
-                                       "num1den2", "den1num2",
-                                       "den1den2", "num2den2")
-                            varsp <- varsp[varsp %in% names(res)]
-                            fits <- res[, lapply(.SD, sum), keyby=c(keynames,
-                                                       "id_nams", "nams"),
-                                                       .SDcols=varsp]
-                            fits1 <- copy(fits)
-                            fits1[, (c("id_nams", "nams")):=list(1, "num1")]
-                            setnames(fits1, (c("num1num1", "num1num2")), c("num1", "num2"))
-
-                            fits2 <- copy(fits)
-                            fits2[, id_nams:=2+as.numeric(!is.null(fits$den2den2))]
-                            fits2[, nams:="num2"]
-                            setnames(fits2, c("num1num2", "num2num2"), c("num1", "num2"))
-
-                            fits3 <- fits4 <- NULL
-                            if (!is.null(fits$den2den2)){
-                                 setnames(fits1, c("num1den1", "num1den2"), c("den1", "den2"))
-                                 setnames(fits2, c("den1num2", "num2den2"), c("den1", "den2"))
-
-                                 fits3 <- copy(fits)
-                                 fits3[, (c("id_nams", "nams")):=list(2, "den1")]
-                                 setnames(fits3, c("num1den1", "den1num2",
-                                                   "den1den1", "den1den2"),
-                                                 c("num1", "num2", "den1", "den2"))
+                      res <- data.table(res, DT3c)
+                      if (annual) { res[, nhcor:=ifelse(nh>1, nh/(nh-1), 1)]
+                                } else res[, nhcor:=1]
   
-                                 fits4 <- copy(fits)
-                                 fits4[, (c("id_nams", "nams")):=list(4, "den2")]
-                                 setnames(fits4, c("num1den2", "num2den2",
-                                                   "den1den2", "den2den2"),
-                                                 c("num1", "num2", "den1", "den2"))
-                               }
-                            res <- rbindlist(list(fits1, fits2, fits3, fits4), fill=TRUE)
-                            fits <- fits1 <- fits2 <- fits3 <- fits4 <- NULL
-                        }
-                       fits <- res[, lapply(.SD, sum),
-                                      keyby=c(keynames,
-                                      "id_nams", "nams"),
-                                      .SDcols=nosv]
-                    return(fits)
+                      res[, num1num1:=num1 * num1 * nhcor]
+                      res[, num2num2:=num2 * num2 * nhcor]
+                      res[, num1num2:=num1 * num2 * nhcor]
+
+                      res[, id_nams:=0]
+                      res[, nams:=""]
+                      if (!is.null(namesZ) & !linratio) {
+                             res[, den1den1:=den1 * den1 * nhcor]
+                             res[, den2den2:=den2 * den2 * nhcor]
+                             res[, num1den1:=num1 * den1 * nhcor]
+                             res[, num1den2:=num1 * den2 * nhcor]
+                             res[, den1num2:=den1 * num2 * nhcor]
+                             res[, den1den2:=den1 * den2 * nhcor]
+                             res[, num2den2:=num2 * den2 * nhcor] }
+
+                      varsp <- c("num1num1", "den1den1",
+                                 "num2num2", "den2den2",
+                                 "num1den1", "num1num2",
+                                 "num1den2", "den1num2",
+                                 "den1den2", "num2den2")
+                      varsp <- varsp[varsp %in% names(res)]
+                      fits <- res[, lapply(.SD, sum), keyby=c(keynames,
+                                             "id_nams", "nams"),
+                                            .SDcols=varsp]
+                      fits1 <- copy(fits)
+                      fits1[, (c("id_nams", "nams")):=list(1, "num1")]
+                      setnames(fits1, (c("num1num1", "num1num2")), c("num1", "num2"))
+
+                      fits2 <- copy(fits)
+                      fits2[, id_nams:=2+as.numeric(!is.null(fits$den2den2))]
+                      fits2[, nams:="num2"]
+                      setnames(fits2, c("num1num2", "num2num2"), c("num1", "num2"))
+
+                      fits3 <- fits4 <- NULL
+                      if (!is.null(fits$den2den2)){
+                            setnames(fits1, c("num1den1", "num1den2"), c("den1", "den2"))
+                            setnames(fits2, c("den1num2", "num2den2"), c("den1", "den2"))
+ 
+                            fits3 <- copy(fits)
+                            fits3[, (c("id_nams", "nams")):=list(2, "den1")]
+                            setnames(fits3, c("num1den1", "den1num2",
+                                              "den1den1", "den1den2"),
+                                            c("num1", "num2", "den1", "den2"))
+   
+                            fits4 <- copy(fits)
+                            fits4[, (c("id_nams", "nams")):=list(4, "den2")]
+                            setnames(fits4, c("num1den2", "num2den2",
+                                              "den1den2", "den2den2"),
+                                            c("num1", "num2", "den1", "den2"))
+                         }
+                      res <- rbindlist(list(fits1, fits2, fits3, fits4), fill=TRUE)
+                      fits <- fits1 <- fits2 <- fits3 <- fits4 <- NULL
+                   
+                      fits <- res[, lapply(.SD, sum),
+                                     keyby=c(keynames,
+                                     "id_nams", "nams"),
+                                    .SDcols=nosv]
+                     return(fits)
                 })
             rbindlist(fits)
          })
@@ -426,6 +440,7 @@ vardchanges <- function(Y, H, PSU, w_final, id,
              res1 <- as.matrix(res[, nosv, with=FALSE])
              rhod <- diag(sqrt(1/diag(res1)), length(nosv), length(nosv))
              rhod <- data.table((t(rhod) %*% res1) %*% rhod)
+
              setnames(rhod, names(rhod), paste0("rho_", nosv))
              dmatr <- diag(sqrt(res[["cros_var"]]/diag(res1)),
                            length(nosv), length(nosv))

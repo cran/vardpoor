@@ -15,7 +15,6 @@ vardcrospoor <- function(Y,
                      order_quant=50,
                      alpha = 20,
                      dataset = NULL,
-                     use.estVar = FALSE,
                      withperiod = TRUE,
                      netchanges = TRUE,
                      confidence = .95,
@@ -48,7 +47,6 @@ vardcrospoor <- function(Y,
  
   if (length(netchanges) != 1 | !any(is.logical(netchanges))) stop("'netchanges' must be the logical value")
   if (length(withperiod) != 1 | !any(is.logical(withperiod))) stop("'withperiod' must be the logical value")
-  if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be the logical value")
  
   if(length(confidence) != 1 | any(!is.numeric(confidence) | confidence < 0 | confidence > 1)) {
          stop("'confidence' must be a numeric value in [0, 1]")  }
@@ -462,19 +460,14 @@ vardcrospoor <- function(Y,
                                          paste(c(-1, DTY2H), collapse= "+")))
                    	  res1 <- lm(funkc, data=DTY2c)
                             
-           	          if (use.estVar==TRUE) {res1 <- data.table(crossprod(res1$res))
-                                 } else res1 <- data.table(res1$res)
+           	          res1 <- data.table(res1$res)
                           setnames(res1, names(res1)[1], "num") 
                           res1[, namesY:=y]
-                           
-                          if (use.estVar==TRUE) {
-                                setnames(res1, "num", "var") 
-                                res1 <- data.table(res1[1], DTY2c[1])
-                            } else {
-                                res1 <- data.table(res1, DTY2c)
-                                res1[, nhcor:=ifelse(nh==1,1, nh/(nh-1))]
-                                res1[, var:=nhcor * num * num]
-                              }
+
+                          res1 <- data.table(res1, DTY2c)
+                          res1[, nhcor:=ifelse(nh>1, nh/(nh-1), 1)]
+                          res1[, var:=nhcor * num * num]
+                          
                           fits <- res1[, lapply(.SD, sum), 
                                          keyby=c(namesperc, "namesY"),
                                          .SDcols="var"]

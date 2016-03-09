@@ -13,7 +13,6 @@ vardchangannual(Y, H, PSU, w_final, id,
             dataset = NULL,
             year1, year2,
             percentratio = 1,
-            use.estVar = FALSE,
             confidence=0.95) }
 
 \arguments{
@@ -45,8 +44,6 @@ vardchangannual(Y, H, PSU, w_final, id,
 \item{year2}{The vector of years from variable \code{periods} describes the second year.}
 
 \item{percentratio}{Positive integer value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
-
-\item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the  estimation of covariance matrix of the residuals.}
 
 \item{confidence}{optional; either a positive value for confidence interval. This variable by default is 0.95 .}
 
@@ -242,7 +239,6 @@ result <- vardchangannual(Y="employed", H="strata",
                           dataset=data,
                           year1=2010, year2=2011,
                           percentratio = 100,
-                          use.estVar = FALSE,
                           confidence=0.95)
 
 \dontrun{
@@ -254,7 +250,6 @@ result <- vardchangannual(Y="unemployed", H="strata",
                           dataset=data,
                           year1=2010, year2=2011,
                           percentratio = 100,
-                          use.estVar = FALSE,
                           confidence=0.95) }
 }
 

@@ -90,7 +90,7 @@ vardomh <- function(Y, H, PSU, w_final,
                      if (length(q)!=nrow(datasetX))  stop("'q' does not exist in 'datasetX'!") }
           if (min(q %in% names(datasetX))==1) q <- datasetX[, q, with=FALSE] } 
      }
-  dataset <- datasetX <- NULL
+  N <- dataset <- datasetX <- NULL
 
   # Y
   Y <- data.table(Y, check.names=TRUE)
@@ -238,9 +238,10 @@ vardomh <- function(Y, H, PSU, w_final,
 
     IDh <- data.table(unique(ID_household))
     if (!is.null(periodX)) {X_ID_household <- data.table(periodX, X_ID_household)
-                           IDh <- data.table(unique(data.table(period, ID_household)))}
+                           IDh <- data.table(period, ID_household)
+                           IDh <- IDh[, .N, by=names(IDh)][, N:=NULL]}
  
-    if (any(duplicated(X_ID_household))) stop("'X_ID_household' have duplicates")
+    if (nrow(X_ID_household[,.N,by=names(X_ID_household)][N>1])>0) stop("'X_ID_household' have duplicates")
     setkeyv(X_ID_household, names(X_ID_household))
     setkeyv(IDh, names(IDh))
     nperIDh <- names(IDh)
