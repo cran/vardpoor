@@ -70,8 +70,9 @@ vardchanges <- function(Y, H, PSU, w_final, id,
   if (nrow(H) != n) stop("'H' length must be equal with 'Y' row count")
   if (ncol(H) != 1) stop("'H' must be 1 column data.frame, matrix, data.table")
   if (any(is.na(H))) stop("'H' has unknown values")
-  if (is.null(names(H))) stop("'H' must be colnames")
-  
+  if (is.null(names(H))) stop("'H' must be colname")
+  H[, (names(H)):=lapply(.SD, as.character)]
+
   # id
   id <- data.table(id)
   if (any(is.na(id))) stop("'id' has unknown values")
@@ -292,14 +293,9 @@ vardchanges <- function(Y, H, PSU, w_final, id,
   sard <- sard[!(sard %in% "period_country")]
   recode.NA(data, c(paste0(sard, "_1"), paste0(sard, "_2")))
 
-  data[, rot_1_rot_2:=rot_1*rot_2]
-  
   fit <- lapply(1:length(Y1), function(i) {
        fitd <- lapply(split(data, data[["ind"]]), function(data1) {
             fits <- lapply(split(data1, data1[[country]]), function(DT3c) {
-
-#i=1
-#DT3c=data[ind==1]
 
                       y1 <- paste0(Y1[i], "_1")
                       y2 <- paste0(Y1[i], "_2")
@@ -308,27 +304,22 @@ vardchanges <- function(Y, H, PSU, w_final, id,
 	                              z2 <- paste0(",", Z1[i], "_2") 
                                } else z1 <- z2 <- ""
 
-                       funkc <- as.formula(paste0("cbind(", y1, z1, ", ", 
-                                                            y2, z2, ")~0+",
+                      funkc <- as.formula(paste0("cbind(", y1, z1, ", ", 
+                                                           y2, z2, ")~0+",
                                                            paste(t(unlist(lapply(dataH, function(x) 
-                                                                     paste0("rot_1*", toString(x), "+",
-                                                                            "rot_2*", toString(x), "+",
-                                                                            "rot_1*rot_2*", toString(x))))),
-                                                                            collapse= "+"))) 
-
-#         funkc2 <- as.formula(cbind(nod_1,nod_2) ~ 0+as.factor(pil_lauk)+as.factor(rot_1)
-#                                              +as.factor(rot_2))
-
-# +as.factor(rot_1_rot_2)
+                                                                     paste0("rot_1:", toString(x), "+",
+                                                                            "rot_2:", toString(x), "+",
+                                                                            "rot_1:rot_2:", toString(x))))),
+                                                                            collapse= "+")))
+                      
                       res <- lm(funkc, data=DT3c)
-#                      res2 <- aov(funkc2, data=DT3c)
-
                       res <- data.table(res$res)
 
                       if (!is.null(namesZ) & !linratio) { 
                                    setnames(res, names(res), c("num1", "den1", "num2", "den2"))
                                    res[, nameZs:=Z1[i]]
                             } else setnames(res, names(res), c("num1", "num2"))
+
                       nosv <- c("num1", "den1", "num2", "den2")
                       nosv <- names(res)[names(res) %in% nosv]
                       Zvn <- as.integer(!is.null(namesZ) & !linratio)

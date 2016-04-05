@@ -174,7 +174,8 @@ vardchangespoor <- function(Y,
   if (ncol(H) != 1) stop("'H' must be 1 column data.frame, matrix, data.table")
   if (any(is.na(H))) stop("'H' has unknown values")
   if (is.null(names(H))) stop("'H' must be colnames")
-  
+  H[, (names(H)):=lapply(.SD, as.character)]
+
   # id
   if (is.null(id)) id <- 1:n
   id <- data.table(id)
@@ -360,9 +361,9 @@ vardchangespoor <- function(Y,
                            funkc <- as.formula(paste0("cbind(", trim(toString(y1)), ", ", 
                                                                 trim(toString(y2)), ")~-1+",
                                                                 paste(t(unlist(lapply(dataH, function(x) 
-                                                                         paste0("rot_1*", toString(x), "+",
-                                                                                "rot_2*", toString(x), "+",
-                                                                                "rot_1*rot_2*", toString(x))))),
+                                                                         paste0("rot_1:", toString(x), "+",
+                                                                                "rot_2:", toString(x), "+",
+                                                                                "rot_1:rot_2:", toString(x))))),
                                                                                 collapse= "+"))) 
                            res <- lm(funkc, data=DT3c)
                            ssumas <- DT3c[, .(sum1=sum(get(y1)), sum2=sum(get(y2)))]

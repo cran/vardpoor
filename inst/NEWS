@@ -1,3 +1,7 @@
+Changes in vardpoor version 0.5.8
+
+    + Corrected small mistake in function vardchanges, vardchangespoor.
+
 Changes in vardpoor version 0.5.6
 
     + Removed variable use.estVar from function vardchanges, vardcros.

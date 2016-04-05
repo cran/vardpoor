@@ -90,8 +90,10 @@ vardcros <- function(Y, H, PSU, w_final, id,
   if (nrow(H) != n) stop("'H' length must be equal with 'Y' row count")
   if (ncol(H) != 1) stop("'H' must be 1 column data.frame, matrix, data.table")
   if (any(is.na(H))) stop("'H' has unknown values")
-  if (is.null(names(H))) stop("'H' must be colnames")
-  
+  if (is.null(names(H))) stop("'H' must be colname")
+  if (names(H)=="dataH_stratas") stop("'H' must be different colname")
+  H[, (names(H)):=lapply(.SD, as.character)]
+
   # id
   id <- data.table(id)
   if (any(is.na(id))) stop("'id' has unknown values")
@@ -343,11 +345,12 @@ vardcros <- function(Y, H, PSU, w_final, id,
 
                         y <- namesY1[i]
                         if ((!is.null(namesZ1))&(!linratio)) z <- paste0(",", toString(namesZ1[i])) else z <- ""
-                        funkc <- as.formula(paste("cbind(", trim(toString(y)), z, ")~",
+
+                        funkc <- as.formula(paste("cbind(", trim(toString(y)), z, ")~ 0 + ",
                                        paste(c(0, DT1H), collapse= "+")))
 
-                   	res1 <- lm(funkc, data=DT1c)
-           	            res1 <- data.table(res1$res)
+                        res1 <- lm(funkc, data=DT1c)
+      	                res1 <- data.table(res1$res)
                         setnames(res1, names(res1)[1], "num") 
                         res1[, nameY1:=y]
                         if (!is.null(namesZ1) & !linratio) {
@@ -366,6 +369,7 @@ vardcros <- function(Y, H, PSU, w_final, id,
                         namep <- namep[namep %in% names(res1)]
                         varsp <- c("num1", "den1", "num_den1")
                         varsp <- varsp[varsp %in% names(res1)]
+
                         fits <- res1[, lapply(.SD, sum), 
                                        keyby=c("period_country",
                                                namesperc, namep),
