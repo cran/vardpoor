@@ -5,6 +5,7 @@ vardcros <- function(Y, H, PSU, w_final, id,
                      dataset = NULL,
                      linratio = FALSE,
                      percentratio=1,
+                     use.estVar = FALSE,
                      household_level_max = TRUE,
                      withperiod = TRUE,
                      netchanges = TRUE,
@@ -15,6 +16,7 @@ vardcros <- function(Y, H, PSU, w_final, id,
   if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
   if (length(netchanges) != 1 | !any(is.logical(netchanges))) stop("'netchanges' must be the logical value")
   if (length(withperiod) != 1 | !any(is.logical(withperiod))) stop("'withperiod' must be the logical value")
+  if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be the logical value")
   if (length(household_level_max) != 1 | !any(is.logical(household_level_max))) stop("'household_level_max' must be the logical value")
   if(length(confidence) != 1 | any(!is.numeric(confidence) |  confidence < 0 | confidence > 1)) {
           stop("'confidence' must be a numeric value in [0,1]")  }
@@ -350,25 +352,34 @@ vardcros <- function(Y, H, PSU, w_final, id,
                                        paste(c(0, DT1H), collapse= "+")))
 
                         res1 <- lm(funkc, data=DT1c)
-      	                res1 <- data.table(res1$res)
+                        if (use.estVar==TRUE) {res1 <- data.table(crossprod(res1$res))
+                                } else res1 <- data.table(res1$res)
                         setnames(res1, names(res1)[1], "num") 
                         res1[, nameY1:=y]
                         if (!is.null(namesZ1) & !linratio) {
                               setnames(res1, names(res1)[2], "den")
                               res1[, nameZ1:=namesZ1[i]]
                             }
-                        
-                        res1 <- data.table(res1, DT1c)
-                        res1[, nhcor:=ifelse(nh==1, 1, nh/(nh-1))]
-                        res1[, num1:=nhcor * num * num]
-                        if (!is.null(namesZ1) & !linratio) {
-                               res1[, num_den1:=nhcor * num * den]
-                               res1[, den1:=nhcor * den * den]
-                         }
-                        namep <- c("nameY1", "nameZ1")
-                        namep <- namep[namep %in% names(res1)]
-                        varsp <- c("num1", "den1", "num_den1")
-                        varsp <- varsp[varsp %in% names(res1)]
+
+
+                        if (use.estVar==TRUE) {    
+                              setnames(res1, "num", "num1") 
+                              if (!is.null(namesZ1) & !linratio) {
+                                       res1[, num_den1:=res1[["den"]][1]]
+                                       res1[, den1:=res1[["den"]][2]] }
+                              res1 <- data.table(res1[1], DT1c[1])
+                          } else {
+                              res1 <- data.table(res1, DT1c)
+                              res1[, nhcor:=ifelse(nh>1, nh/(nh-1), 1)]
+                              res1[, num1:=nhcor * num * num]
+                              if (!is.null(namesZ1) & !linratio) {
+                                   res1[, num_den1:=nhcor * num * den]
+                                   res1[, den1:=nhcor * den * den]
+                               }}
+                         namep <- c("nameY1", "nameZ1")
+                         namep <- namep[namep %in% names(res1)]
+                         varsp <- c("num1", "den1", "num_den1")
+                         varsp <- varsp[varsp %in% names(res1)]
 
                         fits <- res1[, lapply(.SD, sum), 
                                        keyby=c("period_country",

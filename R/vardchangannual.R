@@ -5,11 +5,13 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
                         dataset = NULL,
                         year1, year2,
                         percentratio = 1,
+                        use.estVar = FALSE,
                         confidence=0.95) {
  
   ### Checking
 
   if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
+  if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be the logical value")
   if(length(confidence) != 1 | any(!is.numeric(confidence) |  confidence < 0 | confidence > 1)) {
           stop("'confidence' must be a numeric value in [0,1]")  }
 
@@ -191,7 +193,9 @@ vardchangannual <- function(Y, H, PSU, w_final, id,
                                       period1=yrs[["pers_1"]], period2=yrs[["pers_2"]],
                                       annual=TRUE, linratio=!is.null(Z),
                                       percentratio=percentratio,
-                                      confidence=confidence, change_type="absolute")
+                                      use.estVar = use.estVar,
+                                      confidence=confidence,
+                                      change_type="absolute")
 
                  crossectional_results <- datas$crossectional_results
                  crossectional_results <- merge(sarak, crossectional_results, all.y=TRUE, by="pers")

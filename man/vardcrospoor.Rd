@@ -23,6 +23,7 @@ vardcrospoor(Y,
                      order_quant=50,
                      alpha = 20,
                      dataset = NULL,
+                     use.estVar = FALSE,
                      withperiod = TRUE,
                      netchanges = TRUE,
                      confidence = .95,
@@ -78,6 +79,8 @@ For example, to compute poverty threshold equal to some percentage of median inc
 
 \item{dataset}{Optional survey data object convertible to \code{data.table}.}
 
+\item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the estimation of covariance matrix of the residuals.}
+ 
 \item{withperiod}{Logical value. If \code{TRUE} is value, the results is with period, if \code{FALSE}, without period.}
 
 \item{netchanges}{Logical value. If value is TRUE, then produce two objects: the first object is aggregation of weighted data by period (if available), country, strata and PSU, the second object is an estimation for Y, the variance, gradient for numerator and denominator by country and period (if available). If value is FALSE, then both objects containing \code{NULL}.}

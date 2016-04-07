@@ -15,6 +15,7 @@ vardchangespoor <- function(Y,
                      alpha = 20, 
                      dataset = NULL,
                      period1, period2,
+                     use.estVar = FALSE,
                      confidence=0.95,
                      type="linrmpg",
                      change_type="absolute") {
@@ -43,6 +44,8 @@ vardchangespoor <- function(Y,
 
   if(length(alpha) != 1 | any(!is.numeric(alpha) | alpha < 0 | alpha > 100)) {
          stop("'alpha' must be a numeric value in [0, 100]")  }
+
+  if (!is.logical(use.estVar)) stop("'use.estVar' must be the logical value")
 
   if(length(confidence) != 1 | any(!is.numeric(confidence) | confidence < 0 | confidence > 1)) {
          stop("'confidence' must be a numeric value in [0,1]")  }
@@ -273,6 +276,7 @@ vardchangespoor <- function(Y,
                         order_quant=order_quant,
                         alpha = alpha,
                         dataset = NULL,
+                        use.estVar = use.estVar,
                         withperiod = TRUE,
                         netchanges = TRUE,
                         confidence=confidence,
@@ -368,15 +372,21 @@ vardchangespoor <- function(Y,
                            res <- lm(funkc, data=DT3c)
                            ssumas <- DT3c[, .(sum1=sum(get(y1)), sum2=sum(get(y2)))]
 
-                           res <- data.table(lm(funkc, data=DT3c)$res)
+                           if (use.estVar) { res <- data.table(estVar(res))
+                                        } else res <- data.table(lm(funkc, data=DT3c)$res)
                            setnames(res, names(res), c("num1", "num2"))
                            res[, namesY:=sard[i]]
                           
-                           res <- data.table(res, DT3c)
-
-                           res[, num1num1:=num1 * num1]
-                           res[, num2num2:=num2 * num2]
-                           res[, num1num2:=num1 * num2]
+                           if (use.estVar) { 
+                               res[, num1num1:=res[["num1"]][1]]
+                               res[, num2num2:=res[["num2"]][2]]
+                               res[, num1num2:=res[["num1"]][2]]
+                               res <- data.table(res[1], DT3c[1])
+                             } else {
+                               res[, num1num1:=num1 * num1]
+                               res[, num2num2:=num2 * num2]
+                               res[, num1num2:=num1 * num2]
+                               res <- data.table(res, DT3c)}
 
                            keynames <- c(country, "ind", paste0(per, "_1"), paste0(per, "_2"), "namesY")
                            fits <- res[, lapply(.SD, sum), keyby=keynames,
