@@ -806,14 +806,12 @@ varpoord <- function(Y, w_final,
                                   all_result[, pop_size:=nhs$pop_size]
                                   all_result[, n_nonzero:=nhs$n_nonzero]} 
 
-  all_result[, n_eff:=ifelse(is.na(deff) | deff==0, NA, respondent_count/deff)]
   variabl <- c("respondent_count", "n_nonzero", "pop_size", 
                       "value", "value_eu", "var", "se", "rse",
                       "cv", "absolute_margin_of_error",
                       "relative_margin_of_error", "CI_lower",  
                       "CI_upper", "var_srs_HT", "var_cur_HT", 
-                      "var_srs_ca", "deff_sam",
-                      "deff_est", "deff", "n_eff")
+                      "var_srs_ca", "deff_sam", "deff_est", "deff")
 
   type <- "type"
   if (!is.null(period)) type <- c(type, names(period))

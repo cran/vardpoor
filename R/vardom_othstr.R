@@ -460,11 +460,10 @@
                          } else { all_result[, respondent_count:=nhs$respondent_count]
                                   all_result[, pop_size:=nhs$pop_size]} 
 
- all_result[, n_eff:=deff/respondent_count]
   variab <- c("respondent_count", "n_nonzero", "pop_size", "estim", "var", "se", 
               "rse", "cv", "absolute_margin_of_error", "relative_margin_of_error",
               "CI_lower", "CI_upper", "var_srs_HT",  "var_cur_HT", 
-              "var_srs_ca", "deff_sam", "deff_est", "deff",  "n_eff")
+              "var_srs_ca", "deff_sam", "deff_est", "deff")
 
   setkeyv(all_result, c("nr_names", names(Dom), names(period)))
   all_result <- all_result[, c("variable", names(Dom), names(period), variab), with=FALSE]
