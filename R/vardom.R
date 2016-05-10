@@ -252,7 +252,7 @@ vardom <- function(Y, H, PSU, w_final,
                                                           sum(as.integer(abs(x)> .Machine$double.eps))),
                                                          .SDcols = names(Y1)]
 
-  respondent_count <- pop_size <- NULL
+  sar_nr <- respondent_count <- pop_size <- NULL
   nhs <- data.table(respondent_count=1, pop_size=w_final)
   if (!is.null(period)) nhs <- data.table(period, nhs)
   if (!is.null(Dom)) nhs <- data.table(Dom, nhs)
@@ -283,13 +283,20 @@ vardom <- function(Y, H, PSU, w_final,
           Y2a <- lin.ratio(Y1, Z1, w_design, Dom=NULL, percentratio=percentratio)
         } else {
             periodap <- do.call("paste", c(as.list(period), sep="_"))
-            sorts <- unlist(split(Y1[, .I], periodap))
-            lin1 <- lapply(split(Y1[, .I], periodap), function(i) lin.ratio(Y1[i], Z1[i], w_final[i],
-                                                                            Dom=NULL, percentratio=percentratio))
-            Y2 <- rbindlist(lin1)[sorts]          
-            lin2 <- lapply(split(Y1[, .I], periodap), function(i) lin.ratio(Y1[i], Z1[i], w_design[i],
-                                                                            Dom=NULL, percentratio=percentratio))
-            Y2a <- rbindlist(lin2)[sorts]
+            lin1 <- lapply(split(Y1[, .I], periodap), function(i)
+                            data.table(sar_nr=i, 
+                                   lin.ratio(Y1[i], Z1[i], w_final[i],
+                                     Dom=NULL, percentratio=percentratio)))
+            Y2 <- rbindlist(lin1)
+            setkeyv(Y2, "sar_nr")
+            lin2 <- lapply(split(Y1[, .I], periodap), function(i)
+                            data.table(sar_nr=i, 
+                                       lin.ratio(Y1[i], Z1[i], w_design[i],
+                                       Dom=NULL, percentratio=percentratio)))
+            Y2a <- rbindlist(lin2)
+            setkeyv(Y2a, "sar_nr")
+            Y2[, sar_nr:=NULL]
+            Y2a[, sar_nr:=NULL]
         }
     if (any(is.na(Y2))) print("Results are calculated, but there are cases where Z = 0")
     if (outp_lin) linratio_outp <- data.table(idper, PSU, Y2) 
@@ -304,12 +311,14 @@ vardom <- function(Y, H, PSU, w_final,
   if (!is.null(X)) {
         if (!is.null(period)) ind_gr <- data.table(ind_gr, period)
         ind_gr <- do.call("paste", c(as.list(ind_gr), sep="_"))
-        sortcal <- unlist(split(Y1[, .I], ind_gr))
- 
-        lin1 <- lapply(split(Y2[, .I], ind_gr), function(i) 
-                    residual_est(Y=Y2[i], X=X[i], weight=w_design[i], q=q[i]))
-        Y3 <- rbindlist(lin1)[sortcal]  
-      if (outp_res) res_outp <- data.table(idper, PSU, Y3)
+
+        lin1 <- lapply(split(Y2[,.I], ind_gr), function(i) 
+                        data.table(sar_nr=i, residual_est(Y=Y2[i],
+                                    X=X[i], weight=w_design[i], q=q[i])))
+        Y3 <- rbindlist(lin1)
+        setkeyv(Y3, "sar_nr")
+        Y3[, sar_nr:=NULL]
+        if (outp_res) res_outp <- data.table(idper, PSU, Y3)
   } else Y3 <- Y2
   Y2 <- NULL
   

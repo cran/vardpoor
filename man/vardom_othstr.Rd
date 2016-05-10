@@ -9,7 +9,8 @@
        Dom = NULL, period=NULL, N_h = NULL,
        N_h2, Z = NULL,
        X = NULL, g = NULL, q = NULL, dataset = NULL, 
-       confidence = .95,  outp_lin=FALSE, outp_res=FALSE)}
+       confidence = .95,  percentratio=1, 
+       outp_lin=FALSE, outp_res=FALSE)}
 
 \arguments{
 
@@ -44,6 +45,8 @@
 \item{dataset}{Optional survey data object convertible to \code{data.table}.}
 
 \item{confidence}{Optional positive value for confidence interval. This variable by default is 0.95.}
+
+\item{percentratio}{Positive integer value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
 
 \item{outp_lin}{Logical value. If \code{TRUE} linearized values of the ratio estimator will be printed out.}
 

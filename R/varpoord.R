@@ -425,7 +425,7 @@ varpoord <- function(Y, w_final,
       } else w_design <- w_final
 
   ### Calculation
-  respondent_count <- pop_size <- n_nonzero <- NULL
+  sar_nr <- respondent_count <- pop_size <- n_nonzero <- NULL
   nhs <- data.table(respondent_count=1, pop_size=w_final, 
                                n_nonzero=as.integer(abs(Y)> .Machine$double.eps))
   if (!is.null(period)) nhs <- data.table(period, nhs)
@@ -686,15 +686,16 @@ varpoord <- function(Y, w_final,
        ind_gr <- D1[, np+2, with=FALSE]
        if (!is.null(period)) ind_gr <- data.table(D1[, names(periodX), with=FALSE], ind_gr)
        ind_period <- do.call("paste", c(as.list(ind_gr), sep="_"))
-       sorts <- unlist(split(Y3[, .I], ind_period))
     
        lin1 <- lapply(split(Y3[, .I], ind_period), function(i) 
-                   residual_est(Y=Y3[i],
-                                X=D1[i,(np+5):ncol(D1),with=FALSE],
-                                weight=w_design2[i],
-                                q=D1[i, np+3, with=FALSE]))
-
-       Y4 <- rbindlist(lin1)[sorts]
+                      data.table(sar_nr=i, 
+                             residual_est(Y=Y3[i],
+                                          X=D1[i, (np+5):ncol(D1), with=FALSE],
+                                          weight=w_design2[i],
+                                          q=D1[i, np+3, with=FALSE])))
+       Y4 <- rbindlist(lin1)
+       setkeyv(Y4, "sar_nr")
+       Y4[, sar_nr:=NULL]
        if (outp_res) res_outp <- data.table(IDh, PSU, w_final2, Y4)
    } else Y4 <- Y3
 

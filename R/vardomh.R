@@ -345,7 +345,7 @@ vardomh <- function(Y, H, PSU, w_final,
       } else w_design <- w_final
       
   # Ratio of two totals
-  Z1 <- persort <- linratio_outp <- NULL 
+  sar_nr <- Z1 <- persort <- linratio_outp <- NULL 
   estim <- var_est2 <- se <- rse <- NULL
   cv <- absolute_margin_of_error <- NULL
   relative_margin_of_error <- CI_lower <- NULL
@@ -364,15 +364,20 @@ vardomh <- function(Y, H, PSU, w_final,
           Y2a <- lin.ratio(Y1, Z1, w_design, Dom=NULL, percentratio=percentratio)
         } else {
           periodap <- do.call("paste", c(as.list(period), sep="_"))
-          sorts <- unlist(split(Y1[, .I], periodap))
-
-          lin1 <- lapply(split(Y1[, .I], periodap), function(i) lin.ratio(Y1[i], Z1[i], w_final[i], 
-                                                                          Dom=NULL, percentratio=percentratio))
-          Y2 <- rbindlist(lin1)[sorts]
-           
-          lin2 <- lapply(split(Y1[, .I], periodap), function(i) lin.ratio(Y1[i], Z1[i], w_design[i],
-                                                                          Dom=NULL, percentratio=percentratio))
-          Y2a <- rbindlist(lin2)[sorts]
+          lin1 <- lapply(split(Y1[, .I], periodap), function(i)
+                         data.table(sar_nr=i, 
+                              lin.ratio(Y1[i], Z1[i], w_final[i],
+                                  Dom=NULL, percentratio=percentratio)))
+          Y2 <- rbindlist(lin1)
+         
+          lin2 <- lapply(split(Y1[, .I], periodap), function(i)
+                          data.table(sar_nr=i, 
+                                     lin.ratio(Y1[i], Z1[i], w_design[i],
+                                     Dom=NULL, percentratio=percentratio)))
+          Y2a <- rbindlist(lin2)
+          setkeyv(Y2a, "sar_nr")
+          Y2[, sar_nr:=NULL]
+          Y2a[, sar_nr:=NULL]
         }
      if (any(is.na(Y2))) print("Results are calculated, but there are cases where Z = 0")
      if (outp_lin) linratio_outp <- data.table(idper, PSU, Y2) 
@@ -417,14 +422,16 @@ vardomh <- function(Y, H, PSU, w_final,
        ind_gr <- D1[, np+2, with=FALSE]
        if (!is.null(period)) ind_gr <- data.table(D1[, names(periodX), with=FALSE], ind_gr)
        ind_period <- do.call("paste", c(as.list(ind_gr), sep="_"))
-       sorts <- unlist(split(Y3[, .I], ind_period))
     
        lin1 <- lapply(split(Y3[, .I], ind_period), function(i) 
-                   residual_est(Y=Y3[i],
-                                X=D1[i,(np+5):ncol(D1), with=FALSE],
-                                weight=w_design2[i],
-                                q=D1[i, np+3, with=FALSE]))
-       Y4 <- rbindlist(lin1)[sorts]
+                 data.table(sar_nr=i, 
+                            residual_est(Y=Y3[i],
+                                         X=D1[i,(np+5):ncol(D1), with=FALSE],
+                                         weight=w_design2[i],
+                                         q=D1[i, np+3, with=FALSE])))
+       Y4 <- rbindlist(lin1)
+       setkeyv(Y4, "sar_nr")
+       Y4[, sar_nr:=NULL]
        if (outp_res) res_outp <- data.table(IDh, PSU, w_final2, Y4)
    } else Y4 <- Y3
   Y3 <- NULL
