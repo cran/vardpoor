@@ -164,7 +164,7 @@ vardcros <- function(Y, H, PSU, w_final, id,
   # Calculation
       
   # Domains
-  N <- nameY <- nameZ <- variable <- NULL
+  sar_nr <- N <- nameY <- nameZ <- variable <- NULL
   sample_size <- totalY <- totalZ <- Z1 <- NULL
 
   size <- data.table(size=rep(1, nrow(Y)))
@@ -184,9 +184,12 @@ vardcros <- function(Y, H, PSU, w_final, id,
        if (linratio){ 
                    sorts <- unlist(split(Y1[, .I], period_country))
                    lin1 <- lapply(split(Y1[, .I], period_country), 
-                                  function(i) lin.ratio(Y1[i], Z1[i], w_final[i],
-                                                        Dom=NULL, percentratio=percentratio))
-                   Y2 <- rbindlist(lin1)[sorts]
+                                  function(i) data.table(sar_nr=i,
+                                                         lin.ratio(Y1[i], Z1[i], w_final[i],
+                                                                   Dom=NULL, percentratio=percentratio)))
+                   Y2 <- rbindlist(lin1)
+                   setkeyv(Y2, "sar_nr")
+                   Y2[, sar_nr:=NULL]
                    if (any(is.na(Y2))) print("Results are calculated, but there are cases where Z = 0")
                   } else Y2 <- data.table(copy(Y1), copy(Z1))
     } else Y2 <- copy(Y1)

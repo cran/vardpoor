@@ -332,11 +332,11 @@ vardomh <- function(Y, H, PSU, w_final,
 
   # Design weights
   if (!is.null(X)) {
-             idh <- data.frame(ID_household)
+             idh <- data.table(ID_household)
              if (!is.null(period)) idh <- data.table(period, idh)
              idhx <- data.table(X_ID_household, g)
              setnames(idhx, names(idhx)[c(1:(ncol(idhx)-1))], names(idh))
-             idg <- data.table(merge(idh, idhx, by=names(idh), sort=FALSE))
+             idg <- merge(idh, idhx, by=names(idh), sort=FALSE)
              w_design <- w_final / idg[[ncol(idg)]]
              idg <- data.table(idg, w_design=w_design)
              idh <- idg[, .N, keyby=c(names(idh), "w_design")]
