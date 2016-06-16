@@ -9,7 +9,8 @@
 
 \usage{vardomh(Y, H, PSU, w_final, ID_household,
                id = NULL, Dom = NULL, period = NULL,
-               N_h = NULL, fh_zero = FALSE, PSU_level = TRUE,
+               N_h = NULL, PSU_sort = NULL,
+               fh_zero = FALSE, PSU_level = TRUE,
                Z = NULL, dataset = NULL,
                X = NULL, periodX = NULL, X_ID_household = NULL,
                ind_gr = NULL, g = NULL, q = NULL,
@@ -37,6 +38,8 @@
 
 \item{N_h}{optional data object convertible to \code{data.table}. If period is supplied, the time period is at the beginning of the object and after time period in the object is stratum. If period is not supplied, the first column in the object is stratum. In the last column is the total of the population in each stratum.}
 
+\item{PSU_sort}{optional; if PSU_sort is defined, then variance is calculated for systematic sample.}
+
 \item{fh_zero}{by default FALSE; fh is calculated as division of n_h and N_h in each strata, if true, fh value is zero in each strata.}
 
 \item{PSU_level}{by default TRUE; if PSU_level is true, in each strata fh is calculated as division of count of PSU in sample (n_h) and count of PSU in frame (N_h). if PSU_level is false, in each strata fh is calculated as division of count of units in sample (n_h) and count of units in frame (N_h), which calculated as sum of weights.}
@@ -61,7 +64,7 @@
 
 \item{confidence}{Optional positive value for confidence interval. This variable by default is 0.95.}
 
-\item{percentratio}{Positive integer value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
+\item{percentratio}{Positive numeric value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
 
 \item{outp_lin}{Logical value. If \code{TRUE} linearized values of the ratio estimator will be printed out.}
 

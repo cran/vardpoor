@@ -5,6 +5,7 @@ vardomh <- function(Y, H, PSU, w_final,
                    Dom = NULL,
                    period = NULL,
                    N_h = NULL,
+                   PSU_sort = NULL,
                    fh_zero=FALSE,
                    PSU_level=TRUE,
                    Z = NULL,
@@ -24,7 +25,7 @@ vardomh <- function(Y, H, PSU, w_final,
   ### Checking
   if (length(fh_zero) != 1 | !any(is.logical(fh_zero))) stop("'fh_zero' must be the logical value")
   if (length(PSU_level) != 1 | !any(is.logical(PSU_level))) stop("'PSU_level' must be the logical value")
-  if (length(percentratio) != 1 | !any(is.integer(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive integer value")
+  if (length(percentratio) != 1 | !any(is.numeric(percentratio) | percentratio > 0)) stop("'percentratio' must be the positive numeric value")
   if (length(outp_lin) != 1 | !any(is.logical(outp_lin))) stop("'outp_lin' must be the logical value")
   if (length(outp_res) != 1 | !any(is.logical(outp_res))) stop("'outp_res' must be the logical value")
 
@@ -61,6 +62,9 @@ vardomh <- function(Y, H, PSU, w_final,
       if (!is.null(Dom)) {
           if (min(Dom %in% names(dataset))!=1) stop("'Dom' does not exist in 'dataset'!")
           if (min(Dom %in% names(dataset))==1) Dom <- dataset[, Dom, with=FALSE]  }
+       if (!is.null(PSU_sort)) {
+            if (min(PSU_sort %in% names(dataset))!=1) stop("'PSU_sort' does not exist in 'dataset'!")
+            if (min(PSU_sort %in% names(dataset))==1) PSU_sort <- dataset[, PSU_sort, with=FALSE] }  
     }
 
   if(!is.null(datasetX)) {
@@ -131,6 +135,17 @@ vardomh <- function(Y, H, PSU, w_final,
   if (nrow(ID_household) != n) stop("'ID_household' must be the same length as 'Y'")
   if (is.null(names(ID_household))) setnames(ID_household,names(ID_household),"ID_household")
 
+  # period     
+  if (!is.null(period)) {
+      period <- data.table(period)
+      if (any(duplicated(names(period)))) 
+                stop("'period' are duplicate column names: ", 
+                     paste(names(period)[duplicated(names(period))], collapse = ","))
+      if (nrow(period) != n) stop("'period' must be the same length as 'Y'")
+      if(any(is.na(period))) stop("'period' has unknown values")
+  } 
+  np <- sum(ncol(period))
+
   # id
   if (is.null(id)) id <- 1:n
   id <- data.table(id)
@@ -144,16 +159,22 @@ vardomh <- function(Y, H, PSU, w_final,
                                   if (any(duplicated(dd, by=names(dd)))) stop("'id' by period are duplicate values")
                                   dd <- NULL}
 
-  # period     
-  if (!is.null(period)) {
-      period <- data.table(period)
-      if (any(duplicated(names(period)))) 
-                stop("'period' are duplicate column names: ", 
-                     paste(names(period)[duplicated(names(period))], collapse = ","))
-      if (nrow(period) != n) stop("'period' must be the same length as 'Y'")
-      if(any(is.na(period))) stop("'period' has unknown values")
-  } 
-  np <- sum(ncol(period))
+  # PSU_sort
+  if (!is.null(PSU_sort)) {
+          PSU_sort <- data.frame(PSU_sort)
+          if (nrow(PSU_sort) != n) stop("'PSU_sort' must be equal with 'Y' row count")
+          if (ncol(PSU_sort) != 1) stop("'PSU_sort' must be vector or 1 column data.frame, matrix, data.table")
+          PSU_sort <- PSU_sort[, 1]
+          if (!is.numeric(PSU_sort)) stop("'PSU_sort' must be numerical")
+          if (any(is.na(PSU_sort))) stop("'PSU_sort' has unknown values")
+
+          psuag <- data.table(PSU, PSU_sort)
+          if (!is.null(period)) hpY <- data.table(period, psuag)
+          psuag <- psuag[,.N, by=names(psuag)][,N:=NULL]
+          psuag <- psuag[,.N, by=c(names(period), names(PSU))]
+          if (nrow(psuag[N>1])>0) stop("'PSU_sort' must be equal for each 'PSU'")
+  }
+  psusn <- as.integer(!is.null(PSU_sort))
 
   # N_h
   if (!is.null(N_h)) {
@@ -389,13 +410,17 @@ vardomh <- function(Y, H, PSU, w_final,
 
   # Calibration
 
-  YY <- data.table(idper, ID_household, H, PSU, w_final, Y2)
-  YYa <- data.table(idper, ID_household, H, PSU, w_design, Y2a)
-  
-  YY2 <- YY[, lapply(.SD, sum, na.rm=TRUE), by=c(names(YY)[c(2:(5+np))]), .SDcols=names(YY)[-(1:(5+np))]]
-  YY2a <- YYa[, lapply(.SD, sum, na.rm=TRUE), by=c(names(YYa)[c(2:(5+np))]), .SDcols=names(YYa)[-(1:(5+np))]]
-  Y3 <- YY2[, c(-(1:(4+np))), with=FALSE]
-  Y3a <- YY2a[, c(-(1:(4+np))), with=FALSE]
+  YY <- data.table(idper, ID_household, H, PSU)
+  if (!is.null(PSU_sort)) YY <- data.table(YY, PSU_sort)
+  YYa <- data.table(YY, w_design, Y2a)
+  YY <- data.table(YY, w_final, Y2)
+
+
+
+  YY2 <- YY[, lapply(.SD, sum, na.rm=TRUE), by=c(names(YY)[c(2:(5+np+psusn))]), .SDcols=names(YY)[-(1:(5+np+psusn))]]
+  YY2a <- YYa[, lapply(.SD, sum, na.rm=TRUE), by=c(names(YYa)[c(2:(5+np+psusn))]), .SDcols=names(YYa)[-(1:(5+np+psusn))]]
+  Y3 <- YY2[, c(-(1:(4+np+psusn))), with=FALSE]
+  Y3a <- YY2a[, c(-(1:(4+np+psusn))), with=FALSE]
 
   period <- NULL
   if (np>0) period <- YY2[, c(1:np), with=FALSE]
@@ -407,8 +432,10 @@ vardomh <- function(Y, H, PSU, w_final,
   PSU <- YY2[, np+3, with=FALSE]
   setnames(PSU, names(PSU), aPSU)
 
-  w_final2 <- YY2[[np+4]]
-  w_design2 <- YY2a[[np+4]]    
+  if (!is.null(PSU_sort)) PSU_sort <- YY2[[np+4]]
+
+  w_final2 <- YY2[[np+4+psusn]]
+  w_design2 <- YY2a[[np+4+psusn]]    
   YY <- YYa <- YY2 <- YY2a <- NULL
 
   # Calibration
@@ -437,8 +464,10 @@ vardomh <- function(Y, H, PSU, w_final,
   Y3 <- NULL
                                 
   var_est <- variance_est(Y=Y4, H=H, PSU=PSU,
-                          w_final=w_final2, N_h=N_h, 
-                          fh_zero=fh_zero, PSU_level=PSU_level,
+                          w_final=w_final2,
+                          N_h=N_h, fh_zero=fh_zero, 
+                          PSU_level=PSU_level,
+                          PSU_sort=PSU_sort,
                           period=period, dataset=NULL)
   var_est <- transpos(var_est, is.null(period), "var_est", names(period))
   all_result <- var_est
@@ -447,8 +476,11 @@ vardomh <- function(Y, H, PSU, w_final,
   all_result <- merge(all_result, n_nonzero, all=TRUE)
  
   # Variance of HT estimator under current design
-  var_cur_HT <- variance_est(Y=Y3a, H=H, PSU=PSU, w_final=w_design2,
-                             N_h=N_h, fh_zero=fh_zero, PSU_level=PSU_level,
+  var_cur_HT <- variance_est(Y=Y3a, H=H, PSU=PSU,
+                             w_final=w_design2,
+                             N_h=N_h, fh_zero=fh_zero, 
+                             PSU_level=PSU_level,
+                             PSU_sort=PSU_sort,
                              period=period, dataset=NULL)
   var_cur_HT <- transpos(var_cur_HT, is.null(period), "var_cur_HT", names(period))
   all_result <- merge(all_result, var_cur_HT)

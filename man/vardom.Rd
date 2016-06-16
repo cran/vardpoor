@@ -7,14 +7,17 @@
 \description{Computes the variance estimation of the sample surveys in domain by the ultimate cluster method.}
 
 \usage{
-vardom(Y, H, PSU, w_final, id=NULL,
-       Dom = NULL, period = NULL, 
+vardom(Y, H, PSU, w_final,
+       id = NULL, Dom = NULL,
+       period = NULL, PSU_sort=NULL, 
        N_h = NULL, fh_zero=FALSE,
-       PSU_level = TRUE, Z = NULL,
-       X = NULL, ind_gr = NULL, g = NULL,
-       q= NULL, dataset = NULL, 
-       confidence = .95,  percentratio = 1,
-       outp_lin=FALSE, outp_res=FALSE)}
+       PSU_level=TRUE, Z = NULL,
+       X = NULL, ind_gr = NULL,
+       g = NULL, q = NULL,
+       dataset = NULL, 
+       confidence = .95, percentratio=1,
+       outp_lin = FALSE, outp_res = FALSE)
+}
 
 \arguments{
 
@@ -31,6 +34,8 @@ vardom(Y, H, PSU, w_final, id=NULL,
 \item{Dom}{Optional variables used to define population domains. If supplied, variables of interest are calculated for each domain. An object convertible to \code{data.table} or variable names as character vector, column numbers.}
 
 \item{period}{Optional variable for survey period. If supplied, residual estimation of calibration is done independently for each time period. One dimensional object convertible to one-column \code{data.table}.}
+
+\item{PSU_sort}{optional; if PSU_sort is defined, then variance is calculated for systematic sample.}
 
 \item{N_h}{optional data object convertible to \code{data.table}. If period is supplied, the time period is at the beginning of the object and after time period in the object is stratum. If period is not supplied, the first column in the object is stratum. In the last column is the total of the population in each stratum.}
 
@@ -52,7 +57,7 @@ vardom(Y, H, PSU, w_final, id=NULL,
 
 \item{confidence}{Optional positive value for confidence interval. This variable by default is 0.95.}
 
-\item{percentratio}{Positive integer value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
+\item{percentratio}{Positive numeric value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
 
 \item{outp_lin}{Logical value. If \code{TRUE} linearized values of the ratio estimator will be printed out.}
 

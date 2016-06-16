@@ -1,5 +1,8 @@
+round2 <- function(x, n) {
+  sign(x) * trunc(abs(x)*10 ^ n + 0.5)/10 ^ n
+}
 
-variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=TRUE, period=NULL, dataset=NULL) {
+variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=TRUE, PSU_sort=NULL, period=NULL, dataset=NULL) {
 
   ### Checking
 
@@ -22,6 +25,9 @@ variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=
        if (!is.null(period)) {
             if (min(period %in% names(dataset))!=1) stop("'period' does not exist in 'dataset'!")
             if (min(period %in% names(dataset))==1) period <- dataset[, period, with=FALSE] }
+       if (!is.null(PSU_sort)) {
+            if (min(PSU_sort %in% names(dataset))!=1) stop("'PSU_sort' does not exist in 'dataset'!")
+            if (min(PSU_sort %in% names(dataset))==1) PSU_sort <- dataset[, PSU_sort, with=FALSE] }
       }
 
   # Y
@@ -65,7 +71,24 @@ variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=
        if(any(is.na(period))) stop("'period' has unknown values")  
   }   
   np <- sum(ncol(period))
-  
+  vars <- names(period)
+
+  # PSU_sort
+  if (!is.null(PSU_sort)) {
+          PSU_sort <- data.frame(PSU_sort)
+          if (nrow(PSU_sort) != n) stop("'PSU_sort' must be equal with 'Y' row count")
+          if (ncol(PSU_sort) != 1) stop("'PSU_sort' must be vector or 1 column data.frame, matrix, data.table")
+          PSU_sort <- PSU_sort[, 1]
+          if (!is.numeric(PSU_sort)) stop("'PSU_sort' must be numerical")
+          if (any(is.na(PSU_sort))) stop("'PSU_sort' has unknown values")
+
+          psuag <- data.table(PSU, PSU_sort)
+          if (!is.null(period)) hpY <- data.table(period, psuag)
+          psuag <- psuag[,.N, by=names(psuag)][,N:=NULL]
+          psuag <- psuag[,.N, by=c(names(period), names(PSU))]
+          if (nrow(psuag[N>1])>0) stop("'PSU_sort' must be equal for each 'PSU'")
+  }
+
   # N_h
   if (!is.null(N_h)) {
       N_h <- data.table(N_h)
@@ -94,30 +117,47 @@ variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=
     if (!is.null(period)) Nh <- data.table(period, Nh)
     N_h <- Nh[, .(N_h = sum(w_final, na.rm=TRUE)), keyby=c(names(Nh)[1:(1+np)])]
   }
-  pH <- NULL  
+  psuag <- pH <- NULL  
 
   ### Calculation
-  
+  namY <- names(Y)
+
   # z_hi
-  .SD <- .N <- NULL
+  nhc <- f_h <- .SD <- N <- NULL
   hpY <- data.table(H, PSU, Y*w_final)
+  if (!is.null(PSU_sort)) hpY <- data.table(H, PSU, PSU_sort, Y*w_final)
   if (!is.null(period)) hpY <- data.table(period, hpY)
+  psusn <- as.integer(!is.null(PSU_sort))
   z_hi <- hpY[, lapply(.SD, sum, na.rm=TRUE), 
-                       keyby = c(names(hpY)[1:(2+np)]),
-                       .SDcols = names(hpY)[-(1:(2+np))]]
+                       keyby = c(names(hpY)[1:(2+np+psusn)]),
+                       .SDcols = names(hpY)[-(1:(2+np+psusn))]]
   setkeyv(z_hi, names(z_hi)[c(1:(1+np))]) 
 
   # n_h
   n_h <- data.table(z_hi[, c(1:(1+np)), with=FALSE])
-  n_h <- n_h[,.N, keyby=c(names(n_h)[1:(1+np)])]
-  setnames(n_h, "N", "n_h")
+  n_h <- n_h[, .(n_h=.N), keyby=c(names(n_h)[1:(1+np)])]
 
   # var_z_hi
-  var_z_hi <- z_hi[, lapply(.SD, var, na.rm=FALSE), keyby = c(names(z_hi)[1:(1+np)]),
-    .SDcols = names(z_hi)[-(1:(2+np))]]
-  
+  var_z_hi <- z_hi[, lapply(.SD, var, na.rm=FALSE), keyby = c(names(z_hi)[1:(1+np)]), .SDcols = namY]
+
+  if (!is.null(PSU_sort)) {
+       setkeyv(z_hi, c(names(z_hi)[c(1:(1+np),3+np)]))
+       z_hi[, (paste0("lag_", namY)) := lapply(.SD, function(x) shift(x, 1)),
+                               by=c(names(z_hi)[1:(1+np)]), .SDcols=namY]
+
+
+       laY <- paste0("lag_", namY[1])
+       z_hi <- z_hi[!is.na(get(laY))]
+
+       var_z_hi <- z_hi[, lapply(namY, function(x) 
+                                 sum((get(x)-get(paste0("lag_",x)))^2)),
+                                 keyby=c(names(z_hi)[1:(1+np)])]
+       setnames(var_z_hi, names(var_z_hi)[(2+np):ncol(var_z_hi)], namY)
+   }
+
   # f_h
   F_h <- merge(N_h, n_h, by = names(hpY)[c(1:(1+np))], sort=TRUE)
+  F_h[, N_h:=round2(N_h, 8)]
   F_h[, f_h:=n_h/N_h]
 
   if (nrow(F_h[n_h==1 & f_h != 1])>0) {
@@ -137,28 +177,30 @@ variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=
 
   # fh1
   if (!(PSU_level)) {
-       n_h1 <- NULL
+       n_h1 <- Nh1 <- NULL
        fh1 <- data.table(hpY[, c(1:(1+np)), with=FALSE], w_final)
-       fh1[, n_h1:=1]
-       fh1 <- fh1[, lapply(.SD, sum, na.rm=TRUE), keyby = c(names(fh1)[c(1:(1+np))]),
-	           .SDcols = c("n_h1", "w_final")]
-       fh1[, fh1:=n_h1/w_final]
-       f_h <- fh1[, "fh1", with=FALSE]
-     } else  f_h <- F_h[,"f_h", with=FALSE]
+       fh1 <- fh1[, .(n_h1=.N, Nh1=sum(w_final, na.rm=TRUE)), keyby = c(names(fh1)[1:(1+np)])]
+       F_h <- merge(F_h, fh1, by=c(names(fh1)[1:(1+np)]))
+       F_h[, f_h:=n_h1/Nh1]
+     }
+
+  var_z_hi <- merge(F_h, var_z_hi, by=c(names(F_h)[1:(1+np)]))
+  fh1 <- F_h <- NULL
 
   # var_h
-  var_h <- data.table(matrix((1 - f_h*(1-fh_zero)) * n_h$n_h) * var_z_hi[, -c(1:(1+np)), with=FALSE])
-  var_h2 <- copy(var_h)
-  if (np>0) var_h2 <- data.table(var_z_hi[, c(1:np), with=FALSE], var_h)
 
+  if (!is.null(PSU_sort)) {
+         var_z_hi[, nhc:=ifelse(n_h>1, 1/(2*n_h*(n_h-1)), NA)]
+    } else var_z_hi[, nhc:=n_h]
+  
+  var_z_hi[, (paste0("var_", namY)):=lapply(.SD[, namY, with=FALSE],
+                                         function(x) (1 - f_h*(1-fh_zero))*nhc*x)]
+  
   # Variance_est 
-
-  if (np==0) {var_est <- data.table(t(colSums(var_h, na.rm=TRUE)))
-           } else   var_est <- var_h2[, lapply(.SD, sum, na.rm=TRUE), 
-                                        keyby = c(names(var_h2)[c(1:np)]),
-                                       .SDcols = names(var_h)]
-
-
+   
+  var_est <- var_z_hi[, lapply(.SD, sum, na.rm=TRUE), 
+                                  keyby = vars, .SDcols = paste0("var_", namY)]
+  setnames(var_est, paste0("var_", namY), namY)
   return(var_est)
 }
 
