@@ -2,7 +2,7 @@ round2 <- function(x, n) {
   sign(x) * trunc(abs(x)*10 ^ n + 0.5)/10 ^ n
 }
 
-variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=TRUE, PSU_sort=NULL, period=NULL, dataset=NULL) {
+variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=TRUE, PSU_sort=NULL, period=NULL, dataset=NULL, msg="") {
 
   ### Checking
 
@@ -161,6 +161,7 @@ variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=
   F_h[, f_h:=n_h/N_h]
 
   if (nrow(F_h[n_h==1 & f_h != 1])>0) {
+    print(msg)
     print("There is stratas, where n_h == 1 and f_h <> 1")
     print("Not possible to estimate the variance in these stratas!")
     print("At these stratas estimation of variance was not calculated")
@@ -169,6 +170,7 @@ variance_est <- function(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE, PSU_level=
   }
   
   if (nrow(F_h[f_h > 1])>0) {    
+     print(msg)
      print("There is stratas, where f_h > 1")
      print("At these stratas estimation of variance will be 0")
      print(F_h[f_h > 1])

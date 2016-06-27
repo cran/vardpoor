@@ -4,7 +4,7 @@
 \description{Computes the variance estimation by the ultimate cluster method.}
 \usage{variance_est(Y, H, PSU, w_final, N_h=NULL, fh_zero=FALSE,
                     PSU_level=TRUE, PSU_sort=NULL,
-                    period=NULL, dataset=NULL)}
+                    period=NULL, dataset=NULL, msg="")}
 \arguments{
 \item{Y}{Variables of interest. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
@@ -25,6 +25,8 @@
 \item{period}{Optional variable for the survey periods. If supplied, the values for each period are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
 \item{dataset}{an optional name of the individual dataset  \code{data.table}.}
+
+\item{msg}{an optional printed text, when function print error.}
 
 }
 \value{a \code{data.table} containing the  values of the

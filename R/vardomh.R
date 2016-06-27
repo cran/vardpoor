@@ -468,7 +468,8 @@ vardomh <- function(Y, H, PSU, w_final,
                           N_h=N_h, fh_zero=fh_zero, 
                           PSU_level=PSU_level,
                           PSU_sort=PSU_sort,
-                          period=period, dataset=NULL)
+                          period=period, dataset=NULL,
+                          msg="Current variance estimation")
   var_est <- transpos(var_est, is.null(period), "var_est", names(period))
   all_result <- var_est
 
@@ -481,7 +482,8 @@ vardomh <- function(Y, H, PSU, w_final,
                              N_h=N_h, fh_zero=fh_zero, 
                              PSU_level=PSU_level,
                              PSU_sort=PSU_sort,
-                             period=period, dataset=NULL)
+                             period=period, dataset=NULL,
+                             msg="Variance of HT estimator under current design")
   var_cur_HT <- transpos(var_cur_HT, is.null(period), "var_cur_HT", names(period))
   all_result <- merge(all_result, var_cur_HT)
   n_nonzero <- var_est <-  var_cur_HT <- NULL
