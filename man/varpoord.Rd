@@ -114,7 +114,9 @@ For example, to compute poverty threshold equal to some percentage of median inc
        \code{absolute_margin_of_error} - the estimated absolute margin of error, \cr
        \code{relative_margin_of_error} - the estimated relative margin of error in percentage, \cr
        \code{CI_lower} - the estimated confidence interval lower bound, \cr
-       \code{CI_upper} - the estimated confidence interval upper bound, \cr
+       \code{CI_upper} - the estimated confidence interval upper bound, \cr 
+       \code{S2_y} - the estimated variance of the y variable for total or the estimated variance of the linearised variable for the ratio of two totals, \cr
+       \code{S2_res} - the estimated variance of the regression residuals, \cr
        \code{var_srs_HT} - the estimated variance of the HT estimator under SRS for household, \cr
        \code{var_cur_HT} - the estimated variance of the HT estimator under current design for household, \cr
        \code{var_srs_ca} - the estimated variance of the calibrated estimator under SRS  for household, \cr
