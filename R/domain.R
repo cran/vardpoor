@@ -16,8 +16,8 @@ domain <- function(Y, D, dataset=NULL) {
   
   # Y
   Y <- data.table(Y, check.names = TRUE)
-  if (!all(sapply(Y, is.numeric))) stop(name.Y, " must be numerical")
-  if (any(is.na(Y))) stop(name.Y, " has unknown values")
+  if (!all(sapply(Y, is.numeric))) stop(name.Y, " must be numeric")
+  if (any(is.na(Y))) stop(name.Y, " has missing values")
   n <- nrow(Y)
 
   # D
@@ -26,7 +26,8 @@ domain <- function(Y, D, dataset=NULL) {
     stop(name.D, " has duplicate column names: ",
          paste(names(D)[duplicated(names(D))], collapse = ", "))
   if (nrow(D) != n) stop(name.Y, " and ", name.D ," have different row count")
-  D <- D[, lapply(.SD, as.character), .SDcols = names(D)]
+  D[, (names(D)):=lapply(.SD, as.character)]
+  if (any(is.na(D))) stop("'D' has missing values")
 
   Dom_agg <- unique(D)
   setkeyv(Dom_agg, names(Dom_agg))

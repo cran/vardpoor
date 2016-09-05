@@ -2,8 +2,8 @@ Package: vardpoor
 Type: Package
 Title: Variance Estimation for Sample Surveys by the Ultimate Cluster
         Method
-Version: 0.7.2
-Date: 2016-08-01
+Version: 0.7.4
+Date: 2016-09-05
 Depends: R (>= 3.2.3), data.table (>= 1.9.6), laeken, stringr
 Imports: foreach, plyr, gdata, MASS, stats, utils, surveyplanning
 Authors@R: c(person("Juris", "Breidaks", email = "Juris.Breidaks@csb.gov.lv",
@@ -16,8 +16,8 @@ Repository: CRAN
 URL: https://github.com/CSBLatvia/vardpoor/
 BugReports: https://github.com/CSBLatvia/vardpoor/issues/
 NeedsCompilation: yes
-Packaged: 2016-08-01 08:56:11 UTC; JBreidaks
+Packaged: 2016-09-05 14:25:58 UTC; JBreidaks
 Author: Juris Breidaks [aut, cre],
   Martins Liberts [aut],
   Santa Ivanova [aut]
-Date/Publication: 2016-08-01 13:14:01
+Date/Publication: 2016-09-05 17:21:11
