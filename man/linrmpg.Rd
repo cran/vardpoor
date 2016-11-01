@@ -9,9 +9,10 @@
 }
 
 \usage{
-  linrmpg(Y, id=NULL, weight=NULL, sort=NULL, Dom=NULL,
-          period=NULL, dataset = NULL, percentage=60,
-          order_quant=50, var_name="lin_rmpg")
+  linrmpg(Y, id = NULL, weight = NULL,
+          sort = NULL, Dom = NULL, period = NULL,
+          dataset = NULL, percentage = 60,
+          order_quant = 50, var_name = "lin_rmpg")
 
 }
 
@@ -62,18 +63,22 @@ Jean-Claude Deville (1999). Variance estimation for complex statistics and estim
 
 \examples{
 data(eusilc)
-dati <- data.table(IDd=1:nrow(eusilc),eusilc)
+dati <- data.table(IDd = 1 : nrow(eusilc), eusilc)
 
 # Full population
-d <- linrmpg(Y="eqIncome", id="IDd", weight="rb050", Dom=NULL,
-                     dataset=dati, percentage=60, order_quant=50)
+d <- linrmpg(Y = "eqIncome", id = "IDd",
+             weight = "rb050", Dom = NULL,
+             dataset = dati, percentage = 60,
+             order_quant = 50)
 d$value
 d$threshold
 
 \dontrun{
 # By domains
-dd <- linrmpg(Y="eqIncome", id="IDd", weight = "rb050", Dom="db040",
-                       dataset=dati, percentage=60, order_quant=50)
+dd <- linrmpg(Y = "eqIncome", id = "IDd",
+              weight = "rb050", Dom = "db040",
+              dataset = dati, percentage = 60,
+              order_quant = 50)
 dd$value}
 }
 

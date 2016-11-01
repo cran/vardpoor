@@ -9,9 +9,10 @@
 }
 
 \usage{
-linqsr(Y, id=NULL, weight=NULL, sort = NULL,
-       Dom = NULL, period=NULL, dataset = NULL,
-       alpha = 20, var_name="lin_qsr")
+linqsr(Y, id = NULL, weight = NULL,
+       sort = NULL, Dom = NULL, period = NULL,
+       dataset = NULL, alpha = 20,
+       var_name = "lin_qsr")
 }
 
 \arguments{
@@ -54,17 +55,17 @@ Jean-Claude Deville (1999). Variance estimation for complex statistics and estim
 
 \examples{
 data(eusilc)
-dati <- data.table(IDd=1:nrow(eusilc),eusilc)
+dati <- data.table(IDd = 1 : nrow(eusilc), eusilc)
 
 # Full population
-dd <- linqsr(Y="eqIncome", id="IDd", weight="rb050",
-             Dom=NULL, dataset= dati, alpha=20)
+dd <- linqsr(Y = "eqIncome", id = "IDd", weight = "rb050",
+             Dom = NULL, dataset = dati, alpha = 20)
 dd$value
 
 \dontrun{
 # By domains
-dd <- linqsr(Y="eqIncome", id="IDd", weight="rb050",
-             Dom="db040", dataset= dati, alpha=20)
+dd <- linqsr(Y = "eqIncome", id = "IDd", weight = "rb050",
+             Dom = "db040", dataset = dati, alpha = 20)
 dd$value}
 }
 

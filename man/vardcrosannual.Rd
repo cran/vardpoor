@@ -1,23 +1,23 @@
-\name{vardchangannual}
+\name{vardcrosannual}
 
-\alias{vardchangannual}
+\alias{vardcrosannual}
 
-\title{Variance estimation for measures of annual net change for single and multistage stage cluster sampling designs}
+\title{Variance estimation for measures of annual estiamtes for single and multistage stage cluster sampling designs}
 
-\description{Computes the variance estimation for measures of annual net change for single and multistage stage cluster sampling designs.}
+\description{Computes the variance estimation for measures of annual estimates for single and multistage stage cluster sampling designs.}
 
 \usage{
-vardchangannual(Y, H, PSU, w_final,
-                ID_level1, ID_level2,
-                Dom = NULL, Z = NULL, 
-                country = NULL, years,
-                subperiods, dataset = NULL,
-                year1, year2, X = NULL,
-                countryX = NULL, yearsX = NULL,
-                subperiodsX = NULL, X_ID_level1 = NULL,
-                ind_gr = NULL, g = NULL, q = NULL,
-                datasetX = NULL, percentratio = 1,
-                use.estVar = FALSE, confidence = 0.95)
+vardcrosannual(Y, H, PSU, w_final,
+               ID_level1, ID_level2,
+               Dom = NULL, Z = NULL, 
+               country = NULL, years,
+               subperiods, dataset = NULL,
+               X = NULL, countryX = NULL,
+               yearsX = NULL, subperiodsX = NULL,
+               X_ID_level1 = NULL, ind_gr = NULL,
+               g = NULL, q = NULL, datasetX = NULL,
+               percentratio = 1, use.estVar = FALSE,
+               confidence = 0.95)
 }
 
 \arguments{
@@ -45,10 +45,6 @@ vardchangannual(Y, H, PSU, w_final,
 \item{subperiods}{Variable for the all survey subperiods. The values for each subperiod are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
 \item{dataset}{Optional survey data object convertible to \code{data.table}.}
-
-\item{year1}{The vector of years from variable \code{years} describes the first year.}
-
-\item{year2}{The vector of years from variable \code{periods} describes the second year.}
 
 \item{X}{Optional matrix of the auxiliary variables for the calibration estimator. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
@@ -254,23 +250,22 @@ data[, unemployed := trunc(runif(nrow(data), 0, 2))]
 data[, labour_force := employed + unemployed]
 data[, id_lv2 := .I]
 
-result <- vardchangannual(Y = "employed", H = "strata",
-                          PSU = "PSU", w_final = "rb050",
-                          ID_level1 = "db030", ID_level2 = "id_lv2",
-                          Dom = NULL, Z = NULL, country = "country",
-                          years = "year", subperiods = "quarter",
-                          dataset = data, year1 = 2010, year2 = 2011,
-                          percentratio = 100, confidence = 0.95)
+result <- vardcrosannual(Y = "employed", H = "strata",
+                         PSU = "PSU", w_final = "rb050",
+                         ID_level1 = "db030", ID_level2 = "id_lv2",
+                         Dom = NULL, Z = NULL, country = "country",
+                         years = "year", subperiods = "quarter",
+                         dataset = data, percentratio = 100,
+                         confidence = 0.95)
 
 \dontrun{
-result <- vardchangannual(Y = "unemployed", H = "strata",
-                          PSU = "PSU", w_final = "rb050",
-                          ID_level1 = "db030", ID_level1 = "id_lv2",
-                          Dom = NULL, Z = "labour_force",
-                          country = "country",  years = "year",
-                          subperiods = "quarter", dataset = data,
-                          year1 = 2010, year2 = 2011,
-                          percentratio = 100, confidence = 0.95) }
+result <- vardcrosannual(Y = "unemployed", H = "strata",
+                         PSU = "PSU", w_final = "rb050",
+                         ID_level1 = "db030", ID_level1 = "id_lv2",
+                         Dom = NULL, Z = "labour_force",
+                         country = "country",  years = "year",
+                         subperiods = "quarter", dataset = data,
+                         percentratio = 100, confidence = 0.95) }
 }
 
 \seealso{

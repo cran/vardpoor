@@ -11,10 +11,10 @@ Estimation of the median income of individuals below At Risk of Poverty Threshol
 }
 
 \usage{
-linpoormed(Y, id = NULL, weight=NULL, sort=NULL,
-           Dom=NULL, period=NULL, dataset = NULL,
-           percentage=60, order_quant=50,
-           var_name="lin_poormed")
+linpoormed(Y, id = NULL, weight = NULL,
+           sort = NULL, Dom = NULL, period = NULL,
+           dataset = NULL, percentage = 60,
+           order_quant = 50, var_name = "lin_poormed")
 }
 
 \arguments{
@@ -66,13 +66,17 @@ data(eusilc)
 dati=data.table(IDd=1:nrow(eusilc),eusilc)
 
 # Full population
-d <- linpoormed(Y="eqIncome", id="IDd", weight = "rb050", Dom=NULL,
-                dataset=dati, percentage=60, order_quant=50)
+d <- linpoormed(Y = "eqIncome", id = "IDd",
+                weight = "rb050", Dom = NULL,
+                dataset = dati, percentage = 60,
+                order_quant = 50)
 
 \dontrun{
 # Domains by location of houshold
-dd <- linpoormed(Y="eqIncome", id="IDd", weight="rb050", Dom="db040",
-                dataset=dati, percentage=60, order_quant=50)
+dd <- linpoormed(Y = "eqIncome", id = "IDd",
+                 weight = "rb050", Dom = "db040",
+                 dataset = dati, percentage = 60,
+                 order_quant = 50)
 
 }
 }

@@ -10,8 +10,8 @@
 
 \usage{
   lingini(Y, id = NULL, weight = NULL,
-          sort = NULL, Dom = NULL, period=NULL,
-          dataset = NULL, var_name="lin_gini")
+          sort = NULL, Dom = NULL, period = NULL,
+          dataset = NULL, var_name = "lin_gini")
 }
 
 \arguments{
@@ -53,15 +53,15 @@ Jean-Claude Deville (1999). Variance estimation for complex statistics and estim
 
 \examples{
 data(eusilc)
-dati <- data.table(IDd=1:nrow(eusilc),eusilc)[1:3,]
+dati <- data.table(IDd = 1 : nrow(eusilc), eusilc)[1 : 3,]
 
 # Full population
-dat1 <- lingini(Y="eqIncome", id="IDd", weight="rb050", dataset=dati)
+dat1 <- lingini(Y = "eqIncome", id = "IDd", weight = "rb050", dataset = dati)
 dat1$value
 
 \dontrun{
 # By domains
-dat2 <- lingini(Y="eqIncome", id="IDd", weight="rb050", Dom=c("db040"), dataset=dati)
+dat2 <- lingini(Y = "eqIncome", id = "IDd", weight = "rb050", Dom = c("db040"), dataset = dati)
 dat2$value}
 }
 

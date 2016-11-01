@@ -11,8 +11,8 @@
 \usage{
 lingini2(Y, id = NULL, weight = NULL,
          sort = NULL, Dom = NULL,
-         period=NULL, dataset = NULL,
-         var_name="lin_gini2")
+         period = NULL, dataset = NULL,
+         var_name = "lin_gini2")
 }
 
 \arguments{
@@ -60,12 +60,12 @@ data(eusilc)
 dati <- data.table(IDd=1:nrow(eusilc), eusilc)
 
 # Full population
-dat1 <- lingini2(Y="eqIncome", id="IDd", weight = "rb050",  dataset=dati)
+dat1 <- lingini2(Y = "eqIncome", id = "IDd", weight = "rb050",  dataset = dati)
 dat1$value
 
 \dontrun{
 # By domains
-dat2 <- lingini2(Y="eqIncome", id="IDd", weight = "rb050", Dom=c("db040"), dataset=dati)
+dat2 <- lingini2(Y = "eqIncome", id = "IDd", weight = "rb050", Dom = c("db040"), dataset = dati)
 dat2$value}
 }
 
