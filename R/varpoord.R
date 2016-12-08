@@ -111,7 +111,6 @@ varpoord <- function(Y, w_final,
           if (min(Dom %in% names(dataset)) == 1) Dom <- dataset[, Dom, with = FALSE] }
     }
 
-  if (is.null(datasetX)) datasetX <- copy(dataset)
   if(!is.null(datasetX)) {
       dataset <- data.table(datasetX)
        if (!is.null(periodX)) {
@@ -254,6 +253,7 @@ varpoord <- function(Y, w_final,
   if (ncol(PSU) != 1) stop("'PSU' must have vector or 1 column data.frame, matrix, data.table")
   PSU[, (names(PSU)) := lapply(.SD, as.character)]
   if (any(is.na(PSU))) stop("'PSU' has missing values")
+  if (names(ID_level1) == names(PSU)) setnames(PSU, names(PSU), paste0(names(PSU), "_PSU")) 
 
   # gender
   if (!is.null(gender)) {
