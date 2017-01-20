@@ -2,50 +2,49 @@
 residual_est <- function (Y, X, weight, q) {
  
   # Y
-  Y <- as.data.frame.matrix(data.table(Y, check.names = TRUE))
+  Y <- data.table(Y, check.names = TRUE)
+  if(anyNA(Y)) print("'Residual_est': 'Ys' has missing values", call. = FALSE)
   n <- nrow(Y)
   m <- ncol(Y)
   if (!all(sapply(Y, is.numeric))) stop("'Y' must be numeric")
-  if(any(is.na(Y))) print("'Residual_est': 'Ys' has missing values", call. = FALSE)
+  Y <- as.data.frame.matrix(Y)
  
   # X
-  X <- as.matrix(X)
+  X <- data.table(X, check.names = TRUE)
+  if(anyNA(X)) stop("'X' has missing values")
   if (nrow(X) != n) stop("'X' and 'Y' must be equal row count")
-  if (!all(sapply(X, is.numeric))) stop("'X' must be numeric")
-
-  X1 <- data.table(X, check.names = TRUE)
-  X1 <- X1[, lapply(.SD, function(x) sum(!is.na(x)))]
-  if (!all(X1 == n)) stop("X has missing values")
-  X1 <- NULL
+  X <- as.matrix(X)
+  if (is.numeric(class(X[, 1]))) stop("'X' must be numeric")
 
   # weight
   weight <- data.frame(weight)
+  if(anyNA(weight)) stop("'weight' has missing values")
   if (nrow(weight) != n) stop("'weight' length must be equal with 'Y' row count!")
   if (ncol(weight) != 1) stop("'weight' must be a vector or 1 column data.frame, matrix, data.table")
   weight <- weight[, 1]
   if (!is.numeric(weight)) stop("'weight' must be numeric")
-  if(any(is.na(weight))) stop("'weight' has missing values")
 
   # q
   q <- data.frame(q)
+  if(anyNA(q)) stop("'q' has missing values")
   if (nrow(q) != n) stop("'q' length must be equal with Y' row count!")
   if (ncol(q) != 1) stop("'q' must be a vector or 1 column data.frame, matrix, data.table")
   q <- q[, 1]
   if (!is.numeric(q)) stop("'q' must be numeric")
-  if(any(is.na(q))) stop("'q' has missing values")  
 
   ee <- as.data.frame(matrix(NA, n, m))
   ws <- weight * q
  
-  kolonnas <- colSums(!is.na(X)) == nrow(X)
-  B <- t(X[, kolonnas] * ws)
+  B <- t(X * ws)
+  matr <- ginv(B %*% X) %*% B
+  B <- ws <- q <- weight <- NULL
 
   for (i in 1:ncol(Y)) {
-          beta <- ginv(B %*% X[, kolonnas]) %*% B %*% Y[, i]
-          ee[, i] <- Y[, i] - X[, kolonnas] %*% beta
+          beta <- matr %*% Y[, i]
+          ee[, i] <- Y[, i] - X %*% beta
          }
-
-  colnames(ee) <- colnames(Y)
+  names(ee) <- names(Y)
+  Y <- X <- beta <- NULL
 
   return(ee)
 }

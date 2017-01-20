@@ -146,7 +146,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
               if (min(q %in% names(datasetX)) != 1) stop("'q' does not exist in 'datasetX'!") 
               if (min(q %in% names(datasetX)) == 1) q <- datasetX[, q,  with = FALSE] } 
      }
-  equal_dataset <- all.equal(dataset, datasetX) & !is.null(X)
+  equal_dataset <- identical(dataset, datasetX) & !is.null(datasetX) & !is.null(X)
   if (equal_dataset) X_ID_level1 <- ID_level1
   if (equal_dataset) countryX <- country
 
@@ -156,7 +156,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
   if (ncol(Y) != 1) stop("'Y' must be a vector or 1 column data.frame, matrix, data.table")
   Y <- Y[, 1]
   if (!is.numeric(Y)) stop("'Y' must be numeric")
-  if (any(is.na(Y))) stop("'Y' has missing values")
+  if (anyNA(Y)) stop("'Y' has missing values")
 
   if (!is.null(Y_den)) {
           Y_den <- data.frame(Y_den)
@@ -164,7 +164,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
           if (nrow(Y_den) != n) stop("'Y_den' must be the same length as 'Y'")
           Y_den <- Y_den[, 1]
           if(!is.numeric(Y_den)) stop("'Y_den' must be numeric")
-          if (any(is.na(Y_den))) stop("'Y_den' has missing values")
+          if (anyNA(Y_den)) stop("'Y_den' has missing values")
   }
 
   # age
@@ -174,42 +174,43 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
        if (ncol(age) != 1) stop("'age' must be a vector or 1 column data.frame, matrix, data.table")
        age <- age[, 1]
        if (!is.numeric(age)) stop("'age' must be numeric")
-       if (any(is.na(age))) stop("'age' has missing values")
+       if (anyNA(age)) stop("'age' has missing values")
    }
 
    # pl085
    if (!is.null(pl085)) {
        pl085 <- data.frame(pl085)
+       if (anyNA(pl085)) stop("'pl085' has missing values")
        if (nrow(pl085) != n) stop("'pl085' must be the same length as 'Y'")
        if (ncol(pl085) != 1) stop("'pl085' must be a vector or 1 column data.frame, matrix, data.table")
        pl085 <- pl085[, 1]
        if (!is.numeric(pl085)) stop("'pl085' must be numeric")
-       if (any(is.na(pl085))) stop("'pl085' has missing values")
    }
 
    # month_at_work
    if (!is.null(month_at_work)) {
         month_at_work <- data.frame(month_at_work)
+        if (anyNA(month_at_work)) stop("'month_at_work' has missing values")
         if (nrow(month_at_work) != n) stop("'month_at_work' must be the same length as 'Y'")
         if (ncol(month_at_work) != 1) stop("'month_at_work' must be a vector or 1 column data.frame, matrix, data.table")
         month_at_work <- month_at_work[, 1]
-        if (!is.numeric(pl085)) stop("'month_at_work' must be numeric")
-        if (any(is.na(pl085))) stop("'month_at_work' has missing values")
+        if (!is.numeric(month_at_work)) stop("'month_at_work' must be numeric")
   }
 
   # Y_thres
   if (!is.null(Y_thres)) {
        Y_thres <- data.frame(Y_thres)
+       if (anyNA(Y_thres)) stop("'Y_thres' has missing values") 
        if (nrow(Y_thres) != n) stop("'Y_thres' must have the same length as 'Y'")
        if (ncol(Y_thres) != 1) stop("'Y_thres' must have a vector or 1 column data.frame, matrix, data.table")
        Y_thres <- Y_thres[, 1]
        if (!is.numeric(Y_thres)) stop("'Y_thres' must be numeric")
-       if (any(is.na(Y_thres))) stop("'Y_thres' has missing values") 
      } else Y_thres <- Y
 
   # wght_thres
   if (is.null(wght_thres)) wght_thres <- w_final
   wght_thres <- data.frame(wght_thres)
+  if (anyNA(wght_thres)) stop("'w_final' has missing values") 
   if (nrow(wght_thres) != n) stop("'wght_thres' must have the same length as 'Y'")
   if (ncol(wght_thres) != 1) stop("'wght_thres' must be a vector or 1 column data.frame, matrix, data.table")
   wght_thres <- wght_thres[, 1]
@@ -219,16 +220,15 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
   H <- data.table(H)
   if (nrow(H) != n) stop("'H' length must be equal with 'Y' row count")
   if (ncol(H) != 1) stop("'H' must be 1 column data.frame, matrix, data.table")
-  if (is.null(names(H))) stop("'H' must have column names")
-  H[, (names(H)) := lapply(.SD, as.character)]
-  if (any(is.na(H))) stop("'H' has missing values")
+   H[, (names(H)) := lapply(.SD, as.character)]
+  if (anyNA(H)) stop("'H' has missing values")
 
   # PSU
   PSU <- data.table(PSU)
   if (nrow(PSU) != n) stop("'PSU' length must be equal with 'Y' row count")
   if (ncol(PSU) != 1) stop("'PSU' has more than 1 column")
   PSU[, (names(PSU)) := lapply(.SD, as.character)]
-  if (any(is.na(PSU))) stop("'PSU' has missing values")
+  if (anyNA(PSU)) stop("'PSU' has missing values")
   
   # gender
   if (!is.null(gender)) {
@@ -244,6 +244,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
   # sort
   if (!is.null(sort)) {
         sort <- data.frame(sort)
+        if (anyNA(sort)) stop("'sort' has missing values") 
         if (length(sort) != n) stop("'sort' must have the same length as 'Y'")
         if (ncol(sort) != 1) stop("'sort' must be a vector or 1 column data.frame, matrix, data.table")
         sort <- sort[, 1]
@@ -251,17 +252,17 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
 
   # w_final 
   w_final <- data.frame(w_final)
+  if (anyNA(w_final)) stop("'w_final' has missing values") 
   if (nrow(w_final) != n) stop("'w_final' must be equal with 'Y' row count")
   if (ncol(w_final) != 1) stop("'w_final' must be a vector or 1 column data.frame, matrix, data.table")
   w_final <- w_final[, 1]
   if (!is.numeric(w_final)) stop("'w_final' must be numeric")
-  if (any(is.na(w_final))) stop("'w_final' has missing values") 
   
   # ID_level1
   if (is.null(ID_level1)) stop("'ID_level1' must be defined")
   ID_level1 <- data.table(ID_level1)
   ID_level1[, (names(ID_level1)) := lapply(.SD, as.character)]
-  if (any(is.na(ID_level1))) stop("'ID_level1' has missing values")
+  if (anyNA(ID_level1)) stop("'ID_level1' has missing values")
   if (ncol(ID_level1) != 1) stop("'ID_level1' must be 1 column data.frame, matrix, data.table")
   if (nrow(ID_level1) != n) stop("'ID_level1' must be the same length as 'Y'")
   if (names(ID_level1) == names(PSU)) setnames(PSU, names(PSU), paste0(names(PSU), "_PSU")) 
@@ -269,7 +270,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
   # ID_level2
   ID_level2 <- data.table(ID_level2)
   ID_level2[, (names(ID_level2)) := lapply(.SD, as.character)]
-  if (any(is.na(ID_level2))) stop("'ID_level2' has missing values")
+  if (anyNA(ID_level2)) stop("'ID_level2' has missing values")
   if (nrow(ID_level2) != n) stop("'ID_level2' length must be equal with 'Y' row count")
   if (ncol(ID_level2) != 1) stop("'ID_level2' must be 1 column data.frame, matrix, data.table")
   if (names(ID_level2) == names(ID_level1)) setnames(ID_level2, names(ID_level2), paste0(names(ID_level2), "_id"))
@@ -278,7 +279,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
   if (!is.null(country)){
         country <- data.table(country)
         country[, (names(country)) := lapply(.SD, as.character)]
-        if (any(is.na(country))) stop("'country' has missing values")
+        if (anyNA(country)) stop("'country' has missing values")
         if (names(country) == "percoun") stop("'country' must be different name")
         if (nrow(country) != n) stop("'country' length must be equal with 'Y' row count")
         if (ncol(country) != 1) stop("'country' has more than 1 column")
@@ -288,7 +289,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
   if (withperiod) {
         period <- data.table(period)
         period[, (names(period)) := lapply(.SD, as.character)]
-        if (any(is.na(period))) stop("'period' has missing values")
+        if (anyNA(period)) stop("'period' has missing values")
         if (names(period) == "percoun") stop("'period' must be different name")
         if (nrow(period) != n) stop("'period' length must be equal with 'Y' row count")
     } else if (!is.null(period)) stop("'period' must be NULL for those data")
@@ -302,18 +303,24 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
                  paste(names(Dom)[duplicated(names(Dom))], collapse = ","))
     if (nrow(Dom) != n) stop("'Dom' and 'Y' must be equal row count")
     namesDom <- names(Dom)
-    if (is.null(namesDom)) stop("'Dom' must have column names")
     Dom[, (namesDom):= lapply(.SD, as.character)]
-    if (any(is.na(Dom))) stop("'Dom' has missing values")
-    if (any(grepl("__", names(Dom)))) stop("'Dom' is not allowed column names with '__'")
+    if (anyNA(Dom)) stop("'Dom' has missing values")
+    if (any(grepl("__", namesDom))) stop("'Dom' is not allowed column names with '__'")
   }
+
+  # X
+  if (!is.null(X)) {
+      X <- data.table(X, check.names = TRUE)
+      if (!all(sapply(X, is.numeric))) stop("'X' must be numeric values")
+      if (anyNA(X)) stop("'X' has missing values")
+   }
 
   # periodX
   if (!is.null(X)) {
      if(!is.null(periodX)) {
         periodX <- data.table(periodX)
         periodX[, (names(periodX)) := lapply(.SD, as.character)]
-        if (any(is.na(periodX))) stop("'periodX' has missing values")
+        if (anyNA(periodX)) stop("'periodX' has missing values")
         if (any(duplicated(names(periodX)))) 
                     stop("'periodX' are duplicate column names: ", 
                          paste(names(periodX)[duplicated(names(periodX))], collapse = ","))
@@ -334,32 +341,43 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
 
   # X_ID_level1
   if (!is.null(X)) {
-    X_ID_level1 <- data.table(X_ID_level1)
-    X_ID_level1[, (names(X_ID_level1)) := lapply(.SD, as.character)]
-    if (any(is.na(X_ID_level1))) stop("'X_ID_level1' has missing values")
-    if (nrow(X) != nrow(X_ID_level1)) stop("'X' and 'X_ID_level1' have different row count")
-    if (ncol(X_ID_level1) != 1) stop("'X_ID_level1' must be 1 column data.frame, matrix, data.table")
+      if (is.null(X_ID_level1)) stop("'X_ID_level1' must be defined")
+      X_ID_level1 <- data.table(X_ID_level1)
+      X_ID_level1[, (names(X_ID_level1)) := lapply(.SD, as.character)]
+      if (anyNA(X_ID_level1)) stop("'X_ID_level1' has missing values")
+      if (nrow(X) != nrow(X_ID_level1)) stop("'X' and 'X_ID_level1' have different row count")
+      if (ncol(X_ID_level1) != 1) stop("'X_ID_level1' must be 1 column data.frame, matrix, data.table")
+      if (any(names(X_ID_level1) != names(ID_level1))) stop("'X_ID_level1' and 'ID_level1' must be equal names")
 
-    ID_level1h <- copy(ID_level1)
-    if (!is.null(countryX)) {X_ID_level1 <- data.table(countryX, X_ID_level1)
-                             ID_level1h <- data.table(country, ID_level1h)}
-    if (!is.null(periodX)) {X_ID_level1 <- data.table(periodX, X_ID_level1)
-                            ID_level1h <- data.table(period, ID_level1h)}
-    ID_level1h <- ID_level1h[, .N, by = names(ID_level1h)][, N := NULL]
-    if (nrow(X_ID_level1[,.N, by = names(X_ID_level1)][N > 1]) > 0) stop("'X_ID_level1' have duplicates")
-    setkeyv(X_ID_level1, names(X_ID_level1))
-    setkeyv(ID_level1h, names(ID_level1h))
-    nperIDh <- names(ID_level1h)
-    if (any(nperIDh != names(X_ID_level1))) stop("'X_ID_level1' and 'ID_level1' must be equal  names")
-    if (ID_level1h[, class(get(nperIDh))] != X_ID_level1[, class(get(nperIDh))])  stop("Class for 'X_ID_level1' and class for 'ID_level1' must be equal ")
+      ID_level1h <- copy(ID_level1)
+      X_ID_level1h <- copy(X_ID_level1)
+      if (!is.null(countryX)) {X_ID_level1h <- data.table(countryX, X_ID_level1h)
+                               ID_level1h <- data.table(country, ID_level1h)}
+      if (!is.null(periodX)) {X_ID_level1h <- data.table(periodX, X_ID_level1h)
+                              ID_level1h <- data.table(period, ID_level1h)}
+      ID_level1h <- ID_level1h[, .N, by = names(ID_level1h)][, N := NULL]
+      if (nrow(X_ID_level1h[,.N, by = names(X_ID_level1h)][N > 1]) > 0) stop("'X_ID_level1' have duplicates")  
 
-    if (!is.null(country)) {
-           if (nrow(ID_level1h) != nrow(X_ID_level1)) stop("'unique(countryX, periodX, X_ID_level1)' and 'unique(country, period, ID_level1)' have different row count")
-           if (any(ID_level1h != X_ID_level1)) stop("''unique(countryX, periodX, X_ID_level1)' and 'unique(country, period, ID_level1)' records have different")
+      setkeyv(X_ID_level1h, names(X_ID_level1h))
+      setkeyv(ID_level1h, names(ID_level1h))
+
+      if (!is.null(period)) {
+          if (!is.null(country)) {
+                 if (nrow(ID_level1h) != nrow(X_ID_level1h)) stop("'unique(countryX, periodX, X_ID_level1)' and 'unique(country, period, ID_level1)' have different row count")
+                 if (any(ID_level1h != X_ID_level1h)) stop("''unique(countryX, periodX, X_ID_level1)' and 'unique(country, period, ID_level1)' records have different")
+              } else {
+                 if (nrow(ID_level1h) != nrow(X_ID_level1h)) stop("'unique(periodX, X_ID_level1)' and 'unique(period, ID_level1)' have different row count")
+                 if (any(ID_level1h != X_ID_level1h)) stop("''unique(periodX, X_ID_level1)' and 'unique(period, ID_level1)' records have different")  }
         } else {
-           if (nrow(ID_level1h) != nrow(X_ID_level1)) stop("'unique(periodX, X_ID_level1)' and 'unique(period, ID_level1)' have different row count")
-           if (any(ID_level1h != X_ID_level1)) stop("''unique(periodX, X_ID_level1)' and 'unique(period, ID_level1)' records have different")  }
-   }
+          if (!is.null(country)) {
+               if (nrow(ID_level1h) != nrow(X_ID_level1h)) stop("'unique(countryX, X_ID_level1)' and 'unique(country, ID_level1)' have different row count")
+               if (any(ID_level1h != X_ID_level1h)) stop("''unique(countryX, X_ID_level1)' and 'unique(country, ID_level1)' records have different")
+            } else {
+               if (nrow(ID_level1h) != nrow(X_ID_level1h)) stop("'unique(X_ID_level1)' and 'unique(ID_level1)' have different row count")
+               if (any(ID_level1h != X_ID_level1h)) stop("''unique(X_ID_level1)' and 'unique(ID_level1)' records have different") }
+      }
+      ID_level1h <- X_ID_level1h <- NULL
+    }
 
   # ind_gr
   if (!is.null(X)) {
@@ -368,23 +386,8 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
      if (nrow(ind_gr) != nrow(X)) stop("'ind_gr' length must be equal with 'X' row count")
      if (ncol(ind_gr) != 1) stop("'ind_gr' must be 1 column data.frame, matrix, data.table")
      ind_gr[, (names(ind_gr)) := lapply(.SD, as.character)]
-     if (any(is.na(ind_gr))) stop("'ind_gr' has missing values")
+     if (anyNA(ind_gr)) stop("'ind_gr' has missing values")
    }
-
-  # X
-  if (!is.null(X)) {
-       X1 <- data.table(X, check.names = TRUE)
-       nX1 <- names(X1)
-       ind_gr1 <- copy(ind_gr) 
-       if (!is.null(periodX)) ind_gr1 <- data.table(periodX, ind_gr1, check.names = TRUE)
-       X2 <- data.table(ind_gr1, X1)
-       X1 <- X2[, .N, keyby = names(ind_gr1)][[ncol(ind_gr1) + 1]]
-       X2 <- X2[, lapply(.SD, function(x) sum(!is.na(x))), keyby = names(ind_gr1), .SDcols = nX1]
-       X2 <- X2[, !(names(X2) %in% names(ind_gr1)), with = FALSE]
-
-       if (!all(X2 == 0 | X1 == X2)) stop("X has missing values")
-       ind_gr1 <- nX1 <- nX2 <- X1 <- X2 <- NULL
-    }
 
   # g
   if (!is.null(X)) {
@@ -394,7 +397,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
     if (ncol(g) != 1) stop("'g' must be 1 column data.frame, matrix, data.table")
     g <- g[, 1]
     if (!is.numeric(g)) stop("'g' must be numeric")
-    if (any(is.na(g))) stop("'g' has missing values")
+    if (anyNA(g)) stop("'g' has missing values")
     if (any(g == 0)) stop("'g' value can not be 0")
    }
     
@@ -407,7 +410,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
     if (ncol(q) != 1) stop("'q' must be 1 column data.frame, matrix, data.table")
     q <- q[, 1]
     if (!is.numeric(q)) stop("'q' must be numeric")
-    if (any(is.na(q))) stop("'q' has missing values")
+    if (anyNA(q)) stop("'q' has missing values")
     if (any(is.infinite(q))) stop("'q' value can not be infinite")
   }
   

@@ -8,10 +8,10 @@
 
 \usage{ varpoord(Y, w_final, age = NULL, pl085 = NULL, month_at_work = NULL,
                  Y_den = NULL, Y_thres = NULL, wght_thres = NULL,
-                 ID_level1, ID_level2 = NULL, H, PSU, N_h, fh_zero = FALSE,
-                 PSU_level = TRUE, sort = NULL, Dom = NULL, period = NULL,
-                 gender = NULL, dataset = NULL, X = NULL, periodX = NULL,
-                 X_ID_level1 = NULL, ind_gr = NULL, g = NULL, q=NULL, datasetX = NULL,
+                 ID_level1, ID_level2 = NULL, H, PSU, N_h, PSU_sort = NULL, 
+                 fh_zero = FALSE, PSU_level = TRUE, sort = NULL, Dom = NULL, 
+                 period = NULL, gender = NULL, dataset = NULL, X = NULL, periodX = NULL,
+                 X_ID_level1 = NULL, ind_gr = NULL, g = NULL, q = NULL, datasetX = NULL,
                  percentage = 60, order_quant = 50, alpha = 20,
                  confidence = 0.95, outp_lin = FALSE, outp_res = FALSE, type = "linrmpg") }
                      
@@ -42,7 +42,16 @@
 
 \item{PSU}{Primary sampling unit variable. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
 
-\item{N_h}{optional data object convertible to \code{data.table}. If period is supplied, the time period is at the beginning of the object and after time period in the object is stratum. If period is not supplied, the first column in the object is stratum. In the last column is the total of the population in each stratum.}
+\item{N_h}{Number of primary sampling units in population for each stratum (and period if \code{period} is not \code{NULL}). If \code{N_h = NULL} and \code{fh_zero = FALSE} (default), \code{N_h} is estimated from sample data as sum of weights (\code{w_final}) in each stratum (and period if \code{period} is not \code{NULL}).
+
+  Optional for single-stage sampling design as it will be estimated from sample data. Recommended for multi-stage sampling design as \code{N_h} can not be correctly estimated from the sample data in this case. If \code{N_h} is not used in case of multi-stage sampling design (for example, because this information is not available), it is advisable to set \code{fh_zero = TRUE}.
+
+  If \code{period} \bold{is} \code{NULL}. A two-column data object convertible to \code{data.table} with rows for each stratum. The first column should contain stratum code. The second column - the number of primary sampling units in the population of each stratum.
+
+  If \code{period} \bold{is not} \code{NULL}. A three-column data object convertible to \code{data.table} with rows for each intersection of strata and period. The first column should contain period. The second column should contain stratum code. The third column - the number of primary sampling units in the population of each stratum and period.
+}
+
+\item{PSU_sort}{optional; if PSU_sort is defined, then variance is calculated for systematic sample.}
 
 \item{fh_zero}{by default FALSE; fh is calculated as division of n_h and N_h in each strata, if true, fh value is zero in each strata.}
 
@@ -250,5 +259,3 @@ aa4$res_out[20 : 40]
 \seealso{
 \code{\link{vardom}}, \code{\link{vardomh}}, \code{\link{linarpt}}} 
 \keyword{varpoord}
-
-  
