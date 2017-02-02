@@ -116,7 +116,7 @@ varpoord <- function(Y, w_final,
     }
 
   if(!is.null(datasetX)) {
-      dataset <- data.table(datasetX)
+      datasetX <- data.table(datasetX)
        if (!is.null(periodX)) {
             if (min(periodX %in% names(datasetX)) != 1) stop("'periodX' does not exist in 'datasetX'!")
             if (min(periodX %in% names(datasetX)) == 1) periodX <- datasetX[, periodX, with = FALSE] }     
@@ -355,7 +355,7 @@ varpoord <- function(Y, w_final,
 
  # X_ID_level1
   if (!is.null(X)) {
-    X_ID_level1 <- data.table(ID_level1)
+    X_ID_level1 <- data.table(X_ID_level1)
     if (nrow(X) != nrow(X_ID_level1)) stop("'X' and 'ID_level1' have different row count")
     if (ncol(ID_level1) != 1) stop("'X_ID_level1' must be 1 column data.frame, matrix, data.table")
     X_ID_level1[, (names(ID_level1)) := lapply(.SD, as.character)]
@@ -436,15 +436,15 @@ varpoord <- function(Y, w_final,
              ID_level1h <- data.table(ID_level1)
              if (!is.null(period)) { ID_level1h <- data.table(period, ID_level1h)
                                      X_ID_level1 <- data.table(period, X_ID_level1)
-                                   }
-             ID_level1hx <- data.table(X_ID_level1, g)
-             setnames(ID_level1hx, names(ID_level1hx)[c(1:(ncol(ID_level1hx)-1))], names(ID_level1h))
-             ID_level1g <- merge(ID_level1h, ID_level1hx, by=names(ID_level1h), sort=FALSE)
-             w_design <- w_final / ID_level1g[[ncol(ID_level1g)]]
-             ID_level1g <- data.table(ID_level1g, w_design=w_design)
-             ID_level1h <- ID_level1g[, .N, keyby=c(names(idh), "w_design")]
-             if (nrow(X) != nrow(ID_level1h))  stop("Aggregated 'w_design' length must the same as matrix 'X'")
-             idg <- idhx <- idh <- NULL
+                              }
+             idhx <- data.table(X_ID_level1, g)
+             setnames(idhx, names(idhx)[c(1 : (ncol(idhx) - 1))], names(ID_level1h))
+             idg <- merge(ID_level1h, idhx, by = names(ID_level1h), sort = FALSE)
+             w_design <- w_final / idg[[ncol(idg)]]
+             idg <- data.table(idg, w_design = w_design)
+             idh <- idg[, .N, keyby = c(names(ID_level1h), "w_design")]
+             if (nrow(X) != nrow(idh))  stop("Aggregated 'w_design' length must the same as matrix 'X'")
+             idg <- idhx <- ID_level1h <- NULL
       } else w_design <- w_final
 
   ### Calculation
@@ -638,7 +638,7 @@ varpoord <- function(Y, w_final,
   idper <- period <- NULL
   if (np > 0) period <- Y2[, c(1 : np), with = FALSE]
 
-  IDh <- Y2[, np + 1, with = FALSE]
+  ID_level1h <- Y2[, np + 1, with = FALSE]
   H <- Y2[, np + 2, with = FALSE]
   setnames(H, names(H), aH)
 
@@ -788,7 +788,8 @@ varpoord <- function(Y, w_final,
                "value", "value_eu", "var", "se", "rse", "cv", 
                "absolute_margin_of_error", "relative_margin_of_error",
                "CI_lower", "CI_upper")
-  if (is.null(Dom))  variabl <- c(variabl, "S2_y_HT", "S2_y_ca", "S2_res") 
+print(nDom)
+  if (is.null(nDom))  variabl <- c(variabl, "S2_y_HT", "S2_y_ca", "S2_res") 
   variabl <- c(variabl, "var_srs_HT",  "var_cur_HT", "var_srs_ca",
                "deff_sam", "deff_est", "deff")
 

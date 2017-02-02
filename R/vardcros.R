@@ -267,7 +267,7 @@ vardcros <- function(Y, H, PSU, w_final,
       if (nrow(X) != nrow(X_ID_level1)) stop("'X' and 'X_ID_level1' have different row count")
       if (ncol(X_ID_level1) != 1) stop("'X_ID_level1' must be 1 column data.frame, matrix, data.table")
       if (any(names(X_ID_level1) != names(ID_level1))) stop("'X_ID_level1' and 'ID_level1' must be equal names")
-      
+     
       ID_level1h <- copy(ID_level1)
       X_ID_level1h <- copy(X_ID_level1)
       if (!is.null(countryX)) {X_ID_level1h <- data.table(countryX, X_ID_level1h)
