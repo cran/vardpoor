@@ -17,7 +17,8 @@ vardcros(Y, H, PSU, w_final, ID_level1,
          linratio = FALSE, percentratio=1,
          use.estVar = FALSE, ID_level1_max = TRUE,
          outp_res = FALSE, withperiod = TRUE,
-         netchanges = TRUE, confidence = .95)}
+         netchanges = TRUE, confidence = .95,
+         checking = TRUE)}
 
 \arguments{
 
@@ -74,6 +75,9 @@ vardcros(Y, H, PSU, w_final, ID_level1,
 \item{netchanges}{Logical value. If value is TRUE, then produce two objects: the first object is aggregation of weighted data by period (if available), country, strata and PSU, the second object is an estimation for Y, the variance, gradient for numerator and denominator by country and period (if available). If value is FALSE, then both objects containing \code{NULL}.}
 
 \item{confidence}{Optional positive value for confidence interval. This variable by default is 0.95.}
+
+\item{checking}{Optional variable if this variable is TRUE, then function checks data preparation errors, otherwise not checked. This variable by default is TRUE.}
+
 }
 
 \value{
@@ -131,9 +135,8 @@ set.seed(1)
 data <- data.table(eusilc)
 data[, year := 2010]
 data[, country := "AT"]
-data[age<0, age := 0]
-PSU <- data[, .N, keyby = "db030"]
-PSU[, N := NULL]
+data[age < 0, age := 0]
+PSU <- data[, .N, keyby = "db030"][, N := NULL]
 PSU[, PSU := trunc(runif(nrow(PSU), 0, 100))]
 data <- merge(data, PSU, by = "db030", all = TRUE)
 PSU <- eusilc <- 0
@@ -156,11 +159,10 @@ data[, lwi := ifelse (t_lwi == 1 & exp2 == 1, 1, 0)]
 
 # At-risk-of-poverty or social exclusion (AROPE)
 data[, arope := ifelse (pov == 1 | dep == 1 | lwi == 1, 1, 0)]
-data[, id2 := .I]
 
-result11 <- vardcros(Y="arope", H = "strata", 
+result11 <- vardcros(Y="arope", H = "strata",
                      PSU = "PSU", w_final = "rb050",
-                     ID_level1 = "db030", ID_level2 = "db030",
+                     ID_level1 = "db030", ID_level2 = "rb030",
                      Dom = "rb090", Z = NULL, country = "country",
                      period = "year", dataset = data,
                      linratio = FALSE, withperiod = TRUE,
@@ -171,10 +173,10 @@ result11 <- vardcros(Y="arope", H = "strata",
 data(eusilc)
 set.seed(1)
 data <- data.table(rbind(eusilc, eusilc),
-                      year=c(rep(2010, nrow(eusilc)),
-                             rep(2011, nrow(eusilc))))
+                      year = c(rep(2010, nrow(eusilc)),
+                               rep(2011, nrow(eusilc))))
 data[, country := "AT"]
-data[age<0, age:=0]
+data[age < 0, age := 0]
 PSU <- data[, .N, keyby = "db030"][, N := NULL]
 PSU[, PSU := trunc(runif(nrow(PSU), 0, 100))]
 data <- merge(data, PSU, by = "db030", all = TRUE)
@@ -188,21 +190,20 @@ data[, exp := 1]
 data[, exp2 := 1 * (age < 60)]
 
 # At-risk-of-poverty (AROP)
-data[, pov := ifelse (t_pov == 1, 1, 0)]
+data[, pov := ifelse(t_pov == 1, 1, 0)]
 
 # Severe material deprivation (DEP)
-data[, dep := ifelse (t_dep == 1, 1, 0)]
+data[, dep := ifelse(t_dep == 1, 1, 0)]
 
 # Low work intensity (LWI)
-data[, lwi := ifelse (t_lwi == 1 & exp2 == 1, 1, 0)]
+data[, lwi := ifelse(t_lwi == 1 & exp2 == 1, 1, 0)]
 
 # At-risk-of-poverty or social exclusion (AROPE)
-data[, arope := ifelse (pov == 1 | dep == 1 | lwi == 1, 1, 0)]
-data[, id2 := .I]
+data[, arope := ifelse(pov == 1 | dep == 1 | lwi == 1, 1, 0)]
 
 result11 <- vardcros(Y = c("pov", "dep", "arope"),
                      H = "strata", PSU = "PSU", w_final = "rb050",
-                     ID_level1 = "db030", ID_level2 = "id2",
+                     ID_level1 = "db030", ID_level2 = "rb030",
                      Dom = "rb090", Z = NULL, country = "country",
                      period = "year", dataset=data, linratio = FALSE, 
                      withperiod = TRUE, netchanges = TRUE,
@@ -211,7 +212,7 @@ result11 <- vardcros(Y = c("pov", "dep", "arope"),
 data2 <- data[exp2 == 1]
 result12 <- vardcros(Y = c("lwi"), H = "strata",
                      PSU = "PSU", w_final = "rb050",
-                     ID_level1 = "db030", ID_level2 = "id2",
+                     ID_level1 = "db030", ID_level2 = "rb030",
                      Dom = "rb090", Z = NULL,
                      country = "country", period = "year",
                      dataset = data2, linratio = FALSE, 
@@ -224,10 +225,10 @@ data(eusilc)
 set.seed(1)
 year <- 2011
 data <- data.table(rbind(eusilc, eusilc, eusilc, eusilc),
-                   rb010=c(rep(2008, nrow(eusilc)),
-                           rep(2009, nrow(eusilc)),
-                           rep(2010, nrow(eusilc)),
-                           rep(2011, nrow(eusilc))))
+                   rb010 = c(rep(2008, nrow(eusilc)),
+                             rep(2009, nrow(eusilc)),
+                             rep(2010, nrow(eusilc)),
+                             rep(2011, nrow(eusilc))))
 data[, rb020 := "AT"]
 
 data[, u := 1]

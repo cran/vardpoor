@@ -1,24 +1,22 @@
-\name{vardchangannual}
+\name{vardgpgchangannual}
 
-\alias{vardchangannual}
+\alias{vardgpgchangannual}
 
-\title{Variance estimation for measures of annual net change for single and multistage stage cluster sampling designs}
+\title{Variance estimation for measures of annual gender pay gap for single and multistage stage cluster sampling designs}
 
-\description{Computes the variance estimation for measures of annual net change for single and multistage stage cluster sampling designs.}
+\description{Computes the variance estimation for measures of annual net change for gender pay gap for single and multistage stage cluster sampling designs.}
 
 \usage{
-vardchangannual(Y, H, PSU, w_final,
-                ID_level1, ID_level2,
-                Dom = NULL, Z = NULL, 
-                country = NULL, years,
-                subperiods, dataset = NULL,
-                year1, year2, X = NULL,
-                countryX = NULL, yearsX = NULL,
-                subperiodsX = NULL, X_ID_level1 = NULL,
-                ind_gr = NULL, g = NULL, q = NULL,
-                datasetX = NULL, percentratio = 1,
-                use.estVar = FALSE, use.gender = FALSE,
-                confidence = 0.95)
+vardgpgchangannual(Y, H, PSU, w_final, ID_level1,
+                   ID_level2, Dom = NULL, Z = NULL,
+                   gender, country = NULL, years,
+                   subperiods, dataset = NULL, year1,
+                   year2, X = NULL, countryX = NULL,
+                   yearsX = NULL, subperiodsX = NULL,
+                   X_ID_level1 = NULL, ind_gr = NULL,
+                   g = NULL, q = NULL, datasetX = NULL,
+                   percentratio = 1, use.estVar = FALSE,
+                   confidence = 0.95)
 }
 
 \arguments{
@@ -38,6 +36,8 @@ vardchangannual(Y, H, PSU, w_final,
 \item{Dom}{Optional variables used to define population domains. If supplied, variables are calculated for each domain. An object convertible to \code{data.table} or variable names as character vector, column numbers.}
 
 \item{Z}{Optional variables of denominator for ratio estimation. If supplied, the ratio estimation is computed. Object convertible to \code{data.table} or variable names as character, column numbers. This variable is \code{NULL} by default.}
+
+\item{gender}{Numerical variable for gender, where 1 is for males, but 2 is for females. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
 
 \item{country}{Variable for the survey countries. The values for each country are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
@@ -72,8 +72,6 @@ vardchangannual(Y, H, PSU, w_final,
 \item{percentratio}{Positive numeric value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
 
 \item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the estimation of covariance matrix of the residuals.}
-
-\item{use.gender}{Logical value. If value is \code{TRUE}, then subperiods is defined together with \code{gender}.}
  
 \item{confidence}{optional; either a positive value for confidence interval. This variable by default is 0.95 .}
 
@@ -255,26 +253,28 @@ data[, strata := c("XXXX")]
 data[, employed := trunc(runif(nrow(data), 0, 2))]
 data[, unemployed := trunc(runif(nrow(data), 0, 2))]
 data[, labour_force := employed + unemployed]
+data[, gender := (as.character(rb090) == "female") + 1]
+data[, all := 1]
 data[, id_lv2 := .I]
 
-result <- vardchangannual(Y = "employed", H = "strata",
-                          PSU = "PSU", w_final = "rb050",
-                          ID_level1 = "db030", ID_level2 = "id_lv2",
-                          Dom = NULL, Z = NULL, country = "country",
-                          years = "year", subperiods = "quarter",
-                          dataset = data, year1 = 2010, year2 = 2011,
-                          percentratio = 100, confidence = 0.95)
+result <- vardgpgchangannual(Y = "employed", H = "strata",
+                             PSU = "PSU", w_final = "rb050",
+                             ID_level1 = "db030", ID_level2 = "id_lv2",
+                             Dom = NULL, Z = "all", gender = "gender",
+                             years = "year", subperiods = "quarter",
+                             dataset = data,  year1 = 2010, year2 = 2011,
+                             percentratio = 100, confidence = 0.95)
 
 \dontrun{
-result <- vardchangannual(Y = "unemployed", H = "strata",
-                          PSU = "PSU", w_final = "rb050",
-                          ID_level1 = "db030", ID_level1 = "id_lv2",
-                          Dom = NULL, Z = "labour_force",
-                          country = "country",  years = "year",
-                          subperiods = "quarter", dataset = data,
-                          year1 = 2010, year2 = 2011,
-                          percentratio = 100, confidence = 0.95) }
-}
+result <- vardgpgchangannual(Y = "unemployed", H = "strata",
+                             PSU = "PSU", w_final = "rb050",
+                             ID_level1 = "db030", ID_level1 = "id_lv2",
+                             Dom = NULL, Z = "all", gender = "gender",
+                             country = "country",  years = "year",
+                             subperiods = "quarter", dataset = data,
+                             year1 = 2010, year2 = 2011,
+                             percentratio = 100, confidence = 0.95) }
+} 
 
 \seealso{
 \code{\link{domain}},   \code{\link{vardcros}},  \code{\link{vardchanges}}}

@@ -21,7 +21,7 @@ vardcrospoor(Y, age = NULL, pl085 = NULL,
              use.estVar = FALSE, withperiod = TRUE,
              netchanges = TRUE, confidence = .95,
              outp_lin = FALSE, outp_res = FALSE,
-             type = "linrmpg")
+             type = "linrmpg", checking =TRUE)
 }
 
 \arguments{
@@ -104,7 +104,10 @@ For example, to compute poverty threshold equal to some percentage of median inc
 \item{outp_res}{Logical value. If \code{TRUE} estimated residuals of calibration will be printed out.}
 
 \item{type}{a character vector (of length one unless several.ok is TRUE), example "linarpr","linarpt", "lingpg", "linpoormed", "linrmpg",
-   "lingini", "lingini2", "linqsr", "linarr", "linrmir", "all_choices".}
+   "lingini", "lingini2", "linqsr", "linarr", "linrmir".}
+
+\item{checking}{Optional variable if this variable is TRUE, then function checks data preparation errors, otherwise not checked. This variable by default is TRUE.}
+
 }
 
 \value{
