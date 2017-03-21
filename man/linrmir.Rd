@@ -16,7 +16,7 @@ linrmir(Y, id = NULL, age,
   Dom = NULL,
   period = NULL,
   dataset = NULL,
-  order_quant = 50,
+  order_quant = 50L,
   var_name = "lin_rmir",
   checking = TRUE)
 }
@@ -66,7 +66,7 @@ A list with four objects are returned:
 \references{
 Working group on Statistics on Income and Living Conditions (2015) Task 5 - Improvement and optimization of calculation of net change. \emph{LC- 139/15/EN}, Eurostat. \cr
   
-Jean-Claude Deville (1999). Variance estimation for complex statistics and estimators: linearization and residual techniques. Survey Methodology, 25, 193-203, URL \url{http://www5.statcan.gc.ca/bsolc/olc-cel/olc-cel?lang=eng&catno=12-001-X19990024882}. \cr
+Jean-Claude Deville (1999). Variance estimation for complex statistics and estimators: linearization and residual techniques. Survey Methodology, 25, 193-203, URL \url{http://www.statcan.gc.ca/pub/12-001-x/1999002/article/4882-eng.pdf}. \cr
 }
 
 \seealso{
@@ -76,19 +76,19 @@ Jean-Claude Deville (1999). Variance estimation for complex statistics and estim
 \examples{
 data(eusilc)
 
-dati <- data.table(IDd = 1:nrow(eusilc), eusilc)
+dati <- data.table(IDd = paste0("V", 1 : nrow(eusilc)), eusilc)
 
 # Full population
 d <- linrmir(Y = "eqIncome", id = "IDd",  age = "age",
              weight = "rb050", Dom = NULL,  
-             dataset = dati, order_quant = 50)
+             dataset = dati, order_quant = 50L)
 d$value
 
 \dontrun{
 # By domains
 dd <- linrmir(Y = "eqIncome", id = "IDd", age = "age",
               weight = "rb050", Dom = "db040",
-              dataset = dati, order_quant = 50)
+              dataset = dati, order_quant = 50L)
 dd}
 }
 

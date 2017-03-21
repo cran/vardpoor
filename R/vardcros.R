@@ -27,17 +27,16 @@ vardcros <- function(Y, H, PSU, w_final,
 
   ### Checking
   if (checking) {
-    if (length(linratio) != 1 | !any(is.logical(linratio))) stop("'linratio' must be logical", call. = FALSE)
-    if (length(percentratio) != 1 | !any(is.numeric(percentratio) | percentratio > 0)) stop("'percentratio' must be a positive numeric value", call. = FALSE)
-    if (length(netchanges) != 1 | !any(is.logical(netchanges))) stop("'netchanges' must be logical", call. = FALSE)
-    if (length(withperiod) != 1 | !any(is.logical(withperiod))) stop("'withperiod' must be logical", call. = FALSE)
-    if (length(use.estVar) != 1 | !any(is.logical(use.estVar))) stop("'use.estVar' must be logical", call. = FALSE)
-    if (length(ID_level1_max) != 1 | !any(is.logical(ID_level1_max))) stop("'ID_level1_max' must be logical", call. = FALSE)
-    if (length(outp_res) != 1 | !any(is.logical(outp_res))) stop("'outp_res' must be logical", call. = FALSE)
-    if (all(ID_level1_max, !is.null(X))) stop("'ID_level1_max' must be ", !ID_level1_max, "!", call. = FALSE)
+    percentratio <- check_var(vars = percentratio, varn = "percentratio", varntype = "pinteger") 
+    linratio <- check_var(vars = linratio, varn = "linratio", varntype = "logical") 
+    netchanges <- check_var(vars = netchanges, varn = "netchanges", varntype = "logical") 
+    withperiod <- check_var(vars = withperiod, varn = "withperiod", varntype = "logical") 
+    use.estVar <- check_var(vars = use.estVar, varn = "use.estVar", varntype = "logical") 
+    ID_level1_max <- check_var(vars = ID_level1_max, varn = "ID_level1_max", varntype = "logical") 
+    outp_res <- check_var(vars = outp_res, varn = "outp_res", varntype = "logical") 
+    confidence <- check_var(vars = confidence, varn = "confidence", varntype = "numeric01") 
 
-    if(length(confidence) != 1 | any(!is.numeric(confidence) |  confidence < 0 | confidence > 1)) {
-                                               stop("'confidence' must be a numeric value in [0, 1]", call. = FALSE)  }
+    if (all(ID_level1_max, !is.null(X))) stop("'ID_level1_max' must be ", !ID_level1_max, "!", call. = FALSE)
     if (all(!is.null(Z), !is.null(X), !linratio)) stop("'linratio' must be TRUE", call. = FALSE)
     if (all(is.null(Z), linratio)) stop("'linratio' must be FALSE", call. = FALSE)
 
@@ -98,14 +97,19 @@ vardcros <- function(Y, H, PSU, w_final,
     if(!is.null(X)) {
         X <- check_var(vars = X, varn = "X", dataset = datasetX,
                        check.names = TRUE, isnumeric = TRUE,
-                       grepls = "__")
+                       grepls = "__",
+                       dif_name = c(names(period), names(country), names(H),
+                                    names(PSU), names(ID_level1), names(Y),
+                                    "w_final", "w_design", "g", "q"))
         Xnrow <- nrow(X)
 
 
         ind_gr <- check_var(vars = ind_gr, varn = "ind_gr",
                             dataset = datasetX, ncols = 1,
                             Xnrow = Xnrow, ischaracter = TRUE,
-                            dif_name = c(names(period), names(country)))
+                            dif_name = c(names(period), names(country), names(H),
+                                         names(PSU), names(ID_level1), names(Y),
+                                         names(X), "w_final", "w_design", "g", "q"))
 
         g <- check_var(vars = g, varn = "g", dataset = datasetX,
                        ncols = 1, Xnrow = Xnrow, isnumeric = TRUE,
@@ -126,7 +130,7 @@ vardcros <- function(Y, H, PSU, w_final,
                               ischaracter = TRUE, mustbedefined = !is.null(period),
                               duplicatednames = TRUE, varnout = "period",
                               varname = names(period), country = country,
-                              countryX = countryX)
+                              countryX = countryX, periods = period)
 
          X_ID_level1 <- check_var(vars = X_ID_level1, varn = "X_ID_level1",
                                   dataset = datasetX, ncols = 1, Xnrow = Xnrow,
@@ -165,9 +169,14 @@ vardcros <- function(Y, H, PSU, w_final,
 
   # Domains
   size <- data.table(size = rep(1, nrow(Y)))
-  if (!is.null(Dom)) size1 <- domain(size, Dom) else size1 <- copy(size)
-
-  if (!is.null(Dom)) Y1 <- domain(Y, Dom) else Y1 <- Y
+  if (!is.null(Dom)) { size1 <- domain(Y = size, D = Dom,
+                                       dataset = NULL,
+                                       checking = FALSE) 
+                       Y1 <- domain(Y = Y, D = Dom, 
+                                    dataset = NULL,
+                                    checking = FALSE) 
+                 } else { size1 <- copy(size)
+                          Y1 <- Y }
 
   namesDom <- names(Dom)
   if (!is.null(country)) { DTp <- data.table(country)
@@ -178,12 +187,15 @@ vardcros <- function(Y, H, PSU, w_final,
   period_country <- do.call("paste", c(as.list(DTp), sep = "_"))
 
   if (!is.null(Z)) {
-       if (!is.null(Dom)) Z1 <- domain(Z, Dom) else Z1 <- Z
+       if (!is.null(Dom)) Z1 <- domain(Y = Z, D = Dom, 
+                                       dataset = NULL,
+                                       checking = FALSE) else Z1 <- Z
        if (linratio){
                    sorts <- unlist(split(Y1[, .I], period_country))
                    lin1 <- lapply(split(Y1[, .I], period_country),
                                   function(i) data.table(sar_nr = i,
-                                                         lin.ratio(Y1[i], Z1[i], w_final[i],
+                                                         lin.ratio(Y = Y1[i], Z = Z1[i],
+                                                                   weight = w_final[i],
                                                                    Dom = NULL, dataset = NULL,
                                                                    percentratio = percentratio,
                                                                    checking = FALSE)))
@@ -279,9 +291,9 @@ vardcros <- function(Y, H, PSU, w_final,
                         data.table(DT1[i, nos, with = FALSE],
                                    res <- residual_est(Y = DT1[i, namesY2, with = FALSE],
                                                        X = DT1[i, names(X), with = FALSE],
-                                                       weight = DT1[i, w_design, with = FALSE],
-                                                       q = DT1[i, q, with = FALSE],
-                                                       dataset = NULL, checking = FALSE)))
+                                                       weight = DT1[i][["w_design"]],
+                                                       q = DT1[i][["q"]], dataset = NULL,
+                                                       checking = FALSE)))
          res <- rbindlist(res)
          setnames(res, namesY2, namesY2w)
          DTc <- merge(DTc, res, by = nos)

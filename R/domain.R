@@ -1,6 +1,7 @@
 
 namesD <- function(Y, D) {
   Dom_agg <- unique(D)
+  setkeyv(Dom_agg, names(Dom_agg))
   h <- vector(mode = "character", length = nrow(Dom_agg))
   for (i in 1:nrow(Dom_agg)) {
     cc <- paste(names(D), Dom_agg[i, ], sep = ".")
@@ -9,50 +10,69 @@ namesD <- function(Y, D) {
   foreach(i = 1 : ncol(Y), .combine = c) %do% paste(names(Y)[i], h, sep="__")
 }
 
-
-domain <- function(Y, D, dataset = NULL) {
-  Y <- check_var(vars = Y, varn = "Y", dataset = dataset,
-                 check.names = TRUE, isnumeric = TRUE, grepls = "__")
+domain <- function(Y, D, dataset = NULL, checking = TRUE) {
+  if (checking) {
+          Y <- check_var(vars = Y, varn = "Y", dataset = dataset,
+                         check.names = TRUE, isnumeric = TRUE, grepls = "__") }
   Ynrow <- nrow(Y)
-  D <- check_var(vars = D, varn = "Dom", dataset = dataset,
-                 check.names = TRUE, Ynrow = Ynrow, isnumeric = FALSE,
-                 ischaracter = TRUE, dif_name = "percoun", grepls = "__")
+  if (checking) {
+          D <- check_var(vars = D, varn = "Dom", dataset = dataset,
+                         check.names = TRUE, Ynrow = Ynrow, isnumeric = FALSE,
+                         ischaracter = TRUE, dif_name = "percoun", grepls = "__") }
 
   Dom_agg <- unique(D)
   setkeyv(Dom_agg, names(Dom_agg))
   i <- k <- NULL
 
-  domen <- foreach(i = 1 : ncol(Y), .combine = 'data.frame') %:%
-              foreach(k = 1:nrow(Dom_agg), .combine = 'data.table') %do%
+  domen <- foreach(i = 1 : ncol(Y), .combine = data.table) %:%
+              foreach(k = 1:nrow(Dom_agg), .combine = data.table) %do%
                  ifelse(rowSums(D == Dom_agg[k, ][rep(1, Ynrow), ]) == ncol(D), Y[[i]], 0)
 
-  if (!is.data.table(domen)) domen <- data.table(domen)
-  setnames(domen, names(domen), namesD(Y, D))
+  domen <- data.table(domen, check.names = TRUE)
+  setnames(domen, names(domen), namesD(Y = Y, D = D))
   domen <- data.table(domen, check.names = TRUE)
   return(domen[])
 }
 
-
-check_var <- function(vars, varn, dataset, check.names = FALSE,
-                      ncols = 0, Yncol = 0, Ynrow = 0, Xnrow = 0,
-                      isnumeric = FALSE, ischaracter = FALSE,
-                      mustbedefined = TRUE, isvector = FALSE,
-                      grepls = NULL, dif_name = "", namesID1 = "id",
-                      duplicatednames = FALSE, withperiod = TRUE,
-                      varnout = NULL, varname = NULL, PSUs = NULL,
-                      country = NULL, countryX = NULL, years = NULL,
-                      yearsX = NULL, periods = NULL, periodsX = NULL,
-                      ID_level1 = NULL){
+check_var <- function(vars, varn, varntype = NULL, dataset,
+                      check.names = FALSE, ncols = 0, Yncol = 0,
+                      Ynrow = 0, Xnrow = 0, isnumeric = FALSE,
+                      ischaracter = FALSE, mustbedefined = TRUE,
+                      isvector = FALSE, grepls = NULL, dif_name = "",
+                      namesID1 = "id", duplicatednames = FALSE,
+                      withperiod = TRUE, varnout = NULL, varname = NULL,
+                      PSUs = NULL, country = NULL, countryX = NULL,
+                      years = NULL, yearsX = NULL, periods = NULL,
+                      periodsX = NULL, ID_level1 = NULL, use.gender = FALSE){
 
   N <- NULL
   if (varn %in%  c("g", "q") & (is.null(class(vars)) | any(class(vars) == "function"))) stop("'g' must be numeric", call. = FALSE)
   if (is.null(vars)) {
-    if (Xnrow > 0 & varn %in% c("q", "ind_gr", "id")) { vars <- rep(1, Xnrow)
-                                                        dataset <- NULL}
-    if (Ynrow > 0 & varn == "id") { vars <- rep(1, Ynrow)
+    if (Xnrow > 0 & varn %in% c("q", "ind_gr")) { vars <- rep(1, Xnrow)
+                                                  dataset <- NULL}
+    if (Ynrow > 0 & varn == "id") { vars <- 1:Ynrow
                                     dataset <- NULL}}
 
-  if (!is.null(vars)) {
+
+  if (!is.null(varntype)) {
+      if (varntype == "pinteger") if (length(vars) != 1 | !any(!is.integer(vars) | vars < 1)) stop(paste0("'", varn, "' must be a positive integer"), call. = FALSE)
+      if (varntype == "logical") if (length(vars) != 1 | !any(is.logical(vars))) stop(paste0("'", varn, "' must be logical"), call. = FALSE)
+      if (varntype == "numeric01") if (length(vars) != 1 | any(!is.numeric(vars) |  vars < 0 | vars > 1)) {
+                                                     stop(paste0("'", varn, "' must be a numeric value in [0, 1]"), call. = FALSE)  }
+      if (varntype == "integer0100") {
+                      if ((length(vars) != 1 & varn != "k") | any(!is.integer(vars) |  vars < 0 | vars > 100)) {
+                                    stop(paste0("'", varn, "' must be a integer value", ifelse(varn != "k", "s", ""), " in [0, 100]"), call. = FALSE)  }}
+
+     if (varntype == "numeric0100") if (length(vars) != 1 | any(!is.numeric(vars) |  vars < 0 | vars > 100)) {
+                                                  stop(paste0("'", varn, "' must be a numeric value in [0, 100]"), call. = FALSE)  }
+      if (varntype == "change_type") if (length(vars) != 1 | any(!(vars %in% c("absolute", "relative")))) {
+                                                  stop("'change_type' must be 'absolute' or 'relative'", call. = FALSE)  }
+      if (varntype == "method") if (length(vars) != 1 | any(!(vars %in% c("cros", "netchanges")))) {
+                                                  stop("'method' must be 'cros' or 'netchanges'", call. = FALSE)  }
+   }
+
+  if (!is.null(vars) & !is.null(varntype)) mustbedefined <- FALSE
+  if (!is.null(vars) & is.null(varntype)) {
       if (!withperiod & varn == "period") stop(paste0("'period' must be NULL for those data"), call. = FALSE)
       if(!is.null(dataset)) {
         dataset <- data.table(dataset)
@@ -73,6 +93,10 @@ check_var <- function(vars, varn, dataset, check.names = FALSE,
       if (!is.null(grepls)) if (any(grepl(grepls, names(vars)))) stop(paste0("'", varn, "' is not allowed column names with '", grepls, "'"), call. = FALSE)
       if (any(names(vars) %in% dif_name)) stop(paste0("'", varn, "' must be different name"), call. = FALSE)
       if (any(names(vars) == namesID1)) setnames(vars, names(vars), paste0(names(vars), "_", varn))
+      if (use.gender & varn %in% c("years", "yearsX")){
+                parb <- unique(substr(vars[[1]], nchar(vars[[1]])-1, nchar(vars[[1]])))
+                if (!all(parb %in% c("_1", "_2")) | length(parb) != 2) {
+                     stop(paste0("'", varn, "' must be ended with '_1' and '_2'"), call. = FALSE) }}
 
       if (duplicatednames == TRUE & !is.null(vars)) {
         if (any(duplicated(names(vars))))
@@ -122,7 +146,7 @@ check_var <- function(vars, varn, dataset, check.names = FALSE,
 
       if (varn %in% c("countryX", "periodX", "yearsX", "subperiodsX", "X_ID_level1")) {
                if (names(vars) != varname) stop(paste0("'", varn, "' must be equal with '", varnout,"' names"), call. = FALSE)
-               ncolvars <- ifelse(is.null(vars),0,ncol(vars))
+               ncolvars <- ifelse(is.null(vars), 0, ncol(vars))
                if (ncolvars != length(varname)) stop(paste0("'", varn, "' length must be equal with '",varnout,"' row count"), call. = FALSE)
       }
 
@@ -152,15 +176,15 @@ check_var <- function(vars, varn, dataset, check.names = FALSE,
                varnsX <- c(paste0(varns, "X"), "X_ID_level1")
 
                if (!identical(peri, periX)) {
-                 stop(paste0("'unique(", paste(varns, collapse= ", "), ")' and 'unique(",
-                                          paste(varnsX, collapse= ", "), ")' records have different"), call. = FALSE)
+                 stop(paste0("'unique(", paste(varns, collapse = ", "), ")' and 'unique(",
+                                          paste(varnsX, collapse = ", "), ")' records have different"), call. = FALSE)
                }
                peri <- periX <- NULL
             }
 
     } else if (mustbedefined) stop(paste0("'", varn, "' must be defined!"), call. = FALSE)
-
-    return(vars[])
+    if (is.data.table(vars)) vars <- vars[]
+    return(vars)
 }
 
 

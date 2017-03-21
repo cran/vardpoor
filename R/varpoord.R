@@ -33,32 +33,20 @@ varpoord <- function(Y, w_final,
 
   ### Checking
 
-  if (length(fh_zero) != 1 | !any(is.logical(fh_zero))) stop("'fh_zero' must be logical")
-  if (length(PSU_level) != 1 | !any(is.logical(PSU_level))) stop("'PSU_level' must be logical")
-  if (length(outp_lin) != 1 | !any(is.logical(outp_lin))) stop("'outp_lin' must be logical")
-  if (length(outp_res) != 1 | !any(is.logical(outp_res))) stop("'outp_res' must be logical")
-
   all_choices <- c("linarpr","linarpt","lingpg","linpoormed",
                    "linrmpg","lingini","lingini2", "linqsr", "linrmir", "linarr")
   type <- tolower(type)
   type <- match.arg(type, all_choices, length(type) > 1)
 
-  # check 'p'
-  p <- percentage
-   if(length(p) != 1 |  any(!is.numeric(p) | p < 0 | p > 100)) {
-          stop("'percentage' must be a numeric value in [0, 100]")  }
+  fh_zero <- check_var(vars = fh_zero, varn = "fh_zero", varntype = "logical") 
+  PSU_level <- check_var(vars = PSU_level, varn = "PSU_level", varntype = "logical") 
+  outp_lin <- check_var(vars = outp_lin, varn = "outp_lin", varntype = "logical") 
+  outp_res <- check_var(vars = outp_res, varn = "outp_res", varntype = "logical") 
 
-  # check 'order_quant'
-  oq <- order_quant
-   if(length(oq) != 1 | any(!is.numeric(oq) | oq < 0 | oq > 100)) {
-          stop("'order_quant' must be a numeric value in [0, 100]")  }
-
-  if(length(alpha) != 1 | any(!is.numeric(alpha) | alpha < 0 | alpha > 100)) {
-         stop("'alpha' must be a numeric value in [0,100]")  }
-
-  if(length(confidence) != 1 | any(!is.numeric(confidence) | confidence < 0 | confidence > 1)) {
-         stop("'confidence' must be a numeric value in [0, 1]")  }
-
+  p <- check_var(vars = percentage, varn = "percentage", varntype = "numeric0100") 
+  order_quant <- check_var(vars = order_quant, varn = "order_quant", varntype = "integer0100") 
+  alpha <- check_var(vars = alpha, varn = "alpha", varntype = "numeric0100") 
+  confidence <- check_var(vars = confidence, varn = "confidence", varntype = "numeric01") 
 
   Y <- check_var(vars = Y, varn = "Y", dataset = dataset,
                  ncols = 1, isnumeric = TRUE,
@@ -140,12 +128,12 @@ varpoord <- function(Y, w_final,
   if(!is.null(X)) {
        X <- check_var(vars = X, varn = "X", dataset = datasetX,
                       check.names = TRUE, isnumeric = TRUE,
-                      grepls = "__")
+                      grepls = "__", dif_name = c(names(period) , "g", "q"))
        Xnrow <- nrow(X)
 
        ind_gr <- check_var(vars = ind_gr, varn = "ind_gr",
                            dataset = datasetX, ncols = 1, Xnrow = Xnrow,
-                           ischaracter = TRUE, dif_name = names(period))
+                           ischaracter = TRUE, dif_name = c(names(period) , "g", "q"))
 
        g <- check_var(vars = g, varn = "g", dataset = datasetX,
                       ncols = 1, Xnrow = Xnrow, isnumeric = TRUE,
@@ -445,7 +433,7 @@ varpoord <- function(Y, w_final,
                              residual_est(Y = Y3[i],
                                           X = D1[i, (np + 5) : ncol(D1), with = FALSE],
                                           weight = w_design2[i],
-                                          q = D1[i, np + 3, with = FALSE],
+                                          q = D1[i][["q"]],
                                           dataset = NULL,
                                           checking = FALSE)))
        Y4 <- rbindlist(lin1)

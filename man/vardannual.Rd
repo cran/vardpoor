@@ -1,21 +1,22 @@
-\name{vardgpgcrosannual}
+\name{vardannual}
 
-\alias{vardgpgcrosannual}
+\alias{vardannual}
 
-\title{Variance estimation for measures of annual gender pay gap for single and multistage stage cluster sampling designs}
+\title{Variance estimation for measures of annual net change or annual for single and multistage stage cluster sampling designs}
 
-\description{Computes the variance estimation for measures of annual gender pay gap for single and multistage stage cluster sampling designs.}
+\description{Computes the variance estimation for measures of annual net change or annual for single and multistage stage cluster sampling designs.}
 
 \usage{
-vardgpgcrosannual(Y, H, PSU, w_final, ID_level1,
-                  ID_level2, Dom = NULL, Z = NULL,
-                  gender, country = NULL, years,
-                  subperiods, dataset = NULL, X = NULL,
-                  countryX = NULL, yearsX = NULL,
-                  subperiodsX = NULL, X_ID_level1 = NULL,
-                  ind_gr = NULL, g = NULL, q = NULL,
-                  datasetX = NULL, percentratio = 1,
-                  use.estVar = FALSE, confidence = 0.95)
+vardannual(Y, H, PSU, w_final, ID_level1,
+           ID_level2, Dom = NULL, Z = NULL, 
+           country = NULL, years, subperiods,
+           dataset = NULL, year1 = NULL, year2 = NULL,
+           X = NULL, countryX = NULL, yearsX = NULL,
+           subperiodsX = NULL, X_ID_level1 = NULL,
+           ind_gr = NULL, g = NULL, q = NULL,
+           datasetX = NULL, percentratio = 1,
+           use.estVar = FALSE, use.gender = FALSE,
+           confidence = 0.95, method = "cros")
 }
 
 \arguments{
@@ -36,8 +37,6 @@ vardgpgcrosannual(Y, H, PSU, w_final, ID_level1,
 
 \item{Z}{Optional variables of denominator for ratio estimation. If supplied, the ratio estimation is computed. Object convertible to \code{data.table} or variable names as character, column numbers. This variable is \code{NULL} by default.}
 
-\item{gender}{Numerical variable for gender, where 1 is for males, but 2 is for females. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
-
 \item{country}{Variable for the survey countries. The values for each country are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
 \item{years}{Variable for the all survey years. The values for each year are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
@@ -45,6 +44,10 @@ vardgpgcrosannual(Y, H, PSU, w_final, ID_level1,
 \item{subperiods}{Variable for the all survey subperiods. The values for each subperiod are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
 \item{dataset}{Optional survey data object convertible to \code{data.table}.}
+
+\item{year1}{The vector of years from variable \code{years} describes the first year for measures of annual net change.}
+
+\item{year2}{The vector of years from variable \code{periods} describes the second year for measures of annual net change.}
 
 \item{X}{Optional matrix of the auxiliary variables for the calibration estimator. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
@@ -67,8 +70,12 @@ vardgpgcrosannual(Y, H, PSU, w_final, ID_level1,
 \item{percentratio}{Positive numeric value. All linearized variables are multiplied with \code{percentratio} value, by default - 1.}
 
 \item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the estimation of covariance matrix of the residuals.}
+
+\item{use.gender}{Logical value. If value is \code{TRUE}, then subperiods is defined together with \code{gender}.}
  
 \item{confidence}{optional; either a positive value for confidence interval. This variable by default is 0.95 .}
+
+\item{method}{character value; value 'cros' is for measures of annual or value 'netchanges' is for measures of annual net change. This variable by default is netchanges.}
 
 }
 
@@ -125,6 +132,8 @@ vardgpgcrosannual(Y, H, PSU, w_final, ID_level1,
         \code{cros_var} - the estimated a design-based variance.}
 
   \item{vardchanges_rho}{ A \code{data.table} containing
+        \code{year} -  survey years of \code{years} for crossectional estimates, \cr
+        \code{subperiods} -  survey subperiods of \code{years} for crossectional estimates, \cr
         \code{year_1} -  survey years of \code{years1}, \cr
         \code{subperiods_1} -  survey subperiods of \code{years1}, \cr
         \code{year_2} -  survey years of \code{years2}, \cr
@@ -149,10 +158,12 @@ vardgpgcrosannual(Y, H, PSU, w_final, ID_level1,
         \code{var_tau} - the estimated covariance matrix.}
 
   \item{vardchanges_results}{ A \code{data.table} containing
-        \code{year_1} -  survey years of \code{years1}, \cr
-        \code{subperiods_1} -  survey subperiods of \code{years1}, \cr
-        \code{year_2} -  survey years of \code{years2}, \cr
-        \code{subperiods_2} -  survey subperiods of \code{years2}, \cr
+        \code{year} -  survey years of \code{years} for measures of annual, \cr
+        \code{subperiods} -  survey subperiods of \code{years} for measures of annual, \cr
+        \code{year_1} -  survey years of \code{years1} for measures of annual net change, \cr
+        \code{subperiods_1} -  survey subperiods of \code{years1} for measures of annual net change, \cr
+        \code{year_2} -  survey years of \code{years2} for measures of annual net change, \cr
+        \code{subperiods_2} -  survey subperiods of \code{years2} for measures of annual net change, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
@@ -167,19 +178,20 @@ vardgpgcrosannual(Y, H, PSU, w_final, ID_level1,
         \code{significant} - is the the difference significant}
 
  \item{X_annual}{ A \code{data.table} containing
-        \code{year_1} -  survey years of \code{years1}, \cr
-        \code{year_2} -  survey years of \code{years2}, \cr
-        \code{year} -  survey years, \cr
-        \code{country} - survey countries, \cr
+        \code{year} -  survey years of \code{years} for measures of annual, \cr
+        \code{year_1} -  survey years of \code{years1} for measures of annual net change, \cr
+        \code{year_2} -  survey years of \code{years2} for measures of annual net change, \cr
         \code{period} - period1 and period2 together, \cr
+        \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
         \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
         \code{cros_se} - the estimated cross-sectional standard error.}
 
  \item{A_matrix}{ A \code{data.table} containing
-        \code{year_1} -  survey years of \code{years1}, \cr
-        \code{year_2} -  survey years of \code{years2}, \cr
+        \code{year} -  survey years of \code{years1} for measures of annual, \cr
+        \code{year_1} -  survey years of \code{years1} for measures of annual net change, \cr
+        \code{year_2} -  survey years of \code{years2} for measures of annual net change, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
@@ -197,15 +209,16 @@ vardgpgcrosannual(Y, H, PSU, w_final, ID_level1,
         \code{totalZ} - optional the estimated value of denominator for period2, \cr
         \code{estim} - the estimated value for year .}
 
- \item{annual_changes}{ A \code{data.table} containing
-        \code{year_1} -  survey years of \code{years1}, \cr
-        \code{year_2} -  survey years of \code{years2}, \cr
+ \item{annual_results}{ A \code{data.table} containing
+        \code{year} -  survey years of \code{years} for measures of annual, \cr
+        \code{year_1} -  survey years of \code{years1} for measures of annual net change, \cr
+        \code{year_2} -  survey years of \code{years2} for measures of annual net change, \cr
         \code{country} - survey countries, \cr
         \code{Dom} - optional variable of the population domains, \cr
         \code{namesY} - variable with names of variables of interest, \cr
         \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-        \code{estim_1} - the estimated value for period1, \cr
-        \code{estim_2} - the estimated value for period2, \cr
+        \code{estim_1} - the estimated value for period1 for measures of annual net change, \cr
+        \code{estim_2} - the estimated value for period2 for measures of annual net change, \cr
         \code{estim} - the estimated value, \cr
         \code{var} - the estimated variance, \cr
         \code{se} - the estimated standard error, \cr
@@ -248,25 +261,35 @@ data[, strata := c("XXXX")]
 data[, employed := trunc(runif(nrow(data), 0, 2))]
 data[, unemployed := trunc(runif(nrow(data), 0, 2))]
 data[, labour_force := employed + unemployed]
-data[, gender := (as.character(rb090) == "female") + 1]
-data[, all := 1]
-data[, id_lv2 := .I]
+data[, id_lv2 := paste0("V", .I)]
 
-result <- vardgpgcrosannual(Y = "employed", H = "strata",
-                            PSU = "PSU", w_final = "rb050",
-                            ID_level1 = "db030", ID_level2 = "id_lv2",
-                            Dom = NULL, Z = "all", gender = "gender",
-                            years = "year", subperiods = "quarter",
-                            dataset = data, percentratio = 100, confidence = 0.95)
+result <- vardannual(Y = "employed", H = "strata",
+                     PSU = "PSU", w_final = "rb050",
+                     ID_level1 = "db030", ID_level2 = "id_lv2",
+                     Dom = NULL, Z = NULL, country = "country",
+                     years = "year", subperiods = "quarter",
+                     dataset = data, percentratio = 100,
+                     confidence = 0.95, method = "cros")
+
+result2 <- vardannual(Y = "employed", H = "strata",
+                      PSU = "PSU", w_final = "rb050",
+                      ID_level1 = "db030", ID_level2 = "id_lv2",
+                      Dom = NULL, Z = NULL, country = "country",
+                      years = "year", subperiods = "quarter",
+                      dataset = data, year1 = 2010, year2 = 2011,
+                      percentratio = 100, confidence = 0.95,
+                      method = "netchanges")
 
 \dontrun{
-result <- vardgpgcrosannual(Y = "unemployed", H = "strata",
-                            PSU = "PSU", w_final = "rb050",
-                            ID_level1 = "db030", ID_level1 = "id_lv2",
-                            Dom = NULL, Z = "all", gender = "gender",
-                            country = "country",  years = "year",
-                            subperiods = "quarter", dataset = data,
-                            percentratio = 100, confidence = 0.95) }
+result <- vardannual(Y = "unemployed", H = "strata",
+                     PSU = "PSU", w_final = "rb050",
+                     ID_level1 = "db030", ID_level1 = "id_lv2",
+                     Dom = NULL, Z = "labour_force",
+                     country = "country",  years = "year",
+                     subperiods = "quarter", dataset = data,
+                     year1 = 2010, year2 = 2011,
+                     percentratio = 100, confidence = 0.95,
+                     method = "netchanges") }
 }
 
 \seealso{

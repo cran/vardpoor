@@ -1,13 +1,13 @@
-\name{vardgpgchangannual}
+\name{vardgpgannual}
 
-\alias{vardgpgchangannual}
+\alias{vardgpgannual}
 
 \title{Variance estimation for measures of annual gender pay gap for single and multistage stage cluster sampling designs}
 
-\description{Computes the variance estimation for measures of annual net change for gender pay gap for single and multistage stage cluster sampling designs.}
+\description{Computes the variance estimation for measures of annual net change or annual for gender pay gap for single and multistage stage cluster sampling designs.}
 
 \usage{
-vardgpgchangannual(Y, H, PSU, w_final, ID_level1,
+vardgpgannual(Y, H, PSU, w_final, ID_level1,
                    ID_level2, Dom = NULL, Z = NULL,
                    gender, country = NULL, years,
                    subperiods, dataset = NULL, year1,
@@ -16,7 +16,7 @@ vardgpgchangannual(Y, H, PSU, w_final, ID_level1,
                    X_ID_level1 = NULL, ind_gr = NULL,
                    g = NULL, q = NULL, datasetX = NULL,
                    percentratio = 1, use.estVar = FALSE,
-                   confidence = 0.95)
+                   confidence = 0.95, method = "cros")
 }
 
 \arguments{
@@ -74,6 +74,8 @@ vardgpgchangannual(Y, H, PSU, w_final, ID_level1,
 \item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the estimation of covariance matrix of the residuals.}
  
 \item{confidence}{optional; either a positive value for confidence interval. This variable by default is 0.95 .}
+
+\item{method}{character value; value 'cros' is for measures of annual for gender pay gap or value 'netchanges' is for measures of annual net change for gender pay gap. This variable by default is netchanges.}
 
 }
 
@@ -255,25 +257,39 @@ data[, unemployed := trunc(runif(nrow(data), 0, 2))]
 data[, labour_force := employed + unemployed]
 data[, gender := (as.character(rb090) == "female") + 1]
 data[, all := 1]
-data[, id_lv2 := .I]
+data[, id_lv2 := paste0("V", .I)]
 
-result <- vardgpgchangannual(Y = "employed", H = "strata",
-                             PSU = "PSU", w_final = "rb050",
-                             ID_level1 = "db030", ID_level2 = "id_lv2",
-                             Dom = NULL, Z = "all", gender = "gender",
-                             years = "year", subperiods = "quarter",
-                             dataset = data,  year1 = 2010, year2 = 2011,
-                             percentratio = 100, confidence = 0.95)
+result <- vardgpgannual(Y = "employed", H = "strata",
+                        PSU = "PSU", w_final = "rb050",
+                        ID_level1 = "db030", ID_level2 = "id_lv2",
+                        Dom = NULL, Z = "all", gender = "gender",
+                        years = "year", subperiods = "quarter",
+                        dataset = data,  year1 = 2010, year2 = 2011,
+                        percentratio = 100, confidence = 0.95,
+                        method = "netchanges")
 
 \dontrun{
-result <- vardgpgchangannual(Y = "unemployed", H = "strata",
-                             PSU = "PSU", w_final = "rb050",
-                             ID_level1 = "db030", ID_level1 = "id_lv2",
-                             Dom = NULL, Z = "all", gender = "gender",
-                             country = "country",  years = "year",
-                             subperiods = "quarter", dataset = data,
-                             year1 = 2010, year2 = 2011,
-                             percentratio = 100, confidence = 0.95) }
+result <- vardgpgannual(Y = "unemployed", H = "strata",
+                        PSU = "PSU", w_final = "rb050",
+                        ID_level1 = "db030", ID_level1 = "id_lv2",
+                        Dom = NULL, Z = "all", gender = "gender",
+                        country = "country",  years = "year",
+                        subperiods = "quarter", dataset = data,
+                        percentratio = 100, confidence = 0.95,
+                        method = "cros") 
+
+result <- vardgpgannual(Y = "unemployed", H = "strata",
+                        PSU = "PSU", w_final = "rb050",
+                        ID_level1 = "db030", ID_level1 = "id_lv2",
+                        Dom = NULL, Z = "all", gender = "gender",
+                        country = "country",  years = "year",
+                        subperiods = "quarter", dataset = data,
+                        year1 = 2010, year2 = 2011,
+                        percentratio = 100, confidence = 0.95,
+                        method = "netchanges") 
+
+} 
+
 } 
 
 \seealso{

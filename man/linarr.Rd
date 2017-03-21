@@ -13,7 +13,7 @@ Estimates the aggregate replacement ratio (defined as the gross median individua
 linarr(Y, Y_den, id = NULL, age, pl085,
        month_at_work, weight = NULL,
        sort = NULL, Dom = NULL, period = NULL,
-       dataset = NULL, order_quant = 50,
+       dataset = NULL, order_quant = 50L,
        var_name = "lin_arr", checking = TRUE)
 }
 
@@ -68,7 +68,7 @@ A list with four objects are returned:
 \references{
 Working group on Statistics on Income and Living Conditions (2015) Task 5 - Improvement and optimization of calculation of net change. \emph{LC- 139/15/EN}, Eurostat. \cr
   
-Jean-Claude Deville (1999). Variance estimation for complex statistics and estimators: linearization and residual techniques. Survey Methodology, 25, 193-203, URL \url{http://www5.statcan.gc.ca/bsolc/olc-cel/olc-cel?lang=eng&catno=12-001-X19990024882}. \cr
+Jean-Claude Deville (1999). Variance estimation for complex statistics and estimators: linearization and residual techniques. Survey Methodology, 25, 193-203, URL \url{http://www.statcan.gc.ca/pub/12-001-x/1999002/article/4882-eng.pdf}. \cr
 }
 
 
@@ -78,7 +78,7 @@ Jean-Claude Deville (1999). Variance estimation for complex statistics and estim
 \examples{
 data(eusilc)
 
-dati <- data.table(IDd = 1 : nrow(eusilc), eusilc)
+dati <- data.table(IDd = paste0("V", 1 : nrow(eusilc)), eusilc)
 dati$pl085 <- 12 * trunc(runif(nrow(dati), 0, 2))
 dati$month_at_work <- 12 * trunc(runif(nrow(dati), 0, 2))
 
@@ -87,7 +87,7 @@ d <- linarr(Y = "eqIncome", Y_den = "eqIncome",
             id = "IDd", age = "age",  
             pl085 = "pl085", month_at_work = "month_at_work",
             weight = "rb050",  Dom = NULL,
-            dataset = dati, order_quant = 50)
+            dataset = dati, order_quant = 50L)
 d$value
 
 \dontrun{
@@ -96,7 +96,7 @@ dd <- linarr(Y = "eqIncome", Y_den = "eqIncome",
              id = "IDd", age = "age",  
              pl085 = "pl085", month_at_work = "month_at_work",
              weight = "rb050",  Dom = "db040",
-             dataset = dati, order_quant = 50)
+             dataset = dati, order_quant = 50L)
 dd
 } 
 }

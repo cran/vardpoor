@@ -14,7 +14,7 @@ vardchangespoor <- function(Y, age = NULL,
                             periodX = NULL, X_ID_level1 = NULL,
                             ind_gr = NULL, g = NULL, q = NULL,
                             datasetX = NULL, percentage = 60,
-                            order_quant = 50, alpha = 20,
+                            order_quant = 50L, alpha = 20,
                             use.estVar = FALSE,
                             confidence = 0.95,
                             outp_lin = FALSE,
@@ -23,31 +23,19 @@ vardchangespoor <- function(Y, age = NULL,
                             change_type = "absolute") {
  
   ### Checking
-  if (!change_type %in% c("absolute", "relative")) stop("'change_type' must be 'absolute' or 'relative'", call. = FALSE)
- 
+  change_type <- check_var(vars = change_type, varn = "change_type", varntype = "change_type") 
+
   all_choices <- c("linarpr", "linarpt", "lingpg",
                    "linpoormed", "linrmpg", "lingini",
                    "lingini2", "linqsr", "linrmir", "linarr")
   type <- tolower(type)
   type <- match.arg(type, all_choices, length(type) > 1) 
 
-  # check 'p'
-  p <- percentage
-   if(length(p) != 1 | any(!is.numeric(p) | p < 0 | p > 100)) {
-          stop("'percentage' must be a numeric value in [0, 100]", call. = FALSE)  }
-
-  # check 'order_quant'
-  oq <- order_quant
-  if(length(oq) != 1 | any(!is.numeric(oq) | oq < 0 | oq > 100)) {
-          stop("'order_quant' must be a numeric value in [0, 100]", call. = FALSE)  }
-
-  if(length(alpha) != 1 | any(!is.numeric(alpha) | alpha < 0 | alpha > 100)) {
-         stop("'alpha' must be a numeric value in [0, 100]", call. = FALSE)  }
-
-  if (!is.logical(use.estVar)) stop("'use.estVar' must be logical", call. = FALSE)
-
-  if(length(confidence) != 1 | any(!is.numeric(confidence) | confidence < 0 | confidence > 1)) {
-         stop("'confidence' must be a numeric value in [0, 1]", call. = FALSE)  }
+  p <- check_var(vars = percentage, varn = "percentage", varntype = "numeric0100") 
+  order_quant <- check_var(vars = order_quant, varn = "order_quant", varntype = "integer0100") 
+  alpha <- check_var(vars = alpha, varn = "alpha", varntype = "numeric0100") 
+  use.estVar <- check_var(vars = use.estVar, varn = "use.estVar", varntype = "logical") 
+  confidence <- check_var(vars = confidence, varn = "confidence", varntype = "numeric01") 
 
   if(!is.null(X)) {
          if (is.null(datasetX)) datasetX <- copy(dataset)
@@ -142,14 +130,18 @@ vardchangespoor <- function(Y, age = NULL,
   
   if(!is.null(X)) {
          X <- check_var(vars = X, varn = "X", dataset = datasetX,
-                        check.names = TRUE, isnumeric = TRUE,
-                        grepls = "__")
+                        check.names = TRUE, isnumeric = TRUE, grepls = "__", 
+                        dif_name = c(names(period), names(country), names(H),
+                                     names(PSU), names(ID_level1), "w_final",
+                                     "w_design", "g", "q"))
          Xnrow <- nrow(X)
     
          ind_gr <- check_var(vars = ind_gr, varn = "ind_gr",
                              dataset = datasetX, ncols = 1,
                              Xnrow = Xnrow, ischaracter = TRUE, 
-                             dif_name = c(names(period), names(country)))
+                             dif_name = c(names(period), names(country), names(H),
+                                          names(PSU), names(ID_level1), "w_final",
+                                          "w_design", "g", "q"))
     
          g <- check_var(vars = g, varn = "g", dataset = datasetX,
                         ncols = 1, Xnrow = Xnrow, isnumeric = TRUE,
@@ -171,7 +163,7 @@ vardchangespoor <- function(Y, age = NULL,
                               mustbedefined = !is.null(period),
                               duplicatednames = TRUE, varnout = "period",
                               varname = names(period), country = country,
-                              countryX = countryX)
+                              countryX = countryX, periods = period)
     
          X_ID_level1 <- check_var(vars = X_ID_level1, varn = "X_ID_level1",
                                   dataset = datasetX, ncols = 1, Xnrow = Xnrow,
@@ -195,7 +187,7 @@ vardchangespoor <- function(Y, age = NULL,
                        X = X, countryX = countryX,
                        periodX = periodX, X_ID_level1 = X_ID_level1,
                        ind_gr = ind_gr, g = g, q = q,
-                       datasetX = NULL, percentage = 60,
+                       datasetX = NULL, percentage = percentage,
                        order_quant = order_quant,
                        alpha = alpha,
                        use.estVar = use.estVar,

@@ -50,11 +50,10 @@ export("vardcrospoor")
 
 export("vardchangespoor")
 
-export("vardcrosannual")
+export("vardannual")
 
-export("vardchangannual")
-export("vardgpgcrosannual")
-export("vardgpgchangannual")
+export("vardgpgannual")
+
 
 
 

@@ -13,24 +13,20 @@
 linarpr <- function(Y, id = NULL, weight = NULL, Y_thres = NULL,
                     wght_thres = NULL, sort = NULL, Dom = NULL,
                     period = NULL, dataset = NULL, percentage = 60,
-                    order_quant = 50, var_name = "lin_arpr",
+                    order_quant = 50L, var_name = "lin_arpr",
                     checking = TRUE) {
 
    ## initializations
    if (min(dim(data.table(var_name)) == 1) != 1) {
        stop("'var_name' must have defined one name of the linearized variable")}
 
-   # check 'p'
-   p <- percentage
-   if(length(p) != 1 |  any(!is.numeric(p) | p < 0 | p > 100)) {
-          stop("'percentage' must be a numeric value in [0, 100]") }
-
-   # check 'order_quant'
-   oq <- order_quant
-   if(length(oq) != 1 | any(!is.numeric(oq) | oq < 0 | oq > 100)) {
-          stop("'order_quant' must be a numeric value in [0, 100]") }
-
    if (checking) {
+        percentage <- check_var(vars = percentage, varn = "percentage",
+                                varntype = "numeric0100")
+
+        order_quant <- check_var(vars = order_quant, varn = "order_quant",
+                                 varntype = "integer0100") 
+
         Y <- check_var(vars = Y, varn = "Y", dataset = dataset,
                        ncols = 1, isnumeric = TRUE,
                        isvector = TRUE, grepls = "__")
@@ -96,7 +92,7 @@ linarpr <- function(Y, id = NULL, weight = NULL, Y_thres = NULL,
     setnames(quantile, names(quantile)[ncol(quantile)], "quantile")
     if (ncol(quantile) > 1) setkeyv(quantile, head(names(quantile), -1))
     threshold <- copy(quantile)
-    threshold[, threshold := p / 100 * quantile]
+    threshold[, threshold := percentage / 100 * quantile]
     threshold[, quantile := NULL]
 
     arpr_id <- id
@@ -130,7 +126,7 @@ linarpr <- function(Y, id = NULL, weight = NULL, Y_thres = NULL,
                                                      indicator = ind[indj],
                                                      Y_thresh = Y_thres[indj],
                                                      wght_thresh = wght_thres[indj],
-                                                     percent = p,
+                                                     percent = percentage,
                                                      order_quants = order_quant,
                                                      quant_val = rown[["quantile"]])
                       list(arpr = data.table(rown2, arpr = arpr_l$rate_val_pr), lin = arpr_l$lin)
@@ -156,7 +152,7 @@ linarpr <- function(Y, id = NULL, weight = NULL, Y_thres = NULL,
                                                  indicator = ind0[ind2],
                                                  Y_thresh = Y_thres[ind2],
                                                  wght_thresh = wght_thres[ind2],
-                                                 percent = p,
+                                                 percent = percentage,
                                                  order_quants = order_quant,
                                                  quant_val = rown[["quantile"]])
                           if (!is.null(period)) {
@@ -177,7 +173,7 @@ linarpr <- function(Y, id = NULL, weight = NULL, Y_thres = NULL,
 
 
 ## workhorse
-arprlinCalc <- function(Y1, ids, wght1, indicator, Y_thresh, wght_thresh, percent, order_quants=NULL, quant_val) {
+arprlinCalc <- function(Y1, ids, wght1, indicator, Y_thresh, wght_thresh, percent, order_quants = NULL, quant_val) {
 
     inc2 <- Y_thresh
     wght2 <- wght_thresh
