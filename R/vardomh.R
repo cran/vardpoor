@@ -39,9 +39,19 @@ vardomh <- function(Y, H, PSU, w_final,
   Ynrow <- nrow(Y)
   Yncol <- ncol(Y)
 
+
+  ID_level1 <- check_var(vars = ID_level1, varn = "ID_level1",
+                         dataset = dataset, ncols = 1,
+                         Ynrow = Ynrow, ischaracter = TRUE)
+
+  ID_level2 <- check_var(vars = ID_level2, varn = "ID_level2",
+                          dataset = dataset, ncols = 1, Ynrow = Ynrow,
+                          ischaracter = TRUE, namesID1 = names(ID_level1),
+                          periods = period)
+
   H <- check_var(vars = H, varn = "H", dataset = dataset,
                  ncols = 1, Ynrow = Ynrow, ischaracter = TRUE,
-                 dif_name = "dataH_stratas")
+                 namesID1 = names(ID_level1), dif_name = "dataH_stratas")
 
   w_final <- check_var(vars = w_final, varn = "w_final",
                        dataset = dataset, ncols = 1,
@@ -61,15 +71,6 @@ vardomh <- function(Y, H, PSU, w_final,
                       ischaracter = TRUE, duplicatednames = TRUE,
                       mustbedefined = FALSE)
 
-  ID_level1 <- check_var(vars = ID_level1, varn = "ID_level1",
-                         dataset = dataset, ncols = 1,
-                         Ynrow = Ynrow, ischaracter = TRUE)
-
-  ID_level12 <- check_var(vars = ID_level2, varn = "ID_level2",
-                          dataset = dataset, ncols = 1, Ynrow = Ynrow,
-                          ischaracter = TRUE, namesID1 = names(ID_level1),
-                          periods = period)
-
   PSU <- check_var(vars = PSU, varn = "PSU", dataset = dataset,
                    ncols = 1, Ynrow = Ynrow, ischaracter = TRUE,
                    namesID1 = names(ID_level1))
@@ -81,8 +82,8 @@ vardomh <- function(Y, H, PSU, w_final,
   if(!is.null(X)) {
       X <- check_var(vars = X, varn = "X", dataset = datasetX,
                      check.names = TRUE, isnumeric = TRUE,
-                     grepls = "__", dif_name = c(names(Y), names(period),
-                                                 "g", "q", "weight"))
+                     dif_name = c(names(Y), names(period),
+                                  "g", "q", "weight"))
       Xnrow <- nrow(X)
 
       ind_gr <- check_var(vars = ind_gr, varn = "ind_gr",
@@ -114,6 +115,7 @@ vardomh <- function(Y, H, PSU, w_final,
 
 
   # N_h
+  np <- sum(ncol(period))
   if (!is.null(N_h)) {
       N_h <- data.table(N_h)
       if (anyNA(N_h)) stop("'N_h' has missing values")
@@ -137,7 +139,6 @@ vardomh <- function(Y, H, PSU, w_final,
 
   ### Calculation
   # Domains
-  np <- sum(ncol(period))
   psusn <- as.integer(!is.null(PSU_sort))
   namesDom <- names(Dom)
   aPSU <- names(PSU)

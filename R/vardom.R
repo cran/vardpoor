@@ -53,7 +53,6 @@ vardom <- function(Y, H, PSU, w_final,
                       dataset = dataset, Ynrow = Ynrow,
                       ischaracter = TRUE, mustbedefined = FALSE,
                       duplicatednames = TRUE)
-  np <- sum(ncol(period))
 
   id <- check_var(vars = id, varn = "id", dataset = dataset,
                   ncols = 1, Ynrow = Ynrow, ischaracter = TRUE,
@@ -83,8 +82,7 @@ vardom <- function(Y, H, PSU, w_final,
 
   if (!is.null(X)) {
          X <- check_var(vars = X, varn = "X", dataset = dataset,
-                        check.names = TRUE, Ynrow = Ynrow,
-                        isnumeric = TRUE, grepls = "__",
+                        check.names = TRUE, Ynrow = Ynrow, isnumeric = TRUE,
                         dif_name = c(names(period), "g", "q"))
          Xnrow <- nrow(X)
 
@@ -104,10 +102,11 @@ vardom <- function(Y, H, PSU, w_final,
   dataset <- NULL
 
   # N_h
+  np <- sum(ncol(period))
   if (!is.null(N_h)) {
       N_h <- data.table(N_h)
       if (anyNA(N_h)) stop("'N_h' has missing values")
-      if (ncol(N_h) != np+2) stop(paste0("'N_h' should be ", np + 2," columns"))
+      if (ncol(N_h) != np + 2) stop(paste0("'N_h' should be ", np + 2," columns"))
       if (!is.numeric(N_h[[ncol(N_h)]])) stop("The last column of 'N_h' should be numeric")
       nams <- c(names(period), names(H))
       if (all(nams %in% names(N_h))) {N_h[, (nams) := lapply(.SD, as.character), .SDcols = nams]
@@ -329,7 +328,6 @@ vardom <- function(Y, H, PSU, w_final,
   all_result <- merge(all_result, S2_res, all = TRUE, by = c(names(period), "variable"))
   S2_y_HT <- S2_y_ca <- S2_res <- var_srs_HT <- var_srs_ca <- NULL
 
-
   all_result[, estim := Y_est]
   if (!is.null(all_result$Z_est)) all_result[, estim := Y_est / Z_est * percentratio]
 
@@ -391,6 +389,7 @@ vardom <- function(Y, H, PSU, w_final,
                                   all_result[, pop_size := nhs$pop_size]}
 
   all_result[, n_eff := ifelse(is.na(deff) | deff < .Machine$double.eps, NA, respondent_count / deff)]
+
   variab <- c("respondent_count", "n_nonzero", "pop_size")
   if (!is.null(all_result$Z_est)) variab <- c(variab, "Y_est", "Z_est")
   variab <- c(variab, "estim", "var", "se", "rse", "cv",

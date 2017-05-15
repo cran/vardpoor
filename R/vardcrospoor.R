@@ -23,7 +23,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
   type <- tolower(type)
   type <- match.arg(type, all_choices, length(type)>1) 
 
-  p <- check_var(vars = percentage, varn = "percentage", varntype = "numeric0100") 
+  percentage <- check_var(vars = percentage, varn = "percentage", varntype = "numeric0100") 
   order_quant <- check_var(vars = order_quant, varn = "order_quant", varntype = "integer0100") 
   alpha <- check_var(vars = alpha, varn = "alpha", varntype = "numeric0100") 
   netchanges <- check_var(vars = netchanges, varn = "netchanges", varntype = "logical") 
@@ -119,7 +119,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
          
         if(!is.null(X)) {
               X <- check_var(vars = X, varn = "X", dataset = datasetX,
-                             check.names = TRUE, isnumeric = TRUE, grepls = "__",
+                             check.names = TRUE, isnumeric = TRUE,
                              dif_name = c(names(period), names(country), names(H),
                                            names(PSU), names(ID_level1), "w_final",
                                            "w_design", "g", "q"))
