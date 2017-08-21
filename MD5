@@ -1,6 +1,6 @@
-f9862a6ec7f5bd4a3be0c71aa0f24053 *DESCRIPTION
+6ecc67f175d2480f8758b3fc01916f2f *DESCRIPTION
 bc2845b7e7bbe0e863d59699cf239d1d *NAMESPACE
-38bb0be4afd17c4d296eacb3d7ee9df9 *R/domain.R
+6f13577915b059e79e5c9a2e8a5d46bb *R/domain.R
 897cd836eb4b0114e78d74467d5512ed *R/incPercentile.R
 97ee9a99848545cc47b80da677aeaa37 *R/lin.ratio.R
 7a133d23f0ef7dee81f6b986c58ea67c *R/linarpr.R
@@ -22,10 +22,10 @@ a5f59702407e5decf5205c4adce1c1b1 *R/vardannual.R
 0560f571de2f8f07f7011874b26b8f07 *R/vardcrospoor.R
 6cf82b332e00bfe7521a992eb9bd5ebe *R/vardom.R
 a697e1cc04ed255a680f223dd927e02a *R/vardom_othstr.R
-b8917f1f25df95a7ef80fca473f40152 *R/vardomh.R
+8148c9b6d397090afc11e47c482288d6 *R/vardomh.R
 1afc503b60c54451b16c9660dabed434 *R/variance_est.R
 a938f6b3d776d12e45f34ceb588091d6 *R/variance_othstr.R
-5114bf0d25d7b1d2a71ecf036ac80713 *R/varpoord.R
+83b9b115cbe29a10e7771f26d0a514ab *R/varpoord.R
 e36d4ac33bed8d6980db5476c464a773 *README
 9db57f311b5f678c5af0f4292812278d *inst/BUGS
 b6ebb0103d581e36195301c3c4c462b6 *inst/CITATION
@@ -48,7 +48,7 @@ d5d45bb116992fab3ae4c847cc43fe19 *man/linrmir.Rd
 d22fa7235f2284bba334c75d1dad5787 *man/linrmpg.Rd
 369ca903543ccd71090993618056a8c2 *man/residual_est.Rd
 d372b85797754469c97c87e5f116d9d6 *man/var_srs.Rd
-b034fdbf84395598d3c0f5317fb2ce95 *man/vardannual.Rd
+049d48ebf2bbcae8ae2943e3c7ad79ad *man/vardannual.Rd
 ef13079c40a65ff2faa5d2421b6dae26 *man/vardchanges.Rd
 c4d230eed70545703b29f4593dd98bd8 *man/vardchangespoor.Rd
 b7adacafce3b27be83e1413b0dac7e1e *man/vardcros.Rd
@@ -56,7 +56,7 @@ fa440946e9da9577327ffdf815cbe053 *man/vardcrospoor.Rd
 26a055b037c6e38cb766b538795ba286 *man/vardom.Rd
 345285ff08059fb4c36747dc4daada22 *man/vardom_othstr.Rd
 2b7df7c7d3c6db43fe2ae5960d3162b0 *man/vardomh.Rd
-7630c5fe7e2e99c0dac2c0a0344ee75b *man/vardpoor-package.Rd
+0f367b1cb3973fb73fe79a865aee581c *man/vardpoor-package.Rd
 31e91d0365defecd52f273ec51097812 *man/variance_est.Rd
 8d39cfc2a83a60c4d22d6f1b633c5868 *man/variance_othstr.Rd
 e47c379b409738bcbae0e73f2a403033 *man/varpoord.Rd
