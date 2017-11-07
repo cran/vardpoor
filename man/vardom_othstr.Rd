@@ -7,8 +7,8 @@
 
 \usage{vardom_othstr(Y, H, H2, PSU, w_final, id = NULL,
        Dom = NULL, period=NULL, N_h = NULL,
-       N_h2, Z = NULL,
-       X = NULL, g = NULL, q = NULL, dataset = NULL, 
+       N_h2, Z = NULL, X = NULL, ind_gr = NULL,
+       g = NULL, q = NULL, dataset = NULL, 
        confidence = .95,  percentratio=1, 
        outp_lin=FALSE, outp_res=FALSE)}
 
@@ -37,6 +37,8 @@
 \item{Z}{optional variables of denominator for ratio estimation. Object convertible to \code{data.table} or variable names as character, column numbers.}
 
 \item{X}{Optional matrix of the auxiliary variables for the calibration estimator. Object convertible to \code{data.table} or variable names as character, column numbers.}
+
+\item{ind_gr}{Optional variable by which divided independently X matrix of the auxiliary variables for the calibration. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
 
 \item{g}{Optional variable of the g weights. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
 
