@@ -14,7 +14,7 @@ linarpr(Y, id = NULL, weight = NULL,
         Y_thres = NULL, wght_thres = NULL,
         sort = NULL, Dom = NULL, period = NULL,
         dataset = NULL, percentage = 60,
-        order_quant = 50L, var_name = "lin_arpr",
+        order_quant = 50, var_name = "lin_arpr",
         checking = TRUE)
 }
 
@@ -42,7 +42,7 @@ linarpr(Y, id = NULL, weight = NULL,
 \deqn{\frac{p}{100} \cdot Z_{\frac{\alpha}{100}}.}{p/100 * Z(\alpha/100).}
 For example, to compute at-risk-of-poverty threshold equal to 60\% of some income quantile, \eqn{p} should be set equal to 60.}
   
-\item{order_quant}{A integer value in range \eqn{\left[ 0,100 \right]}{[0,100]} for \eqn{\alpha} in the formula for at-risk-of-poverty threshold computation:
+\item{order_quant}{A numeric value in range \eqn{\left[ 0,100 \right]}{[0,100]} for \eqn{\alpha} in the formula for at-risk-of-poverty threshold computation:
 \deqn{\frac{p}{100} \cdot Z_{\frac{\alpha}{100}}.}{p/100 * Z(\alpha/100).}
 For example, to compute at-risk-of-poverty threshold equal to some percentage of median income, \eqn{\alpha} should be set equal to 50.}
 

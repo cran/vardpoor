@@ -68,8 +68,6 @@ import("plyr")
 import("utils")
 import("stats")
 
-importFrom("gdata","trim")
-
 import("data.table")
 
 import("MASS")

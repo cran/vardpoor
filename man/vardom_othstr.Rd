@@ -64,6 +64,8 @@
 
   \item{res_out}{A \code{data.table} containing the estimated residuals of calibration with id and PSU.}
 
+  \item{betas}{ A numeric \code{data.table} containing the estimated coeffients of calibration.}
+
   \item{s2g}{A \code{data.table} containing the s^2g value.}
 
   \item{all_result}{A \code{data.table}, which containing variables:

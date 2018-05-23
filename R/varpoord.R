@@ -24,7 +24,7 @@ varpoord <- function(Y, w_final,
                      q = NULL,
                      datasetX = NULL,
                      percentage = 60,
-                     order_quant = 50L,
+                     order_quant = 50,
                      alpha = 20,
                      confidence = .95,
                      outp_lin = FALSE,
@@ -44,7 +44,7 @@ varpoord <- function(Y, w_final,
   outp_res <- check_var(vars = outp_res, varn = "outp_res", varntype = "logical") 
 
   percentage <- check_var(vars = percentage, varn = "percentage", varntype = "numeric0100") 
-  order_quant <- check_var(vars = order_quant, varn = "order_quant", varntype = "integer0100") 
+  order_quant <- check_var(vars = order_quant, varn = "order_quant", varntype = "numeric0100") 
   alpha <- check_var(vars = alpha, varn = "alpha", varntype = "numeric0100") 
   confidence <- check_var(vars = confidence, varn = "confidence", varntype = "numeric01") 
 
@@ -208,7 +208,7 @@ varpoord <- function(Y, w_final,
                     n_nonzero = as.integer(abs(Y) > .Machine$double.eps))
   if (!is.null(period)) nhs <- data.table(period, nhs)
   if (!is.null(Dom)) nhs <- data.table(Dom, nhs)
-  if (!is.null(c(Dom, period))) {nhs <- nhs[, lapply(.SD, sum, na.rm=TRUE),
+  if (!is.null(c(Dom, period))) {nhs <- nhs[, lapply(.SD, sum, na.rm = TRUE),
                                                        keyby = eval(names(nhs)[0:2-ncol(nhs)]),
                                                       .SDcols = c("respondent_count", "pop_size", "n_nonzero")]
                           } else nhs <- nhs[, lapply(.SD, sum, na.rm=TRUE),
@@ -418,7 +418,7 @@ varpoord <- function(Y, w_final,
 
   # Calibration
 
-  res_outp <- variable <- NULL
+  res_outp <- betas <- variable <- NULL
   if (!is.null(X)) {
        if (np > 0) ID_level1h <- data.table(period, ID_level1h)
        setnames(ID_level1h, names(ID_level1h), names(X_ID_level1))
@@ -426,17 +426,21 @@ varpoord <- function(Y, w_final,
        D1 <- merge(ID_level1h, X0, by = names(ID_level1h), sort = FALSE)
        ind_gr <- D1[, np + 2, with = FALSE]
        if (!is.null(period)) ind_gr <- data.table(D1[, names(periodX), with = FALSE], ind_gr)
-       ind_period <- do.call("paste", c(as.list(ind_gr), sep="_"))
+       ind_period <- do.call("paste", c(as.list(ind_gr), sep = "_"))
 
-       lin1 <- lapply(split(Y3[, .I], ind_period), function(i)
-                      data.table(sar_nr = i,
-                             residual_est(Y = Y3[i],
-                                          X = D1[i, (np + 5) : ncol(D1), with = FALSE],
-                                          weight = w_design2[i],
-                                          q = D1[i][["q"]],
-                                          dataset = NULL,
-                                          checking = FALSE)))
-       Y4 <- rbindlist(lin1)
+       lin1 <- lapply(split(Y3[, .I], ind_period), function(i) {
+                            resid <- residual_est(Y = Y3[i],
+                                                  X = D1[i, (np + 5) : ncol(D1), with = FALSE],
+                                                  weight = w_design2[i],
+                                                  q = D1[i][["q"]],
+                                                  dataset = NULL,
+                                                  checking = FALSE)
+                            pers0 <- ind_gr[i, .N, keyby = c(names(ind_gr))]
+                            list(data.table(sar_nr = i, resid$residuals),
+                                 data.table(pers0[, N := NULL], resid$betas))
+                                    })
+       Y4 <- rbindlist(lapply(lin1, function(x) x[[1]]))
+       betas <- rbindlist(lapply(lin1, function(x) x[[2]]))
        setkeyv(Y4, "sar_nr")
        Y4[, sar_nr := NULL]
        if (outp_res) res_outp <- data.table(ID_level1h, PSU, w_final2, Y4)
@@ -566,5 +570,6 @@ varpoord <- function(Y, w_final,
   setkeyv(all_result, c(type, nDom))
   list(lin_out = lin_outp,
        res_out = res_outp,
+       betas = betas,
        all_result = all_result[, c(type, nDom, variabl), with = FALSE])
 }

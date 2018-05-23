@@ -12,8 +12,8 @@
                  fh_zero = FALSE, PSU_level = TRUE, sort = NULL, Dom = NULL, 
                  period = NULL, gender = NULL, dataset = NULL, X = NULL, periodX = NULL,
                  X_ID_level1 = NULL, ind_gr = NULL, g = NULL, q = NULL, datasetX = NULL,
-                 percentage = 60, order_quant = 50L, alpha = 20, confidence = 0.95,
-                  outp_lin = FALSE, outp_res = FALSE, type = "linrmpg") }
+                 percentage = 60, order_quant = 50, alpha = 20, confidence = 0.95,
+                 outp_lin = FALSE, outp_res = FALSE, type = "linrmpg") }
                      
 
 \arguments{
@@ -85,7 +85,7 @@
 \deqn{\frac{p}{100} \cdot Z_{\frac{\alpha}{100}}.}{p/100 * Z(\alpha/100).}
 For example, to compute poverty threshold equal to 60\% of some income quantile, \eqn{p} should be set equal to 60.}
 
-\item{order_quant}{A integer value in range \eqn{[0,100]} for \eqn{\alpha} in the formula for poverty threshold computation:
+\item{order_quant}{A numeric value in range \eqn{[0,100]} for \eqn{\alpha} in the formula for poverty threshold computation:
 \deqn{\frac{p}{100} \cdot Z_{\frac{\alpha}{100}}.}{p/100 * Z(\alpha/100).}
 For example, to compute poverty threshold equal to some percentage of median income, \eqn{\alpha} should be set equal to 50.}
 
@@ -109,6 +109,8 @@ For example, to compute poverty threshold equal to some percentage of median inc
   \item{lin_out}{A \code{data.table} containing the linearized values of the ratio estimator with ID_level2 and PSU.}
 
   \item{res_out}{A \code{data.table} containing the estimated residuals of calibration with ID_level1 and PSU.}
+
+  \item{betas}{ A numeric \code{data.table} containing the estimated coeffients of calibration.}
 
   \item{all_result}{A \code{data.table}, which containing variables:
 

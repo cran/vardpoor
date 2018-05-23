@@ -12,7 +12,7 @@
 
 linarpt <- function(Y, id = NULL, weight = NULL, sort = NULL,
                     Dom = NULL, period=NULL, dataset = NULL,
-                    percentage = 60, order_quant = 50L,
+                    percentage = 60, order_quant = 50,
                     var_name="lin_arpt", checking = TRUE) {
 
    ## initializations
@@ -24,7 +24,7 @@ linarpt <- function(Y, id = NULL, weight = NULL, sort = NULL,
                                varntype = "numeric0100") 
 
        order_quant <- check_var(vars = order_quant, varn = "order_quant",
-                                varntype = "integer0100")
+                                varntype = "numeric0100")
 
        Y <- check_var(vars = Y, varn = "Y", dataset = dataset,
                       ncols = 1, isnumeric = TRUE,
@@ -141,13 +141,18 @@ linarpt <- function(Y, id = NULL, weight = NULL, sort = NULL,
     return(list(quantile = quantile, value = threshold, lin = arpt_m))
  }
 
+bandwith_plug <- function(y, w) {
+        N <- sum(w)
+        # h=S/N^(1/5)
+        1 / N * sqrt(N * sum(w * y ^ 2) - (sum(y * w)) ^ 2) * N ^ (-0.2)
+ }
+
+
     ## workhorse
 arptlinCalc <- function(inco, ids, wght, indicator, order_quan, quant_val, percentag) {
     wt <- wght * indicator
     N <- sum(wt); # Estimated (sub)population size
-
-    # h=S/N^(1/5)
-    h <- sqrt((sum(wght * inco * inco) - sum(wght * inco) * sum(wght * inco) / sum(wght)) / sum(wght)) / exp(0.2 * log(sum(wght)))
+    h <- bandwith_plug(y = inco, w = wght)
 
     u <- (quant_val - inco) / h
     vect_f <- exp(-(u^2) / 2) / sqrt(2 * pi)

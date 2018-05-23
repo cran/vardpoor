@@ -13,7 +13,7 @@
 linarpr <- function(Y, id = NULL, weight = NULL, Y_thres = NULL,
                     wght_thres = NULL, sort = NULL, Dom = NULL,
                     period = NULL, dataset = NULL, percentage = 60,
-                    order_quant = 50L, var_name = "lin_arpr",
+                    order_quant = 50, var_name = "lin_arpr",
                     checking = TRUE) {
 
    ## initializations
@@ -25,7 +25,7 @@ linarpr <- function(Y, id = NULL, weight = NULL, Y_thres = NULL,
                                 varntype = "numeric0100")
 
         order_quant <- check_var(vars = order_quant, varn = "order_quant",
-                                 varntype = "integer0100") 
+                                 varntype = "numeric0100") 
 
         Y <- check_var(vars = Y, varn = "Y", dataset = dataset,
                        ncols = 1, isnumeric = TRUE,
