@@ -13,9 +13,9 @@
                  period = NULL, gender = NULL, dataset = NULL, X = NULL, periodX = NULL,
                  X_ID_level1 = NULL, ind_gr = NULL, g = NULL, q = NULL, datasetX = NULL,
                  percentage = 60, order_quant = 50, alpha = 20, confidence = 0.95,
-                 outp_lin = FALSE, outp_res = FALSE, type = "linrmpg") }
+                 outp_lin = FALSE, outp_res = FALSE, kern_method = "gaussian",
+                 r = NULL, ro = NULL, h_breaks = NULL, type = "linrmpg") }
                      
-
 \arguments{
 
 \item{Y}{Study variable (for example equalized disposable income or gross pension income). One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
@@ -96,6 +96,14 @@ For example, to compute poverty threshold equal to some percentage of median inc
 \item{outp_lin}{Logical value. If \code{TRUE} linearized values of the ratio estimator will be printed out.}
 
 \item{outp_res}{Logical value. If \code{TRUE} estimated residuals of calibration will be printed out.}
+
+\item{kern_method}{A character specifying the method used for density calculation.}
+
+\item{r}{Value specifying the smoothing spline degree.}
+
+\item{ro}{Value specifying the smoothing spline error from histogram.}
+
+\item{h_breaks}{Value specifying the histogram bins.}
 
 \item{type}{a character vector (of length one unless several.ok is TRUE), example "linarpr","linarpt", "lingpg", "linpoormed", "linrmpg",
    "lingini", "lingini2", "linqsr", "linarr", "linrmir".}

@@ -80,7 +80,7 @@ vardom <- function(Y, H, PSU, w_final,
                         ncols = 1, Ynrow = Ynrow, ischaracter = TRUE,
                         isvector = TRUE, mustbedefined = FALSE, PSUs = PSU)
 
-  if (!is.null(X)) {
+  if (!is.null(X) | !is.null(g) | !is.null(q) | !is.null(ind_gr)) {
          X <- check_var(vars = X, varn = "X", dataset = dataset,
                         check.names = TRUE, Ynrow = Ynrow, isnumeric = TRUE,
                         dif_name = c(names(period), "g", "q"), dX = "X")

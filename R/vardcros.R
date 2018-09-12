@@ -101,7 +101,8 @@ vardcros <- function(Y, H, PSU, w_final,
                      ischaracter = TRUE, namesID1 = names(ID_level1))
 
 
-    if(!is.null(X)) {
+    if(!is.null(X) | !is.null(ind_gr) | !is.null(g) | !is.null(q) | !is.null(countryX) | 
+       !is.null(periodX) | !is.null(X_ID_level1) | !is.null(datasetX)) {
         X <- check_var(vars = X, varn = "X", dataset = datasetX,
                        check.names = TRUE, isnumeric = TRUE,
                        grepls = "__", dX = "X",

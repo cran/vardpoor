@@ -79,7 +79,8 @@ vardomh <- function(Y, H, PSU, w_final,
                         ncols = 1, Ynrow = Ynrow, ischaracter = TRUE,
                         isvector = TRUE, mustbedefined = FALSE, PSUs = PSU)
 
-  if(!is.null(X)) {
+  if(!is.null(X) | !is.null(ind_gr) |!is.null(g) | !is.null(q) |  
+     !is.null(periodX) | !is.null(X_ID_level1) | !is.null(datasetX)) {
       X <- check_var(vars = X, varn = "X", dataset = datasetX,
                      check.names = TRUE, isnumeric = TRUE,
                      dif_name = c(names(Y), names(period),

@@ -63,7 +63,7 @@ vardom_othstr <- function(Y, H, H2, PSU, w_final,
                  check.names = TRUE, Yncol = Yncol, Ynrow = Ynrow,
                  isnumeric = TRUE, mustbedefined = FALSE)
 
-  if (!is.null(X)) {
+  if (!is.null(X) | !is.null(ind_gr) | !is.null(g) | !is.null(q)) {
          X <- check_var(vars = X, varn = "X", dataset = dataset,
                         check.names = TRUE, Ynrow = Ynrow,
                         isnumeric = TRUE,

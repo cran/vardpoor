@@ -32,10 +32,10 @@ Generation of domain variables,
 \details{
 \tabular{ll}{
 Package: \tab vardpoor\cr
-Version: \tab 0.10.0\cr
-Date: \tab 2018-05-23\cr
+Version: \tab 0.11.0\cr
+Date: \tab 2018-09-07\cr
 Depends: \tab R (>= 3.2.3), data.table (>= 1.10.4), laeken, stringr\cr
-Imports: \tab reshape, foreach, plyr, MASS, stats, utils, surveyplanning\cr
+Imports: \tab reshape, foreach, plyr, MASS, stats, utils, surveyplanning, ggplot2, pracma, graphics\cr
 License: \tab GPL (>= 2)\cr
 URL: \tab https://github.com/CSBLatvia/vardpoor/ \cr
 BugReports: \tab https://github.com/CSBLatvia/vardpoor/issues/ \cr

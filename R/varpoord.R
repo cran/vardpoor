@@ -29,6 +29,10 @@ varpoord <- function(Y, w_final,
                      confidence = .95,
                      outp_lin = FALSE,
                      outp_res = FALSE,
+                     kern_method = "gaussian",
+                     r = NULL,
+                     ro = NULL,
+                     h_breaks = NULL,
                      type="linrmpg") {
 
   ### Checking
@@ -38,15 +42,21 @@ varpoord <- function(Y, w_final,
   type <- tolower(type)
   type <- match.arg(type, all_choices, length(type) > 1)
 
-  fh_zero <- check_var(vars = fh_zero, varn = "fh_zero", varntype = "logical") 
-  PSU_level <- check_var(vars = PSU_level, varn = "PSU_level", varntype = "logical") 
-  outp_lin <- check_var(vars = outp_lin, varn = "outp_lin", varntype = "logical") 
-  outp_res <- check_var(vars = outp_res, varn = "outp_res", varntype = "logical") 
+  fh_zero <- check_var(vars = fh_zero, varn = "fh_zero", varntype = "logical")
+  PSU_level <- check_var(vars = PSU_level, varn = "PSU_level", varntype = "logical")
+  outp_lin <- check_var(vars = outp_lin, varn = "outp_lin", varntype = "logical")
+  outp_res <- check_var(vars = outp_res, varn = "outp_res", varntype = "logical")
 
-  percentage <- check_var(vars = percentage, varn = "percentage", varntype = "numeric0100") 
-  order_quant <- check_var(vars = order_quant, varn = "order_quant", varntype = "numeric0100") 
-  alpha <- check_var(vars = alpha, varn = "alpha", varntype = "numeric0100") 
-  confidence <- check_var(vars = confidence, varn = "confidence", varntype = "numeric01") 
+  percentage <- check_var(vars = percentage, varn = "percentage", varntype = "numeric0100")
+  order_quant <- check_var(vars = order_quant, varn = "order_quant", varntype = "numeric0100")
+  alpha <- check_var(vars = alpha, varn = "alpha", varntype = "numeric0100")
+  confidence <- check_var(vars = confidence, varn = "confidence", varntype = "numeric01")
+
+  kern_method <- check_var(vars = kern_method, varn = "kern_method", varntype = "kern_method")
+  r <- check_var(vars = r, varn = "r", varntype = "pinteger", kern_method = kern_method)
+  ro <- check_var(vars = ro, varn = "ro", varntype = "numeric01", kern_method = kern_method)
+  h_breaks <- check_var(vars = h_breaks, varn = "h_breaks",
+                        varntype = "pinteger", kern_method = kern_method)
 
   Y <- check_var(vars = Y, varn = "Y", dataset = dataset,
                  ncols = 1, isnumeric = TRUE,
@@ -94,7 +104,7 @@ varpoord <- function(Y, w_final,
                          Ynrow = Ynrow, ischaracter = TRUE)
 
   ID_level2 <- check_var(vars = ID_level2, varn = "ID_level2",
-                         dataset = dataset, ncols = 1, 
+                         dataset = dataset, ncols = 1,
                          Ynrow = Ynrow, ischaracter = TRUE,
                          namesID1 = names(ID_level1), periods = period)
 
@@ -126,7 +136,8 @@ varpoord <- function(Y, w_final,
                         ncols = 1, Ynrow = Ynrow, ischaracter = TRUE,
                         isvector = TRUE, mustbedefined = FALSE, PSUs = PSU)
 
-  if(!is.null(X)) {
+  if(!is.null(X) | !is.null(ind_gr) | !is.null(g) | !is.null(q) |
+      !is.null(periodX) | !is.null(X_ID_level1) | !is.null(datasetX)) {
        X <- check_var(vars = X, varn = "X", dataset = datasetX,
                       check.names = TRUE, isnumeric = TRUE,
                       dif_name = c(names(period) , "g", "q"), dX = "X")
@@ -235,7 +246,8 @@ varpoord <- function(Y, w_final,
                         sort = sort, Dom = Dom, period = period,
                         dataset = NULL, percentage = percentage,
                         order_quant = order_quant, var_name = "lin_arpt",
-                        checking = FALSE)
+                        kern_method = "gaussian", r = r, ro = ro,
+                        h_breaks = h_breaks, checking = FALSE)
        Y1 <- merge(Y1, varpt$lin, all.x = TRUE)
        esti <- data.table("ARPT", varpt$value, NA)
        setnames(esti, names(esti)[c(1, -1 : 0 + ncol(esti))],
@@ -251,6 +263,8 @@ varpoord <- function(Y, w_final,
                         percentage = percentage,
                         order_quant = order_quant,
                         var_name = "lin_arpr",
+                        kern_method = "gaussian", r = r,
+                        ro = ro, h_breaks = h_breaks,
                         checking = FALSE)
 
        Y1 <- merge(Y1, varpr$lin, all.x = TRUE)

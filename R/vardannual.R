@@ -99,7 +99,8 @@ vardannual <- function(Y, H, PSU, w_final, ID_level1,
                    ncols = 1, Ynrow = Ynrow, ischaracter = TRUE,
                    namesID1 = names(ID_level1))
 
-  if(!is.null(X)) {
+  if(!is.null(X) | !is.null(ind_gr) | !is.null(g) | !is.null(q) | !is.null(countryX) | 
+      !is.null(yearsX) | !is.null(subperiodsX) | !is.null(X_ID_level1) | !is.null(datasetX)) {
          X <- check_var(vars = X, varn = "X", dataset = datasetX,
                         isnumeric = TRUE,
                         dif_name = c(names(years), names(subperiods),
@@ -326,10 +327,9 @@ vardannual <- function(Y, H, PSU, w_final, ID_level1,
         } else if (!is.null(ysum$totalZ)) {
              ysum[, estim := totalY / totalZ * percentratio]
          } else ysum[, estim := totalY]
-    ysum[get(yearm) %in% "2016"]
     
     year1m <- year1[[yearm]]
-    ysum1 <-     ysum[get(yearm) %in% year1m, c(sars, "estim"), with = FALSE]
+    ysum1 <- ysum[get(yearm) %in% year1m, c(sars, "estim"), with = FALSE]
 
     years1 <- copy(year1)[, Nrs := 1: .N]
     ysum1 <- merge(years1, ysum1, by = yearm, sort = FALSE, allow.cartesian = TRUE)

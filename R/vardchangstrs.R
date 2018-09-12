@@ -24,6 +24,8 @@ calc <- vardom(Y = Y, H = H, PSU = PSU,
                w_final = w_final,
                Dom = Dom, period = periods,
                dataset = dataset[in_sample == 1])$all_result
+calc3 <- copy(calc)
+
 outvars <- c("variable", Dom, periods, "estim", "var")
 calc <- calc[, outvars, with = FALSE]
 
@@ -174,6 +176,6 @@ all_result <- all_result[, c(paste0(periods, "_", 1:2), sars,
                              paste0("estim_", 1:2), "estim",
                              paste0("var_", 1:2), "covv", "var", "se",
                              "cv", "CI_lower", "CI_upper"), with = FALSE]
-
-return(all_result[])
+return(list(vardom_results = calc3,
+            all_result = all_result[]))
 }
