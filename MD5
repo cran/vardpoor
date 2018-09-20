@@ -1,4 +1,4 @@
-eb9c4d366d637dbbc4025366acd19b94 *DESCRIPTION
+f71d8e81fd3b0914bc8cc2b92203c4af *DESCRIPTION
 8dfedd59e1e98be491af334b3e733d1f *NAMESPACE
 ab7518acc08d1f8041b32ed5f8857e1c *R/domain.R
 0cf3a3f239b4cf20cd3ef6856b33fb77 *R/incPercentile.R
@@ -18,7 +18,7 @@ b3dbb4dbf6e7f8a28a8dd162e0a4d796 *R/residual_est.R
 a0543b8d3769bf37604d838b13fd10e9 *R/vardannual.R
 aad7669c6d066aa9ffaf1ce0ee5f3d5b *R/vardchanges.R
 07f314fda0755c105e880fadc04d6c64 *R/vardchangespoor.R
-a8213cba9bf8e759b4625c32a607b1ea *R/vardchangstrs.R
+60fdafb6a80293f1dad141eb43ba051d *R/vardchangstrs.R
 f70b81c7c1b515d031fc6d09926af00a *R/vardcros.R
 d73859f33341b27d1fb721a713806077 *R/vardcrospoor.R
 c8efdc188267697170197e5911639597 *R/vardom.R

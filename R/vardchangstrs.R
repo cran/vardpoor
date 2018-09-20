@@ -70,14 +70,12 @@ frame[, sa2_hl := as.numeric(P_hl == 1 & get(paste0(in_sample, "_2")) == 1)]
 frame[, fa1_hl := as.numeric(P_hl == 1 & get(paste0(in_frame, "_1")) == 1)]
 frame[, fa2_hl := as.numeric(P_hl == 1 & get(paste0(in_frame, "_2")) == 1)]
 
-phls <- frame[, .(fGhl_sum = .N, sghl_sum = sum(g_hl),
-                  sa1hl_sum = sum(sa1_hl), sa2hl_sum = sum(sa2_hl),
-                  fa1hl_sum = sum(fa1_hl), fa2hl_sum = sum(fa2_hl)),
-              keyby = c("ids", paste0(H, "_", 1:2))]
+frame[, `:=`(fGhl_sum = .N, sghl_sum = sum(g_hl),
+             sa1hl_sum = sum(sa1_hl), sa2hl_sum = sum(sa2_hl),
+             fa1hl_sum = sum(fa1_hl), fa2hl_sum = sum(fa2_hl),
+             Dl_sum = sum(D_l), Bl_sum = sum(B_l)),
+             keyby = c("ids", paste0(H, "_", 1:2))]
 
-frame <- merge(frame, phls, by = c("ids", paste0(H, "_", 1:2)), all.x = TRUE)
-frame[, Dl_sum := sum(D_l), by = c("ids", paste0(H, "_", 1:2))]
-frame[, Bl_sum := sum(B_l), by = c("ids", paste0(H, "_", 1:2))]
 frame[, pop1 := .N, by = c("ids", paste0(H, "_", 1))]
 frame[, pop2 := .N, by = c("ids", paste0(H, "_", 2))]
 frame[, nh1 := sum(get(paste0(in_sample, "_1"))), by = c("ids", paste0(H, "_", 1))]
@@ -117,7 +115,7 @@ sample_data[B_l == 1, n_q := nh2]
 sample_data[B_l == 1, ind_1 := 0]
 sample_data[B_l == 1, ind_2 := 1]
 
-rm(list = c("phls", "frame", "dataset"))
+rm(list = c("frame", "dataset"))
 
 
 recode.NA(sample_data, c(paste0(Yvars, "_1"), paste0(Yvars, "_2")))
