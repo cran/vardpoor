@@ -57,8 +57,8 @@ setnames(dat_ids, names(dat_ids), c("ids", paste0(periods, "_", 1:2)))
 
 frame <- merge(frame1, frame2, by = c("ids", PSU), all = TRUE)
 rm(list = c(paste0("periods", 1:2), paste0("frame", 1:2)))
-recode.NA(frame, c(paste0(c("koef", in_sample, in_frame), "_1"),
-                   paste0(c("koef", in_sample, in_frame), "_2")))
+recode.NA(frame, c(paste0(c(in_sample, in_frame), "_1"),
+                   paste0(c(in_sample, in_frame), "_2")))
 
 frame[, D_l := as.numeric(get(paste0(in_frame, "_1")) == 1 & get(paste0(in_frame, "_2")) == 0)]
 frame[, P_hl := as.numeric(get(paste0(in_frame, "_1")) == 1 & get(paste0(in_frame, "_2")) == 1)]
@@ -105,13 +105,13 @@ sample_data[type == "Type3", n_q := as.numeric(fGhl_sum)]
 sample_data[type == "Type3", ind_1 := get(paste0(w_final, "_1"))]
 sample_data[type == "Type3", ind_2 := get(paste0(w_final, "_2"))]
 
-sample_data[D_l == 1, pop_q := pop1]
-sample_data[D_l == 1, n_q := nh1]
+sample_data[D_l == 1, pop_q := pop1] 
+sample_data[D_l == 1, n_q := as.numeric(nh1)]
 sample_data[D_l == 1, ind_1 := 1]
 sample_data[D_l == 1, ind_2 := 0]
 
 sample_data[B_l == 1, pop_q := pop2]
-sample_data[B_l == 1, n_q := nh2]
+sample_data[B_l == 1, n_q := as.numeric(nh2)]
 sample_data[B_l == 1, ind_1 := 0]
 sample_data[B_l == 1, ind_2 := 1]
 
@@ -124,13 +124,16 @@ recode.NA(sample_data, c(paste0(Yvars, "_1"), paste0(Yvars, "_2")))
 aggr1 <- sample_data[, lapply(Yvars, function(x) { sum(get(paste0(x, "_1")) * get(paste0(x, "_2")) * ind_1 * ind_2  * in_sample_1 * in_sample_2)}), 
                      keyby = c("ids", paste0(H, "_", 1:2), "pop_q", "n_q")]
 setnames(aggr1, paste0("V", 1:length(Yvars)), paste0(Yvars, "d1"))
-aggr2 <- sample_data[, lapply(Yvars, function(x) { sum(get(paste0(x, "_1")) * ind_1) * sum(get(paste0(x, "_2")) * ind_2)}), 
+aggr2 <- sample_data[, lapply(Yvars, function(x) { sum(get(paste0(x, "_1")) * ind_1 * in_sample_1) * sum(get(paste0(x, "_2")) * ind_2 * in_sample_2)}), 
                      keyby = c("ids", paste0(H, "_", 1:2), "pop_q", "n_q")]
 setnames(aggr2, paste0("V", 1:length(Yvars)), paste0(Yvars, "d2"))
 
 aggr1 <- merge(aggr1, aggr2, all = TRUE)
 aggr1[, kor := as.numeric(pop_q * (pop_q - n_q) / (n_q * (n_q - 1)))]
 aggr1[pop_q == n_q | n_q < 2, kor := 0]
+
+apgr200 <- copy(aggr1)
+
 aggr2 <- aggr1[, lapply(Yvars, function(x) { sum(kor * (get(paste0(x, "d1")) - 1 / n_q * get(paste0(x, "d2"))))}), 
                by = c("ids")]
 

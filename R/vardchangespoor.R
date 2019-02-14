@@ -209,20 +209,24 @@ vardchangespoor <- function(Y, age = NULL,
   cros_res_out <- cros_calc$res_out
   data_res <- cros_calc$res_out
   data <- cros_calc$data_net_changes
-  crossectional_results <- cros_calc$results
-  ID_level1 <- ID_level2 <- cros_calc <- NULL
+  crossectional_results <- copy(cros_calc$results)
+  ID_level1 <- ID_level2 <- percoun <- cros_calc <- NULL
   
-  sar <- c(names(period), names(country), names(Dom), "type", "estim", "var")
+  sar <- c(names(period), names(country), names(Dom), "percoun", "type", "estim", "var")
+  sar <- sar[sar %in% names(crossectional_results)]
   cros_var_grad <- crossectional_results[, sar, with = FALSE]
   setnames(cros_var_grad, "var", "num1")
-  value <- nameYs <- percoun <- NULL
+  value <- nameYs <- NULL
 
   var_grad0 <- melt(data, id = c(names(period), names(country)), measure.vars = c(names(data)[grepl("lin", names(data))]))
   var_grad0 <- var_grad0[, .(valueY1 = sum(value)), keyby = c(names(period), names(country), "variable")]
   setnames(var_grad0, "variable", "nameYs")
         
-  cros_var_grad[, nameYs := namesD(cros_var_grad[, "type"], cros_var_grad[, names(Dom), with = FALSE])]
-  cros_var_grad[, nameYs := paste0("lin_", tolower(type), "__", substr(nameYs, 7, nchar(nameYs)))]
+  if (!is.null(Dom)) {
+          cros_var_grad[, nameYs := namesD(cros_var_grad[, "type"], cros_var_grad[, names(Dom), with = FALSE], uniqueD = FALSE)]
+          cros_var_grad[, nameYs := paste0("lin_", tolower(type), "__", substr(nameYs, 7, nchar(nameYs)))]
+   } else  cros_var_grad[, nameYs := paste0("lin_", tolower(type))]
+ 
   cros_var_grad <- merge(cros_var_grad, var_grad0, all = TRUE, by = c(names(period), names(country), "nameYs"))
   cros_var_grad[, nameYs := NULL]
   var_grad0 <- NULL
@@ -240,7 +244,7 @@ vardchangespoor <- function(Y, age = NULL,
   
   crossectional_results <- cros_calc$results
   if (is.null(names(country))) crossectional_results[, percoun := NULL]
-  
+
   list(lin_out <- cros_calc$lin_out,
        res_out = cros_calc$res_out,
        crossectional_results = crossectional_results,

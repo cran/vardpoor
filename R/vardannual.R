@@ -230,9 +230,9 @@ vardannual <- function(Y, H, PSU, w_final, ID_level1,
          } else yr12 <- data.table(Nrs = 1 : nrow(year1), yearg = year1[[1]])
  
    if (!is.null(Dom)) {
-             Y1 <- namesD(Y, Dom)
+             Y1 <- namesD(Y, Dom, uniqueD = TRUE)
              Z1 <- NULL
-             if (!is.null(Z)) Z1 <- namesD(Z, Dom)
+             if (!is.null(Z)) Z1 <- namesD(Z, Dom, uniqueD = TRUE)
         } else { Y1 <- names(Y)
                  Z1 <- names(Z) }
 

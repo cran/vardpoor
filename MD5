@@ -1,7 +1,7 @@
-f71d8e81fd3b0914bc8cc2b92203c4af *DESCRIPTION
+864e7c08508061582c36437fd3e50b66 *DESCRIPTION
 8dfedd59e1e98be491af334b3e733d1f *NAMESPACE
-ab7518acc08d1f8041b32ed5f8857e1c *R/domain.R
-0cf3a3f239b4cf20cd3ef6856b33fb77 *R/incPercentile.R
+0d32e26ef631d06e26e8b1c4ab0a5965 *R/domain.R
+45b2fc2936e8d89d4bc9ef0f68c054cb *R/incPercentile.R
 97ee9a99848545cc47b80da677aeaa37 *R/lin.ratio.R
 99fde4b1802938227c885dbd365b1c88 *R/linarpr.R
 bffc94bd83f3e05da894887ffa188b7f *R/linarpt.R
@@ -15,12 +15,12 @@ e6860185f82d3b38d87509a377e19238 *R/linrmir.R
 5a2cb8346f7307bfe21b452b0d6a0d97 *R/linrmpg.R
 b3dbb4dbf6e7f8a28a8dd162e0a4d796 *R/residual_est.R
 22aff706a352a1bab5728d6db812d91c *R/var_srs.R
-a0543b8d3769bf37604d838b13fd10e9 *R/vardannual.R
-aad7669c6d066aa9ffaf1ce0ee5f3d5b *R/vardchanges.R
-07f314fda0755c105e880fadc04d6c64 *R/vardchangespoor.R
-60fdafb6a80293f1dad141eb43ba051d *R/vardchangstrs.R
+99eaea31b75acb128345bfc3d3b1a79a *R/vardannual.R
+96c991033eeea059705a5c1ac9fbc42a *R/vardchanges.R
+bced7d5b0f90e9355c7f19bf045997a1 *R/vardchangespoor.R
+574b79240715b9baaecf7f1632ef084c *R/vardchangstrs.R
 f70b81c7c1b515d031fc6d09926af00a *R/vardcros.R
-d73859f33341b27d1fb721a713806077 *R/vardcrospoor.R
+55091e38f589ab8e163b7fbbce96a89c *R/vardcrospoor.R
 c8efdc188267697170197e5911639597 *R/vardom.R
 e8dd97034c923454d5fde2617ad7ffe9 *R/vardom_othstr.R
 2e4425a068cf76240e457103c5930264 *R/vardomh.R
@@ -32,7 +32,7 @@ e36d4ac33bed8d6980db5476c464a773 *README
 b6ebb0103d581e36195301c3c4c462b6 *inst/CITATION
 7642f36acdb266706850fb8290fa7797 *inst/COPYING
 7bb3e32efeb2b6cb6125a80413b6c0ed *inst/DISCLAIMER
-791ab2ccb6f559a307767b699e2d06d6 *inst/NEWS
+d50c961fc167644319c93d704c77c417 *inst/NEWS
 ed430507b6aaf3c7a926031ad4bd4ec3 *inst/README
 d19ffb6b65f6c80a4583b7a1661df403 *man/domain.Rd
 67f474d2a5efca5915927aab55cac1f7 *man/incPercentile.Rd
@@ -49,7 +49,7 @@ a828617f6b2e28a59f250776fbdc1230 *man/linarpt.Rd
 27fa6d4d33cbe6030ba6751524880ec5 *man/linrmpg.Rd
 46706c238d164cd2030b8ffd262e7135 *man/residual_est.Rd
 d372b85797754469c97c87e5f116d9d6 *man/var_srs.Rd
-7aff1240feabea8a03f9cfdc14186422 *man/vardannual.Rd
+5eec9f565639e1341ddaf1c5bfdbaa3d *man/vardannual.Rd
 ef13079c40a65ff2faa5d2421b6dae26 *man/vardchanges.Rd
 c89a6b3821403ceb437d6a852b60657b *man/vardchangespoor.Rd
 9261a9ee69c000d65844c48f7e59c395 *man/vardchangstrs.Rd
@@ -58,7 +58,7 @@ ad6b22cdc8cf2434eb155fb4c34d1d4a *man/vardcros.Rd
 efa01c3262331aa6b0c2cd17150460dd *man/vardom.Rd
 59bbbbf6f90243d194e4588cabff39fc *man/vardom_othstr.Rd
 00c82916a95bb7b47938c5fb7b95e702 *man/vardomh.Rd
-f33e32b7c991d4c4b465a206989d651a *man/vardpoor-package.Rd
+81eacfa5bd30ae7885b3fba00a22fbfa *man/vardpoor-package.Rd
 31e91d0365defecd52f273ec51097812 *man/variance_est.Rd
 25ad32233e96c4eee36857a5aeb84066 *man/variance_othstr.Rd
 6ff8884b6445fefb982b1f211725f0c9 *man/varpoord.Rd

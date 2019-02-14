@@ -155,8 +155,8 @@ vardchanges <- function(Y, H, PSU, w_final,
                         checking = FALSE)
   
   if (!is.null(Dom)) {
-         Y1 <- namesD(Y, Dom)
-         if (!is.null(Z)) Z1 <- namesD(Z, Dom)
+         Y1 <- namesD(Y, Dom, uniqueD = TRUE)
+         if (!is.null(Z)) Z1 <- namesD(Z, Dom, uniqueD = TRUE)
     } else { Y1 <- names(Y)
              Z1 <- names(Z) }
 
@@ -321,9 +321,9 @@ vardchanges_calculation <- function(Y1, Z1, Dom, names_country,
   recode.NA(data, c(dataHq1, dataHq2, paste0(sard, "_1"), paste0(sard, "_2")))
   
   saraks <- CJ(dataHq1, dataHq2, unique = FALSE)
-  saraks[, vstrata1 := paste0(" rot_1 : ", get("V1"), " ")]
-  saraks[, vstrata2 := paste0(" rot_2 : ", get("V2"), " ")]
-  saraks[, vstrata12 := paste0(" rot_1 : rot_2 : ", get("V1"), " : " , get("V2"), " ")]
+  saraks[, vstrata1 := paste0(" rot_1 : ", get("dataHq1"), " ")]
+  saraks[, vstrata2 := paste0(" rot_2 : ", get("dataHq2"), " ")]
+  saraks[, vstrata12 := paste0(" rot_1 : rot_2 : ", get("dataHq1"), " : " , get("dataHq2"), " ")]
   saraks <- unique(unlist(saraks[, c("vstrata1", "vstrata2", "vstrata12")]))
   saraks <- paste(saraks, collapse = "+")
 

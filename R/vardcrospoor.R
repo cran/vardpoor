@@ -21,7 +21,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
                    "linpoormed", "linrmpg", "lingini",
                    "lingini2", "linqsr", "linrmir", "linarr")
   type <- tolower(type)
-  type <- match.arg(type, all_choices, length(type)>1) 
+  type <- match.arg(type, all_choices, length(type) > 1) 
 
   percentage <- check_var(vars = percentage, varn = "percentage", varntype = "numeric0100") 
   order_quant <- check_var(vars = order_quant, varn = "order_quant", varntype = "numeric0100") 
@@ -460,6 +460,7 @@ vardcrospoor <- function(Y, age = NULL, pl085 = NULL,
     res[, rse := se / estim]
     res[, cv := rse * 100]
    
+    print(res)
     res <- res[, c(names(countryper), namesDom, "type", "count_respondents",
                    "pop_size", "estim", "se", "var", "rse", "cv"), with = FALSE]
 
