@@ -653,6 +653,3 @@ vardcros <- function(Y, H, PSU, w_final,
        results = res)
 
 }
-
-
-

@@ -32,8 +32,8 @@ Generation of domain variables,
 \details{
 \tabular{ll}{
 Package: \tab vardpoor\cr
-Version: \tab 0.14.0\cr
-Date: \tab 2019-02-14\cr
+Version: \tab 0.15.0\cr
+Date: \tab 2019-04-04\cr
 Depends: \tab R (>= 3.2.3), data.table (>= 1.10.4), laeken, stringr\cr
 Imports: \tab reshape, foreach, plyr, MASS, stats, utils, surveyplanning, ggplot2, pracma, graphics\cr
 License: \tab GPL (>= 2)\cr
@@ -61,6 +61,10 @@ linrmpg                 Linearization of the relative median
                         at-risk-of-poverty gap
 residual_est            Residual estimation of calibration
 var_srs                 The estimation of the simple random sampling
+vardbootstr             Variance estimation for measures of annual net change
+                        or annual for single stratified sampling designs
+vardannual              Variance estimation for measures of annual net change
+                        or annual for single and multistage stage cluster sampling designs
 vardchanges             Variance estimation for measures of change for
                         single and multistage stage cluster sampling designs
 vardchangespoor         Variance estimation for measures of change for sample

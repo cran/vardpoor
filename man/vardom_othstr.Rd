@@ -105,6 +105,7 @@
 data(eusilc)
 
 # Example 1
+require(data.table)
 eusilc1 <- eusilc[1:1000, ]
 dataset <- data.table(IDd = paste0("V", 1:nrow(eusilc1)), eusilc1)
 dataset[, db040_2 := get("db040")]

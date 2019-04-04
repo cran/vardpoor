@@ -171,6 +171,7 @@ Working group on Statistics on Income and Living Conditions (2004) Common cross-
 
 \examples{
 data(eusilc)
+require(data.table)
 dataset <- data.table(IDd = paste0("V", 1 : nrow(eusilc)), eusilc)
 dataset1 <- dataset[1 : 1000]
 

@@ -159,7 +159,7 @@ URL \url{https://ec.europa.eu/eurostat/cros/content/handbook-standard-error-esti
 
 data(eusilc)
 set.seed(1)
-
+require(data.table)
 data <- data.table(rbind(eusilc, eusilc),
                    year = c(rep(2010, nrow(eusilc)),
                             rep(2011, nrow(eusilc))),

@@ -94,8 +94,7 @@ M. Liberts. (2004) Non-response Analysis and Bias Estimation in a Survey on Tran
 }
 
 \examples{
-period=NULL
-dataset=NULL
+require(data.table)
 Y <- data.table(matrix(runif(50) * 5, ncol = 5))
 
 H <- data.table(H = as.integer(trunc(5 * runif(10))))

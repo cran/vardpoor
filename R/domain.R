@@ -58,7 +58,7 @@ check_var <- function(vars, varn, varntype = NULL, dataset,
   
   if (!is.null(varntype)) {
     if (varntype == "kern_method")  if (length(vars) != 1 | !any(vars %in% c("gaussian", "smooth_splines"))) stop("'kern_method' must be gaussian or smooth_splines", call. = FALSE)
-    if (varntype == "pinteger" & (varn == "percentratio" | (varn %in%  c("r", "h_breaks") & kern_method == "smooth_splines"))) {
+    if (varntype == "pinteger" & (varn %in% c("boots_count", "percentratio") | (varn %in%  c("r", "h_breaks") & kern_method == "smooth_splines"))) {
       if (length(vars) != 1 | any(!is.numeric(vars) | vars < 1)) stop(paste0("'", varn, "' must be a positive integer"), call. = FALSE)
       if (all(is.numeric(vars))) if (vars %% 1 != 0) stop(paste0("'", varn, "' must be a positive integer"), call. = FALSE)
     }
@@ -83,11 +83,11 @@ check_var <- function(vars, varn, varntype = NULL, dataset,
   
   if ((!is.null(vars) & is.null(varntype)) | any(varn %in% c("alpha", "percentratio", "percentage",
                                                              "order_quant", "kern_method", "h_breaks",
-                                                             "method", "use.estVar", "use.gender",
-                                                             "confidence", "frate", "change_type",
-                                                             "linratio", "outp_lin", "outp_res",
-                                                             "netchanges", "withperiod", "ID_level1_max",
-                                                             "fh_zero", "PSU_level"))
+                                                             "boots_count", "dh", "method", "use.estVar",
+                                                             "use.gender",  "confidence", "frate",
+                                                             "change_type", "linratio", "outp_lin", 
+                                                             "outp_res", "netchanges", "withperiod",
+                                                             "ID_level1_max", "fh_zero", "PSU_level"))
       | (kern_method == "gaussian" & any(varn %in% c("ro", "r"))))  mustbedefined <- FALSE
   if (!is.null(vars) & is.null(varntype)) {
     if (!withperiod & varn == "period") stop(paste0("'period' must be NULL for those data"), call. = FALSE)

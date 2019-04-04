@@ -151,7 +151,7 @@ Eurostat Methodologies and Working papers, Handbook on precision requirements an
 \examples{
 data(eusilc)
 set.seed(1)
-
+require(data.table)
 data <- data.table(rbind(eusilc, eusilc),
                    year = c(rep(2010, nrow(eusilc)),
                             rep(2011, nrow(eusilc))))

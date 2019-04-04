@@ -258,6 +258,7 @@ data("eusilc")
 set.seed(1)
 eusilc1 <- eusilc[1 : 20,]
 set.seed(1)
+require(data.table)
 data <- data.table(rbind(eusilc1, eusilc1),
                    year = c(rep(2010, nrow(eusilc1)),
                             rep(2011, nrow(eusilc1))))
@@ -305,5 +306,5 @@ result <- vardannual(Y = "unemployed", H = "strata",
 }
 
 \seealso{
-\code{\link{domain}},   \code{\link{vardcros}},  \code{\link{vardchanges}}}
-\keyword{vardchangannual}
+\code{\link{domain}},   \code{\link{vardcros}},  \code{\link{vardchanges}}, \code{\link{vardbootstr}}}
+\keyword{vardannual}

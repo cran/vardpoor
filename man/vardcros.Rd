@@ -135,6 +135,7 @@ Eurostat Methodologies and Working papers, Handbook on precision requirements an
 # Example 1
 data(eusilc)
 set.seed(1)
+require(data.table)
 data <- data.table(eusilc)
 data[, year := 2010]
 data[, country := "AT"]
