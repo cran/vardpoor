@@ -79,11 +79,12 @@ vardannual <- function(Y, H, PSU, w_final, ID_level1,
 
   subperiods <- check_var(vars = subperiods, varn = "subperiods",
                           dataset = dataset, ncols = 1, Ynrow = Ynrow,
-                          ischaracter = TRUE, years = years,
+                          ischaracter = TRUE, years = years, Domen = Dom,
                           dif_name = c("percoun", "period_country", names(country), "yearg", "Nrs"))
   subpm <- names(subperiods)
-  subn <- data.table(years, subperiods)
+  subn <- data.table(years, subperiods, Dom)
   subn <- subn[, .N, by = c(names(subn))]
+
   subn <- max(subn[, .N, by = names(years)][["N"]])
  
   ID_level1 <- check_var(vars = ID_level1, varn = "ID_level1",
@@ -282,6 +283,7 @@ vardannual <- function(Y, H, PSU, w_final, ID_level1,
     yr12cros <- merge(yr12, cros_var_grad, by = "yearg",
                             allow.cartesian = TRUE, sort = FALSE)
  
+    
     apstr <- lapply(1 : max(rho[["Nr_sar"]]), function(j){
                   rho2 <- rho1[Nr_sar == j]
                   A_matrix <- diag(1, max_ids, max_ids)

@@ -175,7 +175,6 @@ piecewis2 <- function(x, xi, pak) {as.numeric(x >= xi) * 1 / (pak + 1) * (x - xi
 
 
 # Smooth_spline
-
 smooth_spline <- function(inco, wght, quant_val, r, ro, h_breaks) {
   ..density.. <- dat <- eqIncome1 <- NULL
   YY <- N <- a1 <- a2 <- v1 <- vv <- NULL
@@ -184,7 +183,8 @@ smooth_spline <- function(inco, wght, quant_val, r, ro, h_breaks) {
   pec <- incPercentile(Y = "YY", weights = "sv",
                        k = 10, dataset = dataset)
   dataset[, eqIncome1 := (quant_val -  YY) / hh]
-sum(dataset$eqIncome1)
+ #sum(dataset$eqIncome1)
+ #hist(dataset$YY, prob = TRUE, breaks = h_breaks)
 
   rez <- hist(dataset$eqIncome1, prob = TRUE, breaks = h_breaks)
   tt <- rez$breaks[rez$density != 0]

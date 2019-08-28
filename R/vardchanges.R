@@ -284,12 +284,14 @@ vardchanges_calculation <- function(Y1, Z1, Dom, names_country,
                     by.x = per2, by.y = per,
                     allow.cartesian = TRUE)
   sard <- names(data)[!(names(data) %in% c(sarp, per))]
-
+  
+  data[is.na(ids_nr)]
+  
   setnames(data1, sard, paste0(sard, "_1"))
   setnames(data2, sard, paste0(sard, "_2"))
 
   data <- merge(data1, data2, all = TRUE, by = c("ind", per1, per2, sarp))
-  
+
   if (country == "country") {
                data[is.na(period_country_1), period_country_1 := paste(get(per1), country, sep = "_")] 
                data[is.na(period_country_2), period_country_2 := paste(get(per2), country, sep = "_")]
@@ -457,7 +459,7 @@ vardchanges_calculation <- function(Y1, Z1, Dom, names_country,
    data <- merge(res, var_gradn, all = TRUE, by = c(sars, "id_nams", "nams"))
    res <- fit <- var_gradn <- NULL
 
-   rmax <- max(data[, .N, by = "ids_nr"][["ids_nr"]])
+   rmax <- max(data[!is.na(ids_nr), .N, by = "ids_nr"][["ids_nr"]])
 
    nosv <- c("num1", "den1", "num2", "den2")
    nosv <- names(data)[names(data) %in% nosv]

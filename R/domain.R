@@ -43,9 +43,9 @@ check_var <- function(vars, varn, varntype = NULL, dataset,
                       namesID1 = "namesid1", duplicatednames = FALSE,
                       withperiod = TRUE, varnout = NULL, varname = NULL,
                       PSUs = NULL, country = NULL, countryX = NULL,
-                      years = NULL, yearsX = NULL, periods = NULL,
-                      periodsX = NULL, ID_level1 = NULL, dX = "",
-                      use.gender = FALSE, kern_method = "gaussian"){
+                      years = NULL, Domen = NULL, yearsX = NULL,
+                      periods = NULL, periodsX = NULL, ID_level1 = NULL,
+                      dX = "", use.gender = FALSE, kern_method = "gaussian"){
   
   N <- NULL
   if (varn %in%  c("g", "q") & (is.null(class(vars)) | any(class(vars) == "function"))) stop("'g' must be numeric", call. = FALSE)
@@ -88,7 +88,7 @@ check_var <- function(vars, varn, varntype = NULL, dataset,
                                                              "change_type", "linratio", "outp_lin", 
                                                              "outp_res", "netchanges", "withperiod",
                                                              "ID_level1_max", "fh_zero", "PSU_level"))
-      | (kern_method == "gaussian" & any(varn %in% c("ro", "r"))))  mustbedefined <- FALSE
+      | (any(varn %in% c("ro", "r")) & (kern_method == "gaussian" | !is.null(vars))))  mustbedefined <- FALSE
   if (!is.null(vars) & is.null(varntype)) {
     if (!withperiod & varn == "period") stop(paste0("'period' must be NULL for those data"), call. = FALSE)
     if(!is.null(dataset)) {
@@ -170,10 +170,13 @@ check_var <- function(vars, varn, varntype = NULL, dataset,
     }
     
     if (varn == "subperiods") {
-      subn <- data.table(years, vars)
-      subn <- subn[, .N, by = c(names(subn))]
-      subn <- subn[, .N, by = names(years)][["N"]]
-      if (all(max(subn) != subn)) stop(paste0("'subperiods' must be ", max(subn)), call. = FALSE)
+      subn <- data.table(Domen, years, vars)
+      subn <- subn[, .N, by = names(subn)]
+      griez <- c(names(years), names(Domen))
+      subn <- subn[, .N, by = griez][["N"]]
+      griez <- NULL
+      if (!is.null(Domen)) griez <- "'Dom', "
+      if (any(max(subn) != subn)) stop(paste0(griez, "'years', 'subperiods' must be ", max(subn)), call. = FALSE)
     }
     
     if (varn == "countryX") {

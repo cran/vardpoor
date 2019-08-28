@@ -1,10 +1,10 @@
-c0c28d2d3c16990b369ea6ced3c63ad4 *DESCRIPTION
+63c7cb9de6317f152e4bd5c44e221c3e *DESCRIPTION
 cd81879c7e24d8aeec095a7626cc878e *NAMESPACE
-c77edb7c511943d4f0793c80d35e1932 *R/domain.R
+3c81e86bc18736d2b934c80c1467dd57 *R/domain.R
 45b2fc2936e8d89d4bc9ef0f68c054cb *R/incPercentile.R
 97ee9a99848545cc47b80da677aeaa37 *R/lin.ratio.R
 99fde4b1802938227c885dbd365b1c88 *R/linarpr.R
-bffc94bd83f3e05da894887ffa188b7f *R/linarpt.R
+840af5e16e765fd96721780c4afd4546 *R/linarpt.R
 70d09f2105ef1418abd9d555a0014f4b *R/linarr.R
 cfedbf7856c4afcd902eafa60017b98e *R/lingini.R
 216b566a3eb47e48794050ae50a05b10 *R/lingini2.R
@@ -15,9 +15,9 @@ e6860185f82d3b38d87509a377e19238 *R/linrmir.R
 5a2cb8346f7307bfe21b452b0d6a0d97 *R/linrmpg.R
 b3dbb4dbf6e7f8a28a8dd162e0a4d796 *R/residual_est.R
 22aff706a352a1bab5728d6db812d91c *R/var_srs.R
-99eaea31b75acb128345bfc3d3b1a79a *R/vardannual.R
+c714b6d889351ee6dc75ccfd8e2fe4ff *R/vardannual.R
 57e51f97eb77f65c689e826711afa9d5 *R/vardbootstr.R
-96c991033eeea059705a5c1ac9fbc42a *R/vardchanges.R
+e35cd667d543683f0165fbe324f13935 *R/vardchanges.R
 bced7d5b0f90e9355c7f19bf045997a1 *R/vardchangespoor.R
 574b79240715b9baaecf7f1632ef084c *R/vardchangstrs.R
 69db5a3abf574bda2e058a5d015d56c0 *R/vardcro2s.R
