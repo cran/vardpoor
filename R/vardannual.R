@@ -7,14 +7,14 @@
 #' @param PSU Primary sampling unit variable. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.
 #' @param w_final Weight variable. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.
 #' @param ID_level1 Variable for level1 ID codes. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.
-#' @param ID_level2}{Optional variable for unit ID codes. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.
+#' @param ID_level2 Optional variable for unit ID codes. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.
 #' @param Dom Optional variables used to define population domains. If supplied, variables are calculated for each domain. An object convertible to \code{data.table} or variable names as character vector, column numbers.
 #' @param Z Optional variables of denominator for ratio estimation. If supplied, the ratio estimation is computed. Object convertible to \code{data.table} or variable names as character, column numbers. This variable is \code{NULL} by default.
 #' @param gender Numerical variable for gender, where 1 is for males, but 2 is for females. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.
 #' @param country Variable for the survey countries. The values for each country are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.
 #' @param years Variable for the all survey years. The values for each year are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.
 #' @param subperiods Variable for the all survey sub-periods. The values for each sub-period are computed independently. Object convertible to \code{data.table} or variable names as character, column numbers.
-#' @param dataset}{Optional survey data object convertible to \code{data.table}.
+#' @param dataset Optional survey data object convertible to \code{data.table}.
 #' @param year1 The vector of years from variable \code{years} describes the first year for measures of annual net change.
 #' @param year2 The vector of years from variable \code{periods} describes the second year for measures of annual net change.
 #' @param X Optional matrix of the auxiliary variables for the calibration estimator. Object convertible to \code{data.table} or variable names as character, column numbers.
@@ -35,154 +35,176 @@
 #'
 #' @return A list with objects are returned by the function:
 #' \itemize{
-#'    \item \code{crossectional_results} -  a \code{data.table} containing: \cr
-#'      \code{year} -  survey years, \cr
-#'      \code{subperiods} -  survey sub-periods, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{sample_size} - the sample size (in numbers of individuals), \cr
-#'      \code{pop_size} - the population size (in numbers of individuals), \cr
-#'      \code{total} - the estimated totals, \cr
-#'      \code{variance} - the estimated variance of cross-sectional or longitudinal measures, \cr
-#'      \code{sd_w} - the estimated weighted variance of simple random sample, \cr
-#'      \code{sd_nw} - the estimated variance estimation of simple random sample, \cr
-#'      \code{pop} - the population size (in numbers of households), \cr
-#'      \code{sampl_siz} - the sample size (in numbers of households), \cr
-#'      \code{stderr_w} - the estimated weighted standard error of simple random sample, \cr
-#'      \code{stderr_nw} - the estimated standard error of simple random sample, \cr
-#'      \code{se} - the estimated standard error of cross-sectional or longitudinal, \cr
-#'      \code{rse} - the estimated relative standard error (coefficient of variation), \cr
-#'      \code{cv} - the estimated relative standard error (coefficient of variation) in percentage, \cr
-#'      \code{absolute_margin_of_error} - the estimated absolute margin of error, \cr
-#'      \code{relative_margin_of_error} - the estimated relative margin of error, \cr
-#'      \code{CI_lower} - the estimated confidence interval lower bound, \cr
-#'      \code{CI_upper} - the estimated confidence interval upper bound, \cr 
-#'      \code{confidence_level} - the positive value for confidence interval. 
-#'    \item \code{crossectional_var_grad} - a \code{data.table} containing: \cr
-#'      \code{year} -  survey years, \cr
-#'      \code{subperiods} -  survey sub-periods, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{grad} - the estimated gradient, \cr
-#'      \code{var} - the estimated a design-based variance.
-#'    \item \code{vardchanges_grad_var} - a \code{data.table} containing: \cr
-#'      \code{year_1} -  survey years of \code{years1}, \cr
-#'      \code{subperiods_1} -  survey sub-periods of \code{years1}, \cr
-#'      \code{year_2} -  survey years of \code{years2}, \cr
-#'      \code{subperiods_2} -  survey sub-periods of \code{years2}, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{nams} - gradient names, numerator (num) and denominator (den), for each year, \cr 
-#'      \code{grad} - the estimated gradient, \cr
-#'      \code{cros_var} - the estimated a design-based variance.
-#'    \item \code{vardchanges_rho} - a \code{data.table} containing: \cr
-#'      \code{year} -  survey years of \code{years} for cross-sectional estimates, \cr
-#'      \code{subperiods} -  survey sub-periods of \code{years} for cross-sectional estimates, \cr
-#'      \code{year_1} -  survey years of \code{years1}, \cr
-#'      \code{subperiods_1} -  survey sub-periods of \code{years1}, \cr
-#'      \code{year_2} -  survey years of \code{years2}, \cr
-#'      \code{subperiods_2} -  survey sub-periods of \code{years2}, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{nams} - gradient names, numerator (num) and denominator (den), for each year, \cr
-#'      \code{rho} - the estimated correlation matrix.
-#'    \item \code{vardchanges_var_tau} - a \code{data.table} containing: \cr
-#'      \code{year_1} -  survey years of \code{years1}, \cr
-#'      \code{subperiods_1} -  survey sub-periods of \code{years1}, \cr
-#'      \code{year_2} -  survey years of \code{years2}, \cr
-#'      \code{subperiods_2} -  survey sub-periods of \code{years2}, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{nams} - gradient names, numerator (num) and denominator (den), for each year, \cr
-#'      \code{var_tau} - the estimated covariance matrix.
-#'    \item \code{vardchanges_results} - a \code{data.table} containing: \cr
-#'      \code{year} -  survey years of \code{years} for measures of annual, \cr
-#'      \code{subperiods} -  survey sub-periods of \code{years} for measures of annual, \cr
-#'      \code{year_1} -  survey years of \code{years1} for measures of annual net change, \cr
-#'      \code{subperiods_1} -  survey sub-periods of \code{years1} for measures of annual net change, \cr
-#'      \code{year_2} -  survey years of \code{years2} for measures of annual net change, \cr
-#'      \code{subperiods_2} -  survey sub-periods of \code{years2} for measures of annual net change, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{estim_1} - the estimated value for period1, \cr
-#'      \code{estim_2} - the estimated value for period2, \cr
-#'      \code{estim} - the estimated value, \cr
-#'      \code{var} - the estimated variance, \cr
-#'      \code{se} - the estimated standard error, \cr
-#'      \code{CI_lower} - the estimated confidence interval lower bound, \cr
-#'      \code{CI_upper} - the estimated confidence interval upper bound, \cr
-#'      \code{confidence_level} - the positive value for confidence interval, \cr 
-#'      \code{significant} - is the the difference significant
-#'    \item \code{X_annual} - a \code{data.table} containing: \cr
-#'      \code{year} -  survey years of \code{years} for measures of annual, \cr
-#'      \code{year_1} -  survey years of \code{years1} for measures of annual net change, \cr
-#'      \code{year_2} -  survey years of \code{years2} for measures of annual net change, \cr
-#'      \code{period} - period1 and period2 together, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{cros_se} - the estimated cross-sectional standard error.
-#'    \item \code{A_matrix} - a \code{data.table} containing: \cr
-#'      \code{year} -  survey years of \code{years1} for measures of annual, \cr
-#'      \code{year_1} -  survey years of \code{years1} for measures of annual net change, \cr
-#'      \code{year_2} -  survey years of \code{years2} for measures of annual net change, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{cols} - the estimated matrix_A columns, \cr
-#'      \code{matrix_A} - the estimated matrix A.
-#'    \item \code{annual_sum} - a \code{data.table} containing: \cr
-#'      \code{year} - survey years, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{totalY} - the estimated value of variables of interest for period1, \cr
-#'      \code{totalZ} - optional the estimated value of denominator for period2, \cr
-#'      \code{estim} - the estimated value for year.
-#'    \item \code{annual_results} - a \code{data.table} containing: \cr
-#'      \code{year} -  survey years of \code{years} for measures of annual, \cr
-#'      \code{year_1} -  survey years of \code{years1} for measures of annual net change, \cr
-#'      \code{year_2} -  survey years of \code{years2} for measures of annual net change, \cr
-#'      \code{country} - survey countries, \cr
-#'      \code{Dom} - optional variable of the population domains, \cr
-#'      \code{namesY} - variable with names of variables of interest, \cr
-#'      \code{namesZ} - optional variable with names of denominator for ratio estimation, \cr
-#'      \code{estim_1} - the estimated value for period1 for measures of annual net change, \cr
-#'      \code{estim_2} - the estimated value for period2 for measures of annual net change, \cr
-#'      \code{estim} - the estimated value, \cr
-#'      \code{var} - the estimated variance, \cr
-#'      \code{se} - the estimated standard error, \cr
-#'      \code{rse} - the estimated relative standard error (coefficient of variation), \cr
-#'      \code{cv} - the estimated relative standard error (coefficient of variation) in percentage, \cr
-#'      \code{absolute_margin_of_error} - the estimated absolute margin of error for period1 for measures of annual, \cr
-#'      \code{relative_margin_of_error} - the estimated relative margin of error in percentage for measures of annual, \cr
-#'      \code{CI_lower} - the estimated confidence interval lower bound, \cr
-#'      \code{CI_upper} - the estimated confidence interval upper bound, \cr
-#'      \code{confidence_level} - the positive value for confidence interval, \cr 
-#'      \code{significant} - is the the difference significant
+#'    \item \code{crossectional_results} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year} - survey years,
+#'      \item \code{subperiods} - survey sub-periods,
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{sample_size} - the sample size (in numbers of individuals),
+#'      \item \code{pop_size} - the population size (in numbers of individuals),
+#'      \item \code{total} - the estimated totals,
+#'      \item \code{variance} - the estimated variance of cross-sectional or longitudinal measures,
+#'      \item \code{sd_w} - the estimated weighted variance of simple random sample,
+#'      \item \code{sd_nw} - the estimated variance estimation of simple random sample,
+#'      \item \code{pop} - the population size (in numbers of households),
+#'      \item \code{sampl_siz} - the sample size (in numbers of households),
+#'      \item \code{stderr_w} - the estimated weighted standard error of simple random sample,
+#'      \item \code{stderr_nw} - the estimated standard error of simple random sample,
+#'      \item \code{se} - the estimated standard error of cross-sectional or longitudinal,
+#'      \item \code{rse} - the estimated relative standard error (coefficient of variation),
+#'      \item \code{cv} - the estimated relative standard error (coefficient of variation) in percentage,
+#'      \item \code{absolute_margin_of_error} - the estimated absolute margin of error,
+#'      \item \code{relative_margin_of_error} - the estimated relative margin of error,
+#'      \item \code{CI_lower} - the estimated confidence interval lower bound,
+#'      \item \code{CI_upper} - the estimated confidence interval upper bound, 
+#'      \item \code{confidence_level} - the positive value for confidence interval.
+#'    }
+#'    \item \code{crossectional_var_grad} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year} - survey years,
+#'      \item \code{subperiods} - survey sub-periods,
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{grad} - the estimated gradient,
+#'      \item \code{var} - the estimated a design-based variance.
+#'    }
+#'    \item \code{vardchanges_grad_var} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year_1} - survey years of \code{years1},
+#'      \item \code{subperiods_1} - survey sub-periods of \code{years1},
+#'      \item \code{year_2} - survey years of \code{years2},
+#'      \item \code{subperiods_2} - survey sub-periods of \code{years2},
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{nams} - gradient names, numerator (num) and denominator (den), for each year, 
+#'      \item \code{grad} - the estimated gradient,
+#'      \item \code{cros_var} - the estimated a design-based variance.
+#'    }
+#'    \item \code{vardchanges_rho} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year} - survey years of \code{years} for cross-sectional estimates,
+#'      \item \code{subperiods} - survey sub-periods of \code{years} for cross-sectional estimates,
+#'      \item \code{year_1} - survey years of \code{years1},
+#'      \item \code{subperiods_1} - survey sub-periods of \code{years1},
+#'      \item \code{year_2} - survey years of \code{years2},
+#'      \item \code{subperiods_2} - survey sub-periods of \code{years2},
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{nams} - gradient names, numerator (num) and denominator (den), for each year,
+#'      \item \code{rho} - the estimated correlation matrix.
+#'    }
+#'    \item \code{vardchanges_var_tau} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year_1} - survey years of \code{years1},
+#'      \item \code{subperiods_1} - survey sub-periods of \code{years1},
+#'      \item \code{year_2} - survey years of \code{years2},
+#'      \item \code{subperiods_2} - survey sub-periods of \code{years2},
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{nams} - gradient names, numerator (num) and denominator (den), for each year,
+#'      \item \code{var_tau} - the estimated covariance matrix.
+#'    }
+#'    \item \code{vardchanges_results} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year} - survey years of \code{years} for measures of annual,
+#'      \item \code{subperiods} - survey sub-periods of \code{years} for measures of annual,
+#'      \item \code{year_1} - survey years of \code{years1} for measures of annual net change,
+#'      \item \code{subperiods_1} - survey sub-periods of \code{years1} for measures of annual net change,
+#'      \item \code{year_2} - survey years of \code{years2} for measures of annual net change,
+#'      \item \code{subperiods_2} - survey sub-periods of \code{years2} for measures of annual net change,
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{estim_1} - the estimated value for period1,
+#'      \item \code{estim_2} - the estimated value for period2,
+#'      \item \code{estim} - the estimated value,
+#'      \item \code{var} - the estimated variance,
+#'      \item \code{se} - the estimated standard error,
+#'      \item \code{CI_lower} - the estimated confidence interval lower bound,
+#'      \item \code{CI_upper} - the estimated confidence interval upper bound,
+#'      \item \code{confidence_level} - the positive value for confidence interval, 
+#'      \item \code{significant} - is the the difference significant
+#'    }
+#'    \item \code{X_annual} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year} - survey years of \code{years} for measures of annual,
+#'      \item \code{year_1} - survey years of \code{years1} for measures of annual net change,
+#'      \item \code{year_2} - survey years of \code{years2} for measures of annual net change,
+#'      \item \code{period} - period1 and period2 together,
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{cros_se} - the estimated cross-sectional standard error.
+#'    }
+#'    \item \code{A_matrix} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year} - survey years of \code{years1} for measures of annual,
+#'      \item \code{year_1} - survey years of \code{years1} for measures of annual net change,
+#'      \item \code{year_2} - survey years of \code{years2} for measures of annual net change,
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{cols} - the estimated matrix_A columns,
+#'      \item \code{matrix_A} - the estimated matrix A.
+#'    }
+#'    \item \code{annual_sum} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year} - survey years,
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{totalY} - the estimated value of variables of interest for period1,
+#'      \item \code{totalZ} - optional the estimated value of denominator for period2,
+#'      \item \code{estim} - the estimated value for year.
+#'    }
+#'    \item \code{annual_results} - a \code{data.table} containing:
+#'    \itemize{
+#'      \item \code{year} - survey years of \code{years} for measures of annual,
+#'      \item \code{year_1} - survey years of \code{years1} for measures of annual net change,
+#'      \item \code{year_2} - survey years of \code{years2} for measures of annual net change,
+#'      \item \code{country} - survey countries,
+#'      \item \code{Dom} - optional variable of the population domains,
+#'      \item \code{namesY} - variable with names of variables of interest,
+#'      \item \code{namesZ} - optional variable with names of denominator for ratio estimation,
+#'      \item \code{estim_1} - the estimated value for period1 for measures of annual net change,
+#'      \item \code{estim_2} - the estimated value for period2 for measures of annual net change,
+#'      \item \code{estim} - the estimated value,
+#'      \item \code{var} - the estimated variance,
+#'      \item \code{se} - the estimated standard error,
+#'      \item \code{rse} - the estimated relative standard error (coefficient of variation),
+#'      \item \code{cv} - the estimated relative standard error (coefficient of variation) in percentage,
+#'      \item \code{absolute_margin_of_error} - the estimated absolute margin of error for period1 for measures of annual,
+#'      \item \code{relative_margin_of_error} - the estimated relative margin of error in percentage for measures of annual,
+#'      \item \code{CI_lower} - the estimated confidence interval lower bound,
+#'      \item \code{CI_upper} - the estimated confidence interval upper bound,
+#'      \item \code{confidence_level} - the positive value for confidence interval, 
+#'      \item \code{significant} - is the the difference significant
+#'    }
 #' }
 #'
 #'
 #' @references
-#' Guillaume Osier, Virginie Raymond, (2015), Development of methodology for the estimate of variance of annual net changes for LFS-based indicators. Deliverable 1 - Short document with derivation of the methodology. \cr
-#' Guillaume Osier, Yves Berger,  Tim Goedeme, (2013), Standard error estimation for the EU-SILC indicators of poverty and social exclusion,  Eurostat Methodologies and Working papers, URL \url{http://ec.europa.eu/eurostat/documents/3888793/5855973/KS-RA-13-024-EN.PDF}. \cr
-#' Eurostat Methodologies and Working papers, Handbook on precision requirements and variance estimation for ESS household surveys, 2013, URL \url{http://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-029-EN.PDF}. \cr
-#' Yves G. Berger, Tim Goedeme, Guillame Osier (2013). Handbook on standard error estimation and other related sampling issues in EU-SILC, URL \url{https://ec.europa.eu/eurostat/cros/content/handbook-standard-error-estimation-and-other-related-sampling-issues-ver-29072013_en} \cr
+#' \itemize{
+#'   \item Guillaume Osier, Virginie Raymond, (2015), Development of methodology for the estimate of variance of annual net changes for LFS-based indicators. Deliverable 1 - Short document with derivation of the methodology.
+#'   \item Guillaume Osier, Yves Berger,  Tim Goedeme, (2013), Standard error estimation for the EU-SILC indicators of poverty and social exclusion,  Eurostat Methodologies and Working papers, URL \url{https://ec.europa.eu/eurostat/documents/3888793/5855973/KS-RA-13-024-EN.PDF}.
+#'   \item Eurostat Methodologies and Working papers, Handbook on precision requirements and variance estimation for ESS household surveys, 2013, URL \url{https://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-029-EN.PDF}.
+#'   \item Yves G. Berger, Tim Goedeme, Guillame Osier (2013). Handbook on standard error estimation and other related sampling issues in EU-SILC, URL \url{https://wayback.archive-it.org/12090/20231228140953/https://cros-legacy.ec.europa.eu/content/handbook-standard-error-estimation-and-other-related-sampling-issues-ver-29072013_en}.
+#' }
 #'
 #' @seealso \code{\link{domain}},
 #'          \code{\link{vardcros}},
@@ -191,31 +213,27 @@
 #' @keywords vardannual
 #' 
 #' @examples
-#'  
+#' 
 #' ### Example
 #' library("data.table")
+#' data("eusilc", package = "laeken")
 #' 
 #' set.seed(1)
-#' 
-#' data("eusilc", package = "laeken")
 #' eusilc1 <- eusilc[1:20, ]
-#' rm(eusilc)
 #' 
 #' dataset1 <- data.table(rbind(eusilc1, eusilc1),
 #'                        year = c(rep(2010, nrow(eusilc1)),
 #'                                 rep(2011, nrow(eusilc1))))
-#' rm(eusilc1)
 #' 
 #' dataset1[, country := "AT"]
 #' dataset1[, half := .I - 2 * trunc((.I - 1) / 2)]
 #' dataset1[, quarter := .I - 4 * trunc((.I - 1) / 4)]
 #' dataset1[age < 0, age := 0]
 #' 
-#' PSU <- dataset1[, .N, keyby = "db030"][, N := NULL][]
+#' PSU <- dataset1[, .N, keyby = "db030"][, N := NULL]
 #' PSU[, PSU := trunc(runif(.N, 0, 5))]
 #' 
 #' dataset1 <- merge(dataset1, PSU, all = TRUE, by = "db030")
-#' rm(PSU)
 #' 
 #' dataset1[, strata := "XXXX"]
 #' dataset1[, employed := trunc(runif(.N, 0, 2))]
@@ -231,7 +249,6 @@
 #'            percentratio = 100, confidence = 0.95,
 #'            method = "cros")
 #'   
-#' \dontrun{
 #' vardannual(Y = "employed", H = "strata",
 #'            PSU = "PSU", w_final = "rb050",
 #'            ID_level1 = "db030", ID_level2 = "id_lv2",
@@ -250,7 +267,6 @@
 #'            year1 = 2010, year2 = 2011,
 #'            percentratio = 100, confidence = 0.95,
 #'            method = "netchanges")
-#' }
 #' 
 #' @import data.table
 #' @import MASS
@@ -359,7 +375,7 @@ vardannual <- function(Y, H, PSU, w_final, ID_level1,
                           varntype = "numeric01")
   frate <- check_var(vars = frate, varn = "frate", varntype = "numeric0100")
   
-  if(!is.null(X)) {
+  if (!is.null(X)) {
     if (is.null(datasetX)) datasetX <- copy(dataset)
     equal_dataset <- identical(dataset, datasetX) & !is.null(dataset)
     if (equal_dataset) {
@@ -678,9 +694,8 @@ vardannual <- function(Y, H, PSU, w_final, ID_level1,
     X <- cros_rho[["cros_se"]]
     
     annual_var <- data.table(rho2[1, sar, with = FALSE],
-                             (1 - frate / 100) / (subn) ^ 2 *
-                               (t(X) %*% A_matrix) %*% X)
-    setnames(annual_var, c("V1"), c("var"))
+                             var = c((1 - frate / 100) / (subn) ^ 2 *
+                                      (t(X) %*% A_matrix) %*% X))
     A_matrix <- data.table(rho2[1, sar, with = FALSE],
                            cols = paste0("V", 1:nrow(A_matrix)), A_matrix)
     list(cros_rho, A_matrix, annual_var)

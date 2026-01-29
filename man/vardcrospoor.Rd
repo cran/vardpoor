@@ -89,6 +89,8 @@ vardcrospoor(
 
 \item{X_ID_level1}{Variable for level1 ID codes. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
 
+\item{ind_gr}{Optional variable by which divided independently X matrix of the auxiliary variables for the calibration. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
+
 \item{g}{Optional variable of the g weights. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
 
 \item{q}{Variable of the positive values accounting for heteroscedasticity. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
@@ -105,6 +107,8 @@ For example, to compute poverty threshold equal to some percentage of median inc
 
 \item{alpha}{a numeric value in range \eqn{[0,100]} for the order of the income quantile share ratio (in percentage).}
 
+\item{use.estVar}{Logical value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the estimation of covariance matrix of the residuals.}
+
 \item{withperiod}{Logical value. If \code{TRUE} is value, the results is with period, if \code{FALSE}, without period.}
 
 \item{netchanges}{Logical value. If value is TRUE, then produce two objects: the first object is aggregation of weighted data by period (if available), country, strata and PSU, the second object is an estimation for Y, the variance, gradient for numerator and denominator by country and period (if available). If value is FALSE, then both objects containing \code{NULL}.}
@@ -118,10 +122,6 @@ For example, to compute poverty threshold equal to some percentage of median inc
 \item{type}{a character vector (of length one unless several.ok is TRUE), example "linarpr","linarpt", "lingpg", "linpoormed", "linrmpg", "lingini", "lingini2", "linqsr", "linarr", "linrmir".}
 
 \item{checking}{Optional variable if this variable is TRUE, then function checks data preparation errors, otherwise not checked. This variable by default is TRUE.}
-
-\item{ind_gr}{Optional}{variable by which divided independently X matrix of the auxiliary variables for the calibration. One dimensional object convertible to one-column \code{data.table} or variable name as character, column number.}
-
-\item{use.estVar}{Logical}{value. If value is \code{TRUE}, then \code{R} function \code{estVar} is used for the  estimation of covariance matrix of the residuals. If value is \code{FALSE}, then \code{R} function \code{estVar} is not used for the estimation of covariance matrix of the residuals.}
 }
 \value{
 A list with objects are returned by the function:
@@ -148,66 +148,50 @@ Computes the variance estimation for cross-sectional and longitudinal measures f
 \examples{
 
 library("data.table")
-library("laeken")
-data(eusilc)
+data("eusilc", package = "laeken")
+setDT(eusilc)
+
 set.seed(1)
-dataset1 <- data.table(rbind(eusilc, eusilc),
+eusilc <- eusilc[sample(x = .N, size = 3000)]
+
+dataset1 <- data.table(rbindlist(list(eusilc, eusilc)),
                        year = c(rep(2010, nrow(eusilc)),
                                 rep(2011, nrow(eusilc))))
 dataset1[age < 0, age := 0]
+
 PSU <- dataset1[, .N, keyby = "db030"][, N := NULL]
 PSU[, PSU := trunc(runif(nrow(PSU), 0, 100))]
-PSU$inc <- runif(nrow(PSU), 20, 100000)
+PSU[, inc := runif(.N, 20, 100000)]
+
 dataset1 <- merge(dataset1, PSU, all = TRUE, by = "db030")
-PSU <- eusilc <- NULL
 dataset1[, strata := "XXXX"]
-dataset1[, strata := as.character(strata)]
-dataset1$pl085 <- 12 * trunc(runif(nrow(dataset1), 0, 2))
-dataset1$month_at_work <- 12 * trunc(runif(nrow(dataset1), 0, 2))
+dataset1[, pl085 := 12 * trunc(runif(.N, 0, 2))]
+dataset1[, month_at_work := 12 * trunc(runif(.N, 0, 2))]
 dataset1[, id_l2 := paste0("V", .I)]
 
-result <- vardcrospoor(Y = "inc", age = "age",
-                       pl085 = "pl085", 
-                       month_at_work = "month_at_work",
-                       Y_den = "inc", Y_thres = "inc",
-                       wght_thres = "rb050",
-                       H = "strata", PSU = "PSU", 
-                       w_final = "rb050", ID_level1 = "db030",
-                       ID_level2 = "id_l2",
-                       Dom = c("rb090", "db040"),
-                       country = NULL, period = "year",
-                       sort = NULL, gender = NULL,
-                       dataset = dataset1,
-                       percentage = 60,
-                       order_quant = 50L,
-                       alpha = 20,
-                       confidence = 0.95,
-                       type = "linrmpg")
- 
- \dontrun{
- result2 <- vardcrospoor(Y = "inc", age = "age",
-                         pl085 = "pl085", 
-                         month_at_work = "month_at_work",
-                         Y_den = "inc", Y_thres = "inc",
-                         wght_thres = "rb050",
-                         H = "strata", PSU = "PSU", 
-                         w_final = "rb050", ID_level1 = "db030",
-                         ID_level2 = "id_l2",
-                         Dom = c("rb090", "db040"),
-                         period = "year", sort = NULL,
-                         gender = NULL, dataset = dataset1,
-                         percentage = 60,
-                         order_quant = 50L,
-                         alpha = 20,
-                         confidence = 0.95,
-                         type = "linrmpg")
-result2}
+vardcrospoor(Y = "inc", age = "age",
+             pl085 = "pl085", 
+             month_at_work = "month_at_work",
+             Y_den = "inc", Y_thres = "inc",
+             wght_thres = "rb050",
+             H = "strata", PSU = "PSU", 
+             w_final = "rb050", ID_level1 = "db030",
+             ID_level2 = "id_l2",
+             Dom = c("rb090", "db040"),
+             country = NULL, period = "year",
+             sort = NULL, gender = NULL,
+             dataset = dataset1,
+             percentage = 60,
+             order_quant = 50L,
+             alpha = 20,
+             confidence = 0.95,
+             type = "linrmpg")
   
 }
 \references{
-Guillaume Osier,  Yves Berger,  Tim Goedeme, (2013), Standard error estimation for the EU-SILC indicators of poverty and social exclusion,  Eurostat Methodologies and Working papers, URL \url{http://ec.europa.eu/eurostat/documents/3888793/5855973/KS-RA-13-024-EN.PDF}.
-Yves G. Berger, Tim Goedeme, Guillame Osier (2013). Handbook on standard error estimation and other related sampling issues in EU-SILC, URL \url{https://ec.europa.eu/eurostat/cros/content/handbook-standard-error-estimation-and-other-related-sampling-issues-ver-29072013_en}
-Eurostat Methodologies and Working papers, Handbook on precision requirements and variance estimation for ESS household surveys, 2013, URL \url{http://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-029-EN.PDF}
+Guillaume Osier,  Yves Berger,  Tim Goedeme, (2013), Standard error estimation for the EU-SILC indicators of poverty and social exclusion,  Eurostat Methodologies and Working papers, URL \url{https://ec.europa.eu/eurostat/documents/3888793/5855973/KS-RA-13-024-EN.PDF}.
+Yves G. Berger, Tim Goedeme, Guillame Osier (2013). Handbook on standard error estimation and other related sampling issues in EU-SILC, URL \url{https://wayback.archive-it.org/12090/20231228140953/https://cros-legacy.ec.europa.eu/content/handbook-standard-error-estimation-and-other-related-sampling-issues-ver-29072013_en}
+Eurostat Methodologies and Working papers, Handbook on precision requirements and variance estimation for ESS household surveys, 2013, URL \url{https://ec.europa.eu/eurostat/documents/3859598/5927001/KS-RA-13-029-EN.PDF}
 }
 \seealso{
 \code{\link{linrmir}},

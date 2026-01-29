@@ -2,7 +2,7 @@
 % Please edit documentation in R/var_srs.R
 \name{var_srs}
 \alias{var_srs}
-\title{The estimation of the simple random sampling.}
+\title{The estimation of the simple random sampling}
 \usage{
 var_srs(Y, w = rep(1, length(Y)))
 }
@@ -28,7 +28,7 @@ var_srs(Ys, ws)
 
 }
 \references{
-Yves G. Berger, Tim Goedeme, Guillame Osier (2013). Handbook on standard error estimation and other related sampling issues in EU-SILC, URL \url{https://ec.europa.eu/eurostat/cros/content/handbook-standard-error-estimation-and-other-related-sampling-issues-ver-29072013_en}
+Yves G. Berger, Tim Goedeme, Guillame Osier (2013). Handbook on standard error estimation and other related sampling issues in EU-SILC, URL \url{https://wayback.archive-it.org/12090/20231228140953/https://cros-legacy.ec.europa.eu/content/handbook-standard-error-estimation-and-other-related-sampling-issues-ver-29072013_en}
 }
 \seealso{
 \code{\link{vardom}},
